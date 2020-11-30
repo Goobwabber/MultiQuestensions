@@ -1,0 +1,29 @@
+{
+  "id": "multiquestensions",
+  "name": "MultiQuestensions",
+  "version": "0.1.0",
+  "author": "Goobie",
+  "description": [
+    "Lightweight port of MultiplayerExtensions, the PC mod that adds features to official Multiplayer."
+  ],
+  "category": "Gameplay",
+  "gameVersion": "1.13.0",
+  "platform": "Quest",
+  "components": [
+    {
+      "type": "HookMod",
+      "installAction": {
+        "installLibraryFile": "libmultiquestensions.so"
+      },
+      "uninstallAction": {
+        "removeLibraryFile": "libmultiquestensions.so"
+      }
+    },
+    {
+      "type": "HookModLibrary",
+      "installAction": {
+        "installLibraryFile": "libbeatsaber-hook_0_8_4.so"
+      }
+    }
+  ]
+}

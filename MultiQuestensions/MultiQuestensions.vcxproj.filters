@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="Android.mk" />
+    <None Include="Application.mk" />
+    <None Include="bmbfmod.json" />
+    <None Include="default-config.json" />
+    <None Include="qpm.json" />
+    <None Include="MultiQuestensions.vcxproj.user" />
+    <None Include=".gitignore" />
+    <None Include="Directory.build.props.user" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{26aa2093-dfac-466e-b80f-f369a2dd2bea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{8fdd278c-c854-40e0-a614-f3d62ad57a72}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\main.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
