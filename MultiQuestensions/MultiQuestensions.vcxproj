@@ -15,9 +15,7 @@
     <None Include="Android.mk" />
     <None Include="Application.mk" />
     <None Include="bmbfmod.json" />
-    <None Include="default-config.json" />
-    <None Include="Directory.build.props.user" />
-    <None Include="MultiQuestensions.vcxproj.user" Condition="Exists('MultiQuestensions.vcxproj.user')" />
+    <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
     <None Include="qpm.json" />
   </ItemGroup>
   <ItemGroup>
@@ -47,10 +45,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
-  <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros">
-    <NdkPath></NdkPath>
-  </PropertyGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Import Project="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Import Project="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp</NMakeIncludeSearchPath>
     <NMakePreprocessorDefinitions>ID='"Mod ID"';VERSION='"Mod Version"'</NMakePreprocessorDefinitions>

@@ -4,11 +4,9 @@
     <None Include="Android.mk" />
     <None Include="Application.mk" />
     <None Include="bmbfmod.json" />
-    <None Include="default-config.json" />
     <None Include="qpm.json" />
-    <None Include="MultiQuestensions.vcxproj.user" />
     <None Include=".gitignore" />
-    <None Include="Directory.build.props.user" />
+    <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
