@@ -17,8 +17,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
-    
-    - run: cd ${GITHUB_WORKSPACE}/MultiQuestensions
+      name: Checkout
     
     - name: Download QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
@@ -32,7 +31,8 @@ jobs:
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
-        ./QPM/QPM restore
+        cd ./MultiQuestensions
+        ../QPM/QPM restore
     
     - name: Setup NDK
       uses: nttld/setup-ndk@v1.0.3
