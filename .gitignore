@@ -342,3 +342,6 @@ healthchecksdb
 # VS Makefile Logs
 ARM/
 ARM64/
+
+# User props
+ndkbuild.props

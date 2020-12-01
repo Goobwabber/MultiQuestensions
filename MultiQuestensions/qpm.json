@@ -17,6 +17,11 @@
           "src/inline-hook"
         ]
       }
+    },
+    {
+      "id": "codegen",
+      "versionRange": "*",
+      "additionalData": {}
     }
   ],
   "additionalData": {}
