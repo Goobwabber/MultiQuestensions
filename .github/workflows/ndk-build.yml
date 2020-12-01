@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'MultiQuestensions/**'
+      - '.github/workflows/ndk-build.yml'
   pull_request:
     branches: [ main ]
     paths:
