@@ -1,5 +1,6 @@
 #include "main.hpp"
-#include "packets.cpp"
+#include "beatmaps.hpp"
+#include "packets.hpp"
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -16,21 +17,92 @@ const Logger& getLogger() {
     return logger;
 }
 
-static PacketManager packetManager;
 
-static Il2CppString* moddedState = createcsstr("modded", StringType::Manual);
-static Il2CppString* customSongsState = createcsstr("customsongs", StringType::Manual);
-static Il2CppString* enforceModsState = createcsstr("enforcemods", StringType::Manual);
+
+// Plugin setup stuff
+static GlobalNamespace::MultiplayerSessionManager* sessionManager;
+static GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
+static PacketManager* packetManager;
+
+static Il2CppString* moddedState = createcsstr("modded", il2cpp_utils::StringType::Manual);
+static Il2CppString* questState = createcsstr("platformquest", il2cpp_utils::StringType::Manual);
+static Il2CppString* customSongsState = createcsstr("customsongs", il2cpp_utils::StringType::Manual);
+static Il2CppString* enforceModsState = createcsstr("enforcemods", il2cpp_utils::StringType::Manual);
+
+static Il2CppString* beatmapDownloadedState = createcsstr("beatmap_downloaded", il2cpp_utils::StringType::Manual);
+
+
+static void HandlePreviewBeatmapPacket(PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
+    GlobalNamespace::IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
+    PreviewBeatmapStub* preview;
+
+    if (localPreview != nullptr) {
+        preview = new PreviewBeatmapStub(localPreview);
+    }
+    else {
+        preview = new PreviewBeatmapStub(packet);
+    }
+
+    if (player->get_isConnectionOwner()) {
+        sessionManager->SetLocalPlayerState(beatmapDownloadedState, preview->isDownloaded);
+    }
+
+    GlobalNamespace::BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), preview, packet->difficulty, characteristic);
+}
+
 
 MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSessionManager* self) {
     SessionManagerStart(self);
 
-    packetManager = PacketManager(self);
+    sessionManager = self;
+    packetManager = new PacketManager(self);
 
     self->SetLocalPlayerState(moddedState, true);
+    self->SetLocalPlayerState(questState, true);
     self->SetLocalPlayerState(customSongsState, getConfig().config["customsongs"].GetBool());
     self->SetLocalPlayerState(enforceModsState, getConfig().config["enforcemods"].GetBool());
+
+    packetManager->RegisterCallback(HandlePreviewBeatmapPacket);
 }
+
+
+
+// LobbyPlayersDataModel Activate
+MAKE_HOOK_OFFSETLESS(LobbyPlayersActivate, void, GlobalNamespace::LobbyPlayersDataModel* self) {
+    LobbyPlayersActivate(self);
+    lobbyPlayersDataModel = self;
+}
+
+// LobbyPlayersDataModel SetLocalPlayerBeatmapLevel
+MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPlayersDataModel* self, Il2CppString* levelId, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic) {
+    GlobalNamespace::IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
+    if (localPreview != nullptr) {
+        getLogger().info("Local user selected song '", levelId, "'.");
+        PreviewBeatmapStub preview = PreviewBeatmapStub(localPreview);
+
+        if (preview.levelHash != nullptr) {
+            if (self->get_localUserId() == self->get_hostUserId()) {
+                sessionManager->SetLocalPlayerState(beatmapDownloadedState, true);
+            }
+
+            packetManager->Send(preview.GetPacket(characteristic->get_serializedName(), beatmapDifficulty));
+            self->menuRpcManager->SelectBeatmap(GlobalNamespace::BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
+            self->SetPlayerBeatmapLevel(self->get_localUserId(), &preview, beatmapDifficulty, characteristic);
+            return;
+        }
+    }
+    LobbyPlayersSetLocalBeatmap(self, levelId, beatmapDifficulty, characteristic);
+}
+
+// LobbyPlayersDataModel HandleMenuRpcManagerSelectedBeatmap (DONT REMOVE THIS, without it a player's selected map will be cleared)
+MAKE_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, void, GlobalNamespace::LobbyPlayersDataModel* self, Il2CppString* userId, GlobalNamespace::BeatmapIdentifierNetSerializable* beatmapId) {
+    GlobalNamespace::IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(beatmapId->levelID);
+    if (localPreview != nullptr) {
+        LobbyPlayersSelectedBeatmap(self, userId, beatmapId);
+    }
+}
+
 
 
 void saveDefaultConfig() {
