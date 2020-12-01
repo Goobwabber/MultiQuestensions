@@ -1,4 +1,4 @@
-name: NDK build
+name: NDK Build
 
 on:
   push:
@@ -17,6 +17,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+    
+    - run: cd ${GITHUB_WORKSPACE}/MultiQuestensions
     
     - name: Download QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
