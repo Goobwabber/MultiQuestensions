@@ -48,5 +48,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: libmultiquestensions.so
-        path: ./obj/local/arm64-v8a/libmultiquestension.so
+        path: .MultiQuestensions/obj/local/arm64-v8a/libmultiquestension.so
         if-no-files-found: error
