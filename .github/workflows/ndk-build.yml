@@ -1,0 +1,52 @@
+name: NDK Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'MultiQuestensions/**'
+      - '.github/workflows/ndk-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'MultiQuestensions/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout
+    
+    - name: Download QPM
+      if: steps.cache-qpm.outputs.cache-hit != 'true'
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: main.yml
+        name: QPM-ubuntu-x64
+        path: QPM
+        repo: sc2ad/QuestPackageManager
+        
+    - name: QPM Restore
+      run: |
+        chmod +x ./QPM/QPM
+        cd ./MultiQuestensions
+        ../QPM/QPM restore
+    
+    - name: Setup NDK
+      uses: nttld/setup-ndk@v1.0.3
+      with:
+        ndk-version: r21
+
+    - name: Build
+      run: |
+        cd ./MultiQuestensions
+        ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
+        
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libmultiquestensions.so
+        path: ./MultiQuestensions/obj/local/arm64-v8a/libmultiquestensions.so
+        if-no-files-found: error
