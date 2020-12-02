@@ -1,4 +1,4 @@
-# MultiQuestensions [![NDK Build](https://github.com/Goobwabber/MultiQuestensions/workflows/NDK%20Build/badge.svg)](https://github.com/Goobwabber/MultiQuestensions/actions?query=workflow%3A%22NDK+Build%22)
+# MultiQuestensions [![Build](https://github.com/Goobwabber/MultiQuestensions/workflows/NDK%20Build/badge.svg)](https://github.com/Goobwabber/MultiQuestensions/actions?query=workflow%3A%22NDK+Build%22)
 There's nothing here. Go away.
 
 ## Features
