@@ -20,16 +20,15 @@ const Logger& getLogger() {
 
 
 // Plugin setup stuff
-static GlobalNamespace::MultiplayerSessionManager* sessionManager;
-static GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
-static PacketManager* packetManager;
+GlobalNamespace::MultiplayerSessionManager* sessionManager;
+GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
+PacketManager* packetManager;
 
-static Il2CppString* moddedState = createcsstr("modded", il2cpp_utils::StringType::Manual);
-static Il2CppString* questState = createcsstr("platformquest", il2cpp_utils::StringType::Manual);
-static Il2CppString* customSongsState = createcsstr("customsongs", il2cpp_utils::StringType::Manual);
-static Il2CppString* enforceModsState = createcsstr("enforcemods", il2cpp_utils::StringType::Manual);
-
-static Il2CppString* beatmapDownloadedState = createcsstr("beatmap_downloaded", il2cpp_utils::StringType::Manual);
+std::string moddedState = "modded";
+std::string questState = "platformquest";
+std::string customSongsState = "customsongs";
+std::string enforceModsState = "enforcemods";
+std::string beatmapDownloadedState = "beatmap_downloaded";
 
 
 static void HandlePreviewBeatmapPacket(PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
@@ -44,7 +43,7 @@ static void HandlePreviewBeatmapPacket(PreviewBeatmapPacket* packet, GlobalNames
     }
 
     if (player->get_isConnectionOwner()) {
-        sessionManager->SetLocalPlayerState(beatmapDownloadedState, preview->isDownloaded);
+        sessionManager->SetLocalPlayerState(il2cpp_utils::createcsstr(beatmapDownloadedState), preview->isDownloaded);
     }
 
     GlobalNamespace::BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
@@ -58,10 +57,10 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
     sessionManager = self;
     packetManager = new PacketManager(self);
 
-    self->SetLocalPlayerState(moddedState, true);
-    self->SetLocalPlayerState(questState, true);
-    self->SetLocalPlayerState(customSongsState, getConfig().config["customsongs"].GetBool());
-    self->SetLocalPlayerState(enforceModsState, getConfig().config["enforcemods"].GetBool());
+    self->SetLocalPlayerState(il2cpp_utils::createcsstr(moddedState), true);
+    self->SetLocalPlayerState(il2cpp_utils::createcsstr(questState), true);
+    self->SetLocalPlayerState(il2cpp_utils::createcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
+    self->SetLocalPlayerState(il2cpp_utils::createcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
 
     packetManager->RegisterCallback(HandlePreviewBeatmapPacket);
 }
@@ -83,7 +82,7 @@ MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPl
 
         if (preview.levelHash != nullptr) {
             if (self->get_localUserId() == self->get_hostUserId()) {
-                sessionManager->SetLocalPlayerState(beatmapDownloadedState, true);
+                sessionManager->SetLocalPlayerState(il2cpp_utils::createcsstr(beatmapDownloadedState), true);
             }
 
             packetManager->Send(preview.GetPacket(characteristic->get_serializedName(), beatmapDifficulty));
@@ -141,6 +140,10 @@ extern "C" void load() {
     il2cpp_functions::Init();
 
     getLogger().info("Installing hooks...");
-    // Install our hooks (none defined yet)
+    INSTALL_HOOK_OFFSETLESS(SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
+    INSTALL_HOOK_OFFSETLESS(LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));
+    INSTALL_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
+    INSTALL_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
+
     getLogger().info("Installed all hooks!");
 }
