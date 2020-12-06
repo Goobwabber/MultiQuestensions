@@ -1,6 +1,7 @@
 #include "main.hpp"
-#include "beatmaps.hpp"
-#include "packets.hpp"
+#include "Beatmaps/PreviewBeatmapPacket.hpp"
+#include "Beatmaps/PreviewBeatmapStub.hpp"
+#include "Packets/PacketManager.hpp"
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -22,7 +23,7 @@ const Logger& getLogger() {
 // Plugin setup stuff
 GlobalNamespace::MultiplayerSessionManager* sessionManager;
 GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
-PacketManager* packetManager;
+MultiQuestensions::PacketManager* packetManager;
 
 std::string moddedState = "modded";
 std::string questState = "platformquest";
@@ -31,15 +32,15 @@ std::string enforceModsState = "enforcemods";
 std::string beatmapDownloadedState = "beatmap_downloaded";
 
 
-static void HandlePreviewBeatmapPacket(PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
+static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
     GlobalNamespace::IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
-    PreviewBeatmapStub* preview;
+    MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = new MultiQuestensions::Beatmaps::PreviewBeatmapStub();
 
     if (localPreview != nullptr) {
-        preview = new PreviewBeatmapStub(localPreview);
+        preview->fromPreview(localPreview);
     }
     else {
-        preview = new PreviewBeatmapStub(packet);
+        preview->fromPacket(packet);
     }
 
     if (player->get_isConnectionOwner()) {
@@ -55,7 +56,7 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
     SessionManagerStart(self);
 
     sessionManager = self;
-    packetManager = new PacketManager(self);
+    packetManager = new MultiQuestensions::PacketManager(self);
 
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(moddedState), true);
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(questState), true);
@@ -78,7 +79,8 @@ MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPl
     GlobalNamespace::IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
     if (localPreview != nullptr) {
         getLogger().info("Local user selected song '", levelId, "'.");
-        PreviewBeatmapStub preview = PreviewBeatmapStub(localPreview);
+        MultiQuestensions::Beatmaps::PreviewBeatmapStub preview = MultiQuestensions::Beatmaps::PreviewBeatmapStub();
+        preview.fromPreview(localPreview);
 
         if (preview.levelHash != nullptr) {
             if (self->get_localUserId() == self->get_hostUserId()) {

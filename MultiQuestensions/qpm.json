@@ -22,6 +22,11 @@
       "id": "codegen",
       "versionRange": "*",
       "additionalData": {}
+    },
+    {
+      "id": "custom-types",
+      "versionRange": "*",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

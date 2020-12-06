@@ -34,10 +34,13 @@
 #include "LiteNetLib/Utils/NetDataReader.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
 
+#include "System/Collections/Generic/Dictionary_2.hpp"
+#include "System/Collections/Generic/List_1.hpp"
 #include "System/Threading/Tasks/Task_1.hpp"
 #include "System/Threading/CancellationToken.hpp"
 #include "System/Type.hpp"
 #include "System/Func_2.hpp"
+#include "System/Action_3.hpp"
 
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/Rect.hpp"
