@@ -41,6 +41,7 @@
 #include "System/Type.hpp"
 #include "System/Func_2.hpp"
 #include "System/Action_3.hpp"
+#include "System/Array.hpp"
 
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/Rect.hpp"

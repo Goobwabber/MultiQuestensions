@@ -7,8 +7,8 @@ namespace MultiQuestensions {
 		_sessionManager->RegisterSerializer(GlobalNamespace::MultiplayerSessionManager_MessageType(100), packetSerializer);
 	}
 
-	void PacketManager::Send(LiteNetLib::Utils::INetSerializable* message) { _sessionManager->Send(message); }
-	void PacketManager::SendUnreliable(LiteNetLib::Utils::INetSerializable* message) { _sessionManager->Send(message); }
+	void PacketManager::Send(Il2CppObject* message) { _sessionManager->Send(message); }
+	void PacketManager::SendUnreliable(Il2CppObject* message) { _sessionManager->Send(message); }
 
 	template <class TPacket>
 	void PacketManager::RegisterCallback(void (*callback)(TPacket, GlobalNamespace::IConnectedPlayer*)) {

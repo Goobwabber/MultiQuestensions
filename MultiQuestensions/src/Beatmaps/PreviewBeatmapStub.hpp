@@ -66,7 +66,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Beatmaps, PreviewBeatmapStub, GlobalNam
 		REGISTER_METHOD(fromPacket);
 
 		REGISTER_METHOD(GetPacket);
-		REGISTER_METHOD(GetRawCoverImageAsync);
+		REGISTER_METHOD(GetRawCoverAsync);
 		REGISTER_METHOD(GetCoverImageAsync);
 		REGISTER_METHOD(GetPreviewAudioClipAsync);
 	)

@@ -3,9 +3,9 @@
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 
-DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	il2cpp_utils::GetClassFromName("LiteNetLib::Utils", "INetSerializable");
-	il2cpp_utils::GetClassFromName("", "IPoolablePacket"),
+DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps , PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
+	(il2cpp_utils::GetClassFromName("LiteNetLib::Utils", "INetSerializable"),
+	il2cpp_utils::GetClassFromName("", "IPoolablePacket")),
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelKey);
@@ -17,7 +17,7 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, 
 	DECLARE_INSTANCE_FIELD(float, songDuration);
 
 	DECLARE_INSTANCE_FIELD(bool, isDownloadable);
-	DECLARE_INSTANCE_FIELD(Array<uint8_t>*, coverImage);
+	DECLARE_INSTANCE_FIELD(Il2CppArray*, coverImage);
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
 	DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapDifficulty, difficulty);
