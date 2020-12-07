@@ -48,7 +48,7 @@ static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewB
     }
 
     GlobalNamespace::BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), preview, packet->difficulty, characteristic);
+    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), preview, GlobalNamespace::BeatmapDifficulty(packet->difficulty), characteristic);
 }
 
 

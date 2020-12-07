@@ -6,7 +6,6 @@ namespace MultiQuestensions {
 	void PacketSerializer::Serialize(LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet) {
 		System::Type* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
 		
-		getLogger().info(csstrtostr(packetType->ToString()));
 		writer->Put(packetType->ToString());
 		packet->LiteNetLib_Utils_INetSerializable_Serialize(writer);
 	}

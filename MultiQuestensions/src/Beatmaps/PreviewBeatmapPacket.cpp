@@ -16,7 +16,7 @@ namespace MultiplayerExtensions::Beatmaps {
 		writer->Put(isDownloadable);
 
 		writer->Put(characteristic);
-		writer->Put(difficulty.value);
+		writer->Put(difficulty);
 
 		if (coverImage != nullptr) {
 			writer->PutBytesWithLength(coverImage);
@@ -40,7 +40,7 @@ namespace MultiplayerExtensions::Beatmaps {
 		isDownloadable = reader->GetBool();
 
 		characteristic = reader->GetString();
-		difficulty = GlobalNamespace::BeatmapDifficulty(reader->GetUInt());
+		difficulty = reader->GetUInt();
 
 		coverImage = reader->GetBytesWithLength();
 	}
