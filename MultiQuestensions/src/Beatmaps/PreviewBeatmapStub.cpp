@@ -1,5 +1,20 @@
 #include "PreviewBeatmapStub.hpp"
 
+Il2CppString* LevelIdToHash(Il2CppString* levelId) {
+	if (Il2CppString::IsNullOrWhiteSpace(levelId)) {
+		return nullptr;
+	}
+	Array<Il2CppString*>* ary = levelId->Split('_', ' ');
+	Il2CppString* hash = nullptr;
+	if (ary->Length() > 2) {
+		hash = ary->values[2];
+	}
+	if (hash != nullptr && hash->get_Length() == 40) {
+		return hash;
+	}
+	return nullptr;
+}
+
 namespace MultiQuestensions::Beatmaps {
 	void PreviewBeatmapStub::fromPreview(GlobalNamespace::IPreviewBeatmapLevel* preview) {
 		levelID = preview->get_levelID();

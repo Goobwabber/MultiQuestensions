@@ -63,7 +63,7 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
 
-    packetManager->RegisterCallback(HandlePreviewBeatmapPacket);
+    packetManager->RegisterCallback<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>(HandlePreviewBeatmapPacket);
 }
 
 
