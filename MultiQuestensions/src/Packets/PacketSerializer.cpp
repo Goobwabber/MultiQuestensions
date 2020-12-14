@@ -1,4 +1,4 @@
-#include "PacketSerializer.hpp"
+#include "Packets/PacketSerializer.hpp"
 
 DEFINE_CLASS(MultiQuestensions::PacketSerializer);
 

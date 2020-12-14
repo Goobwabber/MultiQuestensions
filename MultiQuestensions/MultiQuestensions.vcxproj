@@ -26,11 +26,11 @@
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Beatmaps\PreviewBeatmapPacket.hpp" />
+    <ClInclude Include="include\Beatmaps\PreviewBeatmapStub.hpp" />
     <ClInclude Include="include\main.hpp" />
-    <ClInclude Include="src\Beatmaps\PreviewBeatmapPacket.hpp" />
-    <ClInclude Include="src\Beatmaps\PreviewBeatmapStub.hpp" />
-    <ClInclude Include="src\Packets\PacketManager.hpp" />
-    <ClInclude Include="src\Packets\PacketSerializer.hpp" />
+    <ClInclude Include="include\Packets\PacketManager.hpp" />
+    <ClInclude Include="include\Packets\PacketSerializer.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1c603531-cd52-4be0-a840-ba695bb7e0c7}</ProjectGuid>

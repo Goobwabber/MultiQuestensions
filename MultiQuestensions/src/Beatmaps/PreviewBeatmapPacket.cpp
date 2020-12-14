@@ -1,4 +1,4 @@
-#include "PreviewBeatmapPacket.hpp"
+#include "Beatmaps/PreviewBeatmapPacket.hpp"
 
 DEFINE_CLASS(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket);
 

@@ -1,4 +1,4 @@
-#include "PacketManager.hpp"
+#include "Packets/PacketManager.hpp"
 
 namespace MultiQuestensions {
 	PacketManager::PacketManager(GlobalNamespace::MultiplayerSessionManager* sessionManager) {

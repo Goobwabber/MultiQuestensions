@@ -21,6 +21,12 @@
     <Filter Include="src\Beatmaps">
       <UniqueIdentifier>{c10d61fe-9c5f-4606-a463-7488b96cbaa6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Beatmaps">
+      <UniqueIdentifier>{3b81cab7-42da-4cb1-9288-2c01308f3473}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Packets">
+      <UniqueIdentifier>{887c95fa-1cf7-4668-bea7-e022d31b7a98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -43,17 +49,17 @@
     <ClInclude Include="include\main.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\Packets\PacketManager.hpp">
-      <Filter>src\Packets</Filter>
+    <ClInclude Include="include\Beatmaps\PreviewBeatmapPacket.hpp">
+      <Filter>include\Beatmaps</Filter>
     </ClInclude>
-    <ClInclude Include="src\Packets\PacketSerializer.hpp">
-      <Filter>src\Packets</Filter>
+    <ClInclude Include="include\Beatmaps\PreviewBeatmapStub.hpp">
+      <Filter>include\Beatmaps</Filter>
     </ClInclude>
-    <ClInclude Include="src\Beatmaps\PreviewBeatmapPacket.hpp">
-      <Filter>src\Beatmaps</Filter>
+    <ClInclude Include="include\Packets\PacketManager.hpp">
+      <Filter>include\Packets</Filter>
     </ClInclude>
-    <ClInclude Include="src\Beatmaps\PreviewBeatmapStub.hpp">
-      <Filter>src\Beatmaps</Filter>
+    <ClInclude Include="include\Packets\PacketSerializer.hpp">
+      <Filter>include\Packets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

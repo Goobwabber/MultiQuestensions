@@ -9,13 +9,12 @@
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "LiteNetLib/Utils/INetSerializable.hpp"
 
 // Codegen includes
 #include "GlobalNamespace/MultiplayerSessionManager.hpp"
-#include "GlobalNamespace/MultiplayerSessionManager_MessageType.hpp"
 #include "GlobalNamespace/IMenuRpcManager.hpp"
 #include "GlobalNamespace/LobbyPlayersDataModel.hpp"
-#include "GlobalNamespace/LobbyPlayerDataModel.hpp"
 #include "GlobalNamespace/BeatmapLevelsModel.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 
@@ -24,32 +23,6 @@
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicCollectionSO.hpp"
-
-#include "GlobalNamespace/INetworkPacketSubSerializer_1.hpp"
-#include "GlobalNamespace/ThreadStaticPacketPool_1.hpp"
-#include "GlobalNamespace/PacketPool_1.hpp"
-#include "GlobalNamespace/IPoolablePacket.hpp"
-
-#include "LiteNetLib/Utils/INetSerializable.hpp"
-#include "LiteNetLib/Utils/NetDataReader.hpp"
-#include "LiteNetLib/Utils/NetDataWriter.hpp"
-
-#include "System/Collections/Generic/Dictionary_2.hpp"
-#include "System/Collections/Generic/List_1.hpp"
-#include "System/Threading/Tasks/Task_1.hpp"
-#include "System/Threading/CancellationToken.hpp"
-#include "System/Type.hpp"
-#include "System/Func_2.hpp"
-#include "System/Action_3.hpp"
-#include "System/Array.hpp"
-
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/Rect.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "UnityEngine/Vector4.hpp"
-#include "UnityEngine/Texture2D.hpp"
-#include "UnityEngine/AudioClip.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
 
 // Cpp includes
 #include "map"

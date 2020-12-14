@@ -3,7 +3,12 @@
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 
-DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps , PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
+#include "LiteNetLib/Utils/NetDataReader.hpp"
+#include "LiteNetLib/Utils/NetDataWriter.hpp"
+#include "GlobalNamespace/ThreadStaticPacketPool_1.hpp"
+#include "GlobalNamespace/PacketPool_1.hpp"
+
+DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
 	(il2cpp_utils::GetClassFromName("LiteNetLib::Utils", "INetSerializable"),
 	il2cpp_utils::GetClassFromName("", "IPoolablePacket")),
 

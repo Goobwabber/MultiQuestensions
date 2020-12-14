@@ -1,4 +1,4 @@
-#include "PreviewBeatmapStub.hpp"
+#include "Beatmaps/PreviewBeatmapStub.hpp"
 
 Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 	if (Il2CppString::IsNullOrWhiteSpace(levelId)) {

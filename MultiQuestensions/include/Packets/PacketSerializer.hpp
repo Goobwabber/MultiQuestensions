@@ -3,6 +3,14 @@
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 
+#include "System/Action_3.hpp"
+#include "LiteNetLib/Utils/NetDataReader.hpp"
+#include "LiteNetLib/Utils/NetDataWriter.hpp"
+#include "System/Collections/Generic/Dictionary_2.hpp"
+#include "System/Collections/Generic/List_1.hpp"
+#include "GlobalNamespace/INetworkPacketSubSerializer_1.hpp"
+#include "System/Type.hpp"
+
 using CallbackAction = System::Action_3<LiteNetLib::Utils::NetDataReader*, int, GlobalNamespace::IConnectedPlayer*>;
 using CallbackDictionary = System::Collections::Generic::Dictionary_2<Il2CppString*, CallbackAction*>;
 using StringList = System::Collections::Generic::List_1<Il2CppString*>;

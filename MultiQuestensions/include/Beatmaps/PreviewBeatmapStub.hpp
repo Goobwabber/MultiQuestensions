@@ -4,6 +4,16 @@
 #include "custom-types/shared/macros.hpp"
 
 #include "PreviewBeatmapPacket.hpp"
+#include "System/Threading/CancellationToken.hpp"
+#include "System/Threading/Tasks/Task_1.hpp"
+#include "System/Func_2.hpp"
+#include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/AudioClip.hpp"
+#include "UnityEngine/Texture2D.hpp"
+#include "UnityEngine/Rect.hpp"
+#include "UnityEngine/Vector2.hpp"
+#include "UnityEngine/Vector4.hpp"
+#include "UnityEngine/SpriteMeshType.hpp"
 
 Il2CppString* LevelIdToHash(Il2CppString*);
 

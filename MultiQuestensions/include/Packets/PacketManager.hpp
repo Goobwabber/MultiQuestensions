@@ -2,6 +2,10 @@
 #include "main.hpp"
 #include "PacketSerializer.hpp"
 
+#include "GlobalNamespace/MultiplayerSessionManager_MessageType.hpp"
+#include "GlobalNamespace/ThreadStaticPacketPool_1.hpp"
+#include "GlobalNamespace/PacketPool_1.hpp"
+
 template <class T>
 using PacketCallback = void (*)(T, GlobalNamespace::IConnectedPlayer*);
 
