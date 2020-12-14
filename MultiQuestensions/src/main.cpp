@@ -87,7 +87,7 @@ MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPl
                 sessionManager->SetLocalPlayerState(il2cpp_utils::createcsstr(beatmapDownloadedState), true);
             }
 
-            packetManager->Send((Il2CppObject*)(preview.GetPacket(characteristic->get_serializedName(), beatmapDifficulty)));
+            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(preview.GetPacket(characteristic->get_serializedName(), beatmapDifficulty)));
             self->menuRpcManager->SelectBeatmap(GlobalNamespace::BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
             self->SetPlayerBeatmapLevel(self->get_localUserId(), &preview, beatmapDifficulty, characteristic);
             return;

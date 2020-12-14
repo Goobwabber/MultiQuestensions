@@ -43,7 +43,6 @@ namespace MultiQuestensions::Beatmaps {
 	void PreviewBeatmapStub::fromPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet) {
 		levelID = packet->levelId;
 		levelHash = LevelIdToHash(levelID);
-		levelKey = packet->levelKey;
 		isDownloaded = false;
 
 		songName = packet->songName;
@@ -53,8 +52,6 @@ namespace MultiQuestensions::Beatmaps {
 
 		beatsPerMinute = packet->beatsPerMinute;
 		songDuration = packet->songDuration;
-
-		isDownloadable = packet->isDownloadable;
 
 		_rawCoverGetter = System::Threading::Tasks::Task_1<Array<uint8_t>*>::New_ctor(packet->coverImage);
 		_coverGetter = _rawCoverGetter->ContinueWith<UnityEngine::Sprite*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<Array<uint8_t>*>*, UnityEngine::Sprite*>*>(
@@ -77,7 +74,6 @@ namespace MultiQuestensions::Beatmaps {
 		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = new MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket();
 
 		packet->levelId = levelID;
-		packet->levelKey = levelKey;
 
 		packet->songName = songName;
 		packet->songSubName = songSubName;
@@ -85,7 +81,6 @@ namespace MultiQuestensions::Beatmaps {
 		packet->levelAuthorName = levelAuthorName;
 
 		packet->beatsPerMinute = beatsPerMinute;
-		packet->isDownloadable = isDownloadable;
 
 		_rawCoverGetter->Wait();
 		packet->coverImage = _rawCoverGetter->get_Result();

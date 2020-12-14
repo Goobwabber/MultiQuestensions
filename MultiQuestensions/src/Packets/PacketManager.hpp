@@ -13,15 +13,15 @@ namespace MultiQuestensions {
 
 	public:
 		PacketManager(GlobalNamespace::MultiplayerSessionManager* sessionManager);
-		void Send(Il2CppObject* message);
-		void SendUnreliable(Il2CppObject* message);
+		void Send(LiteNetLib::Utils::INetSerializable* message);
+		void SendUnreliable(LiteNetLib::Utils::INetSerializable* message);
 
 		template <class TPacket>
 		void RegisterCallback(PacketCallback<TPacket> callback) {
 			System::Type* packetType = typeof(TPacket);
 			Il2CppString* identifier = packetType->ToString();
 
-			auto deserealize = [](LiteNetLib::Utils::NetDataReader* reader, int size) -> TPacket {
+			auto* newCallback = il2cpp_utils::MakeDelegate<CallbackAction*>(classof(CallbackAction*), &callback, *[](PacketCallback<TPacket> context, LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
 				TPacket packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
 				if (packet == nullptr) {
 					reader->SkipBytes(size);
@@ -29,11 +29,8 @@ namespace MultiQuestensions {
 				else {
 					packet->Deserialize(reader);
 				}
-				return packet;
-			};
 
-			CallbackAction* newCallback = il2cpp_utils::MakeAction<CallbackAction*>(*[](LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
-				//(*callback)(deserealize(reader, size), player);
+				(*context)(packet, player);
 			});
 
 			packetSerializer->RegisterCallback(identifier, newCallback);

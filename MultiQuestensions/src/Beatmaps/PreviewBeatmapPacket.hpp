@@ -8,7 +8,6 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps , PreviewBeatmapPacket,
 	il2cpp_utils::GetClassFromName("", "IPoolablePacket")),
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, levelKey);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songSubName);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songAuthorName);
@@ -16,7 +15,6 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps , PreviewBeatmapPacket,
 	DECLARE_INSTANCE_FIELD(float, beatsPerMinute);
 	DECLARE_INSTANCE_FIELD(float, songDuration);
 
-	DECLARE_INSTANCE_FIELD(bool, isDownloadable);
 	DECLARE_INSTANCE_FIELD(Array<uint8_t>*, coverImage);
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
@@ -28,7 +26,6 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps , PreviewBeatmapPacket,
 
 	REGISTER_FUNCTION(PreviewBeatmapPacket,
 		REGISTER_FIELD(levelId);
-		REGISTER_FIELD(levelKey);
 		REGISTER_FIELD(songName);
 		REGISTER_FIELD(songSubName);
 		REGISTER_FIELD(songAuthorName);
@@ -36,7 +33,6 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps , PreviewBeatmapPacket,
 		REGISTER_FIELD(beatsPerMinute);
 		REGISTER_FIELD(songDuration);
 
-		REGISTER_FIELD(isDownloadable);
 		REGISTER_FIELD(coverImage);
 
 		REGISTER_FIELD(characteristic);

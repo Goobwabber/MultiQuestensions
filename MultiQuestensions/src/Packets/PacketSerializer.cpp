@@ -11,10 +11,21 @@ namespace MultiQuestensions {
 	}
 
 	void PacketSerializer::Deserialize(LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data) {
+		int prevPosition = reader->get_Position();
 		Il2CppString* packetType = reader->GetString();
+		length -= reader->get_Position() - prevPosition;
+		prevPosition = reader->get_Position();
 		if (packetHandlers->ContainsKey(packetType)) {
-			packetHandlers->get_Item(packetType)->Invoke(reader, length, data);
+			try {
+				packetHandlers->get_Item(packetType)->Invoke(reader, length, data);
+			} catch (const std::exception& e) {
+				getLogger().warning("An exception was thrown while processing custom packet");
+				getLogger().error(e.what());
+			}
 		}
+
+		int processedBytes = reader->get_Position() - prevPosition;
+		reader->SkipBytes(length - processedBytes);
 	}
 
 	bool PacketSerializer::HandlesType(System::Type* type) {

@@ -13,7 +13,6 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Beatmaps, PreviewBeatmapStub, GlobalNam
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, _audioGetter);
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelHash);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, levelKey);
 
 	DECLARE_INSTANCE_FIELD(bool, isDownloaded);
 	DECLARE_INSTANCE_FIELD(bool, isDownloadable);
@@ -36,7 +35,6 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Beatmaps, PreviewBeatmapStub, GlobalNam
 
 	REGISTER_FUNCTION(PreviewBeatmapStub,
 		REGISTER_FIELD(levelHash);
-		REGISTER_FIELD(levelKey);
 
 		REGISTER_FIELD(isDownloaded);
 		REGISTER_FIELD(isDownloadable);
