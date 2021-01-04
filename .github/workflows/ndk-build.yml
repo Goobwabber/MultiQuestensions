@@ -46,7 +46,7 @@ jobs:
       run: |
         cd ./MultiQuestensions
         ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
-        pwsh -Command buildBMBF.ps1
+        pwsh -Command ./buildBMBF.ps1
         
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -54,7 +54,8 @@ jobs:
         name: libmultiquestensions.so
         path: ./MultiQuestensions/obj/local/arm64-v8a/libmultiquestensions.so
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload BMBF build
+      uses: actions/upload-artifact@v2
       with:
         name: multiquestensions.zip
         path: ./MultiQuestensions/${(multiquestensions*.zip)[0]}
