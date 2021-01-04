@@ -36,7 +36,12 @@ namespace MultiplayerExtensions::Beatmaps {
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
 
-		coverImage = reader->GetBytesWithLength();
+		if (reader->GetBytesWithLength() != nullptr) {
+			coverImage = reader->GetBytesWithLength();
+		} else {
+			Array<uint8_t> emptyByteArray = Array<uint8_t>();
+			coverImage = &emptyByteArray;
+		}
 	}
 
 	void PreviewBeatmapPacket::Release() {

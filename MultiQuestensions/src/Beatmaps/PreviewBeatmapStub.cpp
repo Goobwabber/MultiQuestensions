@@ -1,4 +1,5 @@
 #include "Beatmaps/PreviewBeatmapStub.hpp"
+#include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 
 Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 	if (Il2CppString::IsNullOrWhiteSpace(levelId)) {
@@ -28,13 +29,16 @@ namespace MultiQuestensions::Beatmaps {
 
 		beatsPerMinute = preview->get_beatsPerMinute();
 		songDuration = preview->get_songDuration();
+		
+		// Need this declared before getter to prevent early freeing
+		static Unity::Collections::NativeArray_1<uint8_t> rawCover;
 
 		_audioGetter = preview->GetPreviewAudioClipAsync(System::Threading::CancellationToken::get_None());
 		_coverGetter = preview->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
 		_rawCoverGetter = _coverGetter->ContinueWith<Array<uint8_t>*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, Array<uint8_t>*>*>(
 			*[](System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* spriteTask)->Array<uint8_t>*{
 				UnityEngine::Sprite* sprite = spriteTask->get_Result();
-				Unity::Collections::NativeArray_1<uint8_t> rawCover = sprite->get_texture()->GetRawTextureData<uint8_t>();
+				rawCover = sprite->get_texture()->GetRawTextureData<uint8_t>();
 				return reinterpret_cast<Array<uint8_t>*>(&rawCover);
 			}
 		));
@@ -71,6 +75,7 @@ namespace MultiQuestensions::Beatmaps {
 	}
 
 	MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
+		//MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = (MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*)*il2cpp_utils::New(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket());
 		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = new MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket();
 
 		packet->levelId = levelID;
