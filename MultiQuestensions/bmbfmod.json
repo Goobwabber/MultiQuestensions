@@ -24,6 +24,18 @@
       "installAction": {
         "installLibraryFile": "libbeatsaber-hook_0_8_4.so"
       }
+    },
+	  {
+	    "type": "HookModLibrary",
+      "installAction": {
+        "installLibraryFile": "libcustom-types.so"
+      }
+    },
+    {
+      "type": "HookModLibrary",
+      "installAction": {
+        "installLibraryFile": "libmodloader.so"
+      }
     }
   ]
 }

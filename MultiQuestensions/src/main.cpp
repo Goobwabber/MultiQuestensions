@@ -1,7 +1,8 @@
-#include "main.hpp"
-#include "Beatmaps/PreviewBeatmapPacket.hpp"
-#include "Beatmaps/PreviewBeatmapStub.hpp"
-#include "Packets/PacketManager.hpp"
+#include "include/main.hpp"
+#include "include/Beatmaps/PreviewBeatmapPacket.hpp"
+#include "include/Beatmaps/PreviewBeatmapStub.hpp"
+#include "include/Packets/PacketManager.hpp"
+#include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -56,8 +57,9 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
     SessionManagerStart(self);
 
     sessionManager = self;
-    packetManager = new MultiQuestensions::PacketManager(self);
-
+    packetManager = new MultiQuestensions::PacketManager(sessionManager);
+    //packetManager = (MultiQuestensions::PacketManager*)*il2cpp_utils::New(MultiQuestensions::PacketManager(sessionManager));
+    
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(moddedState), true);
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(questState), true);
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
