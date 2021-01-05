@@ -27,7 +27,8 @@ namespace MultiQuestensions {
 				getLogger().error("Packet Type null.");
 				return;
 			}
-			Il2CppString* identifier = packetType->ToString();
+			Il2CppString* identifier = reinterpret_cast<System::Type*>(packetType)->ToString();
+			getLogger().info(to_utf8(csstrtostr(identifier)));
 
 			auto* newCallback = il2cpp_utils::MakeDelegate<CallbackAction*>(classof(CallbackAction*), &callback, *[](PacketCallback<TPacket> context, LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
 				TPacket packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
@@ -42,7 +43,11 @@ namespace MultiQuestensions {
 			});
 
 			if (identifier == nullptr) {
-				getLogger().error("Identifier null.");
+				getLogger().error("Cannot register callback: Identifier null.");
+				return;
+			} else if (newCallback == nullptr) {
+				getLogger().error("Cannot register callback: Callback null.");
+				return;
 			} else {
 				packetSerializer->RegisterCallback(identifier, newCallback);
 			}

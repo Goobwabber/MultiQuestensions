@@ -11,11 +11,8 @@ Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 	Il2CppString* hash = nullptr;
 	if (ary->Length() > 2) {
 		hash = ary->values[2];
-		if (hash->get_Length() != 40) {
-			hash = nullptr;
-		}
 	}
-	return hash;
+	return (hash != nullptr && hash->get_Length() == 40) ? hash : nullptr;
 }
 
 namespace MultiQuestensions::Beatmaps {

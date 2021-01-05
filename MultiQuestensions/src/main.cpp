@@ -143,6 +143,10 @@ extern "C" void setup(ModInfo& info) {
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
+    
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
 
     getLogger().info("Installing hooks...");
     INSTALL_HOOK_OFFSETLESS(SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
@@ -150,9 +154,6 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
     INSTALL_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
     
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
 
     getLogger().info("Installed all hooks!");
 }

@@ -33,7 +33,15 @@ namespace MultiQuestensions {
 	}
 
 	void PacketSerializer::RegisterCallback(Il2CppString* identifier, CallbackAction* callback) {
-		registeredTypes->Add(identifier);
-		packetHandlers->set_Item(identifier, callback);
+		if (registeredTypes == nullptr) {
+			getLogger().info("Cannot register callback: registered types null.");
+			return;
+		} else {
+			getLogger().info("h-hewo??? ;w;");
+			registeredTypes->Add(identifier);
+			getLogger().info("m-m-mistuw obama????? QwQ");
+			packetHandlers->set_Item(identifier, callback);
+			getLogger().info("IZDAT YEW????????? QWQ");
+		}
 	}
 }
