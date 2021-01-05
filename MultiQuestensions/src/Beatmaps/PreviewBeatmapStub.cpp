@@ -1,6 +1,8 @@
 #include "Beatmaps/PreviewBeatmapStub.hpp"
 #include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 
+DEFINE_CLASS(MultiQuestensions::Beatmaps::PreviewBeatmapStub);
+
 Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 	if (Il2CppString::IsNullOrWhiteSpace(levelId)) {
 		return nullptr;
@@ -9,11 +11,11 @@ Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 	Il2CppString* hash = nullptr;
 	if (ary->Length() > 2) {
 		hash = ary->values[2];
+		if (hash->get_Length() != 40) {
+			hash = nullptr;
+		}
 	}
-	if (hash != nullptr && hash->get_Length() == 40) {
-		return hash;
-	}
-	return nullptr;
+	return hash;
 }
 
 namespace MultiQuestensions::Beatmaps {

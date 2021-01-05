@@ -21,7 +21,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions, PacketSerializer, GlobalNamespace::INet
 
 	DECLARE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
 	DECLARE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
-	DECLARE_METHOD(bool, HandlesType, System::Type* type);
+	DECLARE_METHOD(bool, HandlesType, Il2CppReflectionType* type);
 	DECLARE_METHOD(void, RegisterCallback, Il2CppString* identifier, CallbackAction* callback);
 		
 	REGISTER_FUNCTION(PacketSerializer,

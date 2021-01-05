@@ -15,12 +15,12 @@ namespace MultiplayerExtensions::Beatmaps {
 		writer->Put(characteristic);
 		writer->Put(difficulty);
 
-		if (coverImage != nullptr) {
-			writer->PutBytesWithLength(coverImage);
-		}
-		else {
+		if (coverImage == nullptr) {
 			Array<uint8_t> emptyByteArray = Array<uint8_t>();
 			writer->PutBytesWithLength(&emptyByteArray);
+		}
+		else {
+			writer->PutBytesWithLength(coverImage);
 		}
 	}
 
@@ -36,11 +36,11 @@ namespace MultiplayerExtensions::Beatmaps {
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
 
-		if (reader->GetBytesWithLength() != nullptr) {
-			coverImage = reader->GetBytesWithLength();
-		} else {
+		if (reader->GetBytesWithLength() == nullptr) {
 			Array<uint8_t> emptyByteArray = Array<uint8_t>();
 			coverImage = &emptyByteArray;
+		} else {
+			coverImage = reader->GetBytesWithLength();
 		}
 	}
 

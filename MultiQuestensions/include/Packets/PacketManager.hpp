@@ -22,7 +22,11 @@ namespace MultiQuestensions {
 
 		template <class TPacket>
 		void RegisterCallback(PacketCallback<TPacket> callback) {
-			System::Type* packetType = typeof(TPacket);
+			Il2CppReflectionType* packetType = typeof(TPacket);
+			if (packetType == nullptr) {
+				getLogger().error("Packet Type null.");
+				return;
+			}
 			Il2CppString* identifier = packetType->ToString();
 
 			auto* newCallback = il2cpp_utils::MakeDelegate<CallbackAction*>(classof(CallbackAction*), &callback, *[](PacketCallback<TPacket> context, LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
@@ -34,7 +38,7 @@ namespace MultiQuestensions {
 					packet->Deserialize(reader);
 				}
 
-				(*context)(packet, player);
+				//(*callback)(packet, player);
 			});
 
 			packetSerializer->RegisterCallback(identifier, newCallback);
