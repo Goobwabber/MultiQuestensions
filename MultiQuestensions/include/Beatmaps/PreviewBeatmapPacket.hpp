@@ -27,9 +27,10 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
 	DECLARE_INSTANCE_FIELD(unsigned int, difficulty);
 
-	//DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("LiteNetLib::Utils", "INetSerializable", "Serialize"), LiteNetLib::Utils::NetDataWriter*);
-	//DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethod("LiteNetLib::Utils", "INetSerializable", "Deserialize"), LiteNetLib::Utils::NetDataReader*);
+	//DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("LiteNetLib.Utils", "INetSerializable", "LiteNetLib_Utils_INetSerializable_Serialize"), LiteNetLib::Utils::NetDataWriter*);
+	//DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethod("LiteNetLib.Utils", "INetSerializable", "LiteNetLib_Utils_INetSerializable_Serialize"), LiteNetLib::Utils::NetDataReader*);
 	//DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethod("", "IPoolablePacket", "Release"));
+	
 	DECLARE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter*);
 	DECLARE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader*);
 	DECLARE_METHOD(void, Release);
