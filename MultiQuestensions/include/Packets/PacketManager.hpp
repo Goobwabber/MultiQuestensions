@@ -38,10 +38,14 @@ namespace MultiQuestensions {
 					packet->Deserialize(reader);
 				}
 
-				//(*callback)(packet, player);
+				//(*context)(packet, player);
 			});
 
-			packetSerializer->RegisterCallback(identifier, newCallback);
+			if (identifier == nullptr) {
+				getLogger().error("Identifier null.");
+			} else {
+				packetSerializer->RegisterCallback(identifier, newCallback);
+			}
 		}
 	};
 }

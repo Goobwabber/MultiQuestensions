@@ -3,10 +3,8 @@
 namespace MultiQuestensions {
 	PacketManager::PacketManager(GlobalNamespace::MultiplayerSessionManager* sessionManager) {
 		_sessionManager = sessionManager;
-		packetSerializer = (PacketSerializer*)il2cpp_functions::object_new(PacketSerializer::klass); 
-		//packetSerializer = new PacketSerializer();
-		auto messageType = GlobalNamespace::MultiplayerSessionManager_MessageType(100u);
-		_sessionManager->RegisterSerializer(messageType, packetSerializer);
+		packetSerializer = (PacketSerializer*)il2cpp_functions::object_new(PacketSerializer::klass);
+		_sessionManager->RegisterSerializer(GlobalNamespace::MultiplayerSessionManager_MessageType((uint8_t)100), packetSerializer);
 	}
 
 	void PacketManager::Send(LiteNetLib::Utils::INetSerializable* message) { _sessionManager->Send(message); }

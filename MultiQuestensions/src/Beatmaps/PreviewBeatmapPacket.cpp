@@ -3,6 +3,9 @@
 DEFINE_CLASS(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket);
 
 namespace MultiplayerExtensions::Beatmaps {
+	void PreviewBeatmapPacket::Release() {
+		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
+	}
 	void PreviewBeatmapPacket::Serialize(LiteNetLib::Utils::NetDataWriter* writer) {
 		writer->Put(levelId);
 		writer->Put(songName);
@@ -42,9 +45,5 @@ namespace MultiplayerExtensions::Beatmaps {
 		} else {
 			coverImage = reader->GetBytesWithLength();
 		}
-	}
-
-	void PreviewBeatmapPacket::Release() {
-		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
 	}
 }

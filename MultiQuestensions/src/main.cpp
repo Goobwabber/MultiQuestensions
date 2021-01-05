@@ -56,9 +56,9 @@ static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewB
 
 
 MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSessionManager* self) {
-    SessionManagerStart(self);
 
     sessionManager = self;
+    SessionManagerStart(sessionManager);
     packetManager = new MultiQuestensions::PacketManager(sessionManager);
     
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(moddedState), true);
@@ -73,8 +73,8 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
 
 // LobbyPlayersDataModel Activate
 MAKE_HOOK_OFFSETLESS(LobbyPlayersActivate, void, GlobalNamespace::LobbyPlayersDataModel* self) {
-    LobbyPlayersActivate(self);
     lobbyPlayersDataModel = self;
+    LobbyPlayersActivate(lobbyPlayersDataModel);
 }
 
 // LobbyPlayersDataModel SetLocalPlayerBeatmapLevel
@@ -151,8 +151,8 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
     
     CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
     CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
 
     getLogger().info("Installed all hooks!");
 }
