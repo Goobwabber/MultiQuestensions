@@ -3,6 +3,7 @@
 #include "include/Beatmaps/PreviewBeatmapStub.hpp"
 #include "include/Packets/PacketManager.hpp"
 #include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "custom-types/shared/register.hpp"
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -36,12 +37,13 @@ std::string beatmapDownloadedState = "beatmap_downloaded";
 static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
     GlobalNamespace::IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = new MultiQuestensions::Beatmaps::PreviewBeatmapStub();
+    //MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = (MultiQuestensions::Beatmaps::PreviewBeatmapStub*)il2cpp_functions::object_new(MultiQuestensions::Beatmaps::PreviewBeatmapStub::klass);
 
-    if (localPreview != nullptr) {
-        preview->fromPreview(localPreview);
+    if (localPreview == nullptr) {
+        preview->fromPacket(packet);
     }
     else {
-        preview->fromPacket(packet);
+        preview->fromPreview(localPreview);
     }
 
     if (player->get_isConnectionOwner()) {
@@ -58,7 +60,6 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
 
     sessionManager = self;
     packetManager = new MultiQuestensions::PacketManager(sessionManager);
-    //packetManager = (MultiQuestensions::PacketManager*)*il2cpp_utils::New(MultiQuestensions::PacketManager(sessionManager));
     
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(moddedState), true);
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(questState), true);
@@ -148,6 +149,10 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));
     INSTALL_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
     INSTALL_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
+    
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
+    CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
 
     getLogger().info("Installed all hooks!");
 }
