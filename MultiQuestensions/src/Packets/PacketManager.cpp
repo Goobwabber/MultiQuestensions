@@ -7,7 +7,7 @@ namespace MultiQuestensions {
 	PacketManager::PacketManager(GlobalNamespace::MultiplayerSessionManager* sessionManager) {
 		if (packetSerializer == nullptr) {
 			_sessionManager = sessionManager;
-			packetSerializer = (PacketSerializer*)il2cpp_functions::object_new(PacketSerializer::klass);
+			packetSerializer = (PacketSerializer*)il2cpp_functions::object_new(il2cpp_utils::GetClassFromName("MultiQuestensions", "PacketSerializer"));
 			_sessionManager->RegisterSerializer((GlobalNamespace::MultiplayerSessionManager_MessageType)100, packetSerializer);
 		} else {
 			getLogger().info("Packet serializer already exists");

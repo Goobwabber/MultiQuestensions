@@ -27,7 +27,7 @@ namespace MultiQuestensions {
 				getLogger().error("Packet Type null.");
 				return;
 			}
-			Il2CppString* identifier = reinterpret_cast<System::Type*>(packetType)->ToString();
+			Il2CppString* identifier = packetType->ToString()->Replace(il2cpp_utils::createcsstr((std::string)"::"), il2cpp_utils::createcsstr((std::string)"."));
 			getLogger().info(to_utf8(csstrtostr(identifier)));
 
 			auto* newCallback = il2cpp_utils::MakeDelegate<CallbackAction*>(classof(CallbackAction*), &callback, *[](PacketCallback<TPacket> context, LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
@@ -39,7 +39,7 @@ namespace MultiQuestensions {
 					packet->Deserialize(reader);
 				}
 
-				//(*context)(packet, player);
+				(*context)(packet, player);
 			});
 
 			if (identifier == nullptr) {
