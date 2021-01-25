@@ -3,6 +3,10 @@
 DEFINE_CLASS(MultiQuestensions::PacketSerializer);
 
 namespace MultiQuestensions {
+
+	CallbackDictionary* packetHandlers = CallbackDictionary::New_ctor();
+	StringList* registeredTypes = StringList::New_ctor();
+
 	void PacketSerializer::Serialize(LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet) {
 		Il2CppReflectionType* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
 		
