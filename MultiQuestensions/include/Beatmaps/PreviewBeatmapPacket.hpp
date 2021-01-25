@@ -5,11 +5,13 @@
 
 #include "LiteNetLib/Utils/NetDataReader.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
+#include "LiteNetLib/Utils/INetSerializable.hpp"
 #include "GlobalNamespace/ThreadStaticPacketPool_1.hpp"
 #include "GlobalNamespace/PacketPool_1.hpp"
+#include "GlobalNamespace/IPoolablePacket.hpp"
 
 DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	(il2cpp_utils::GetClassFromName("LiteNetLib::Utils", "INetSerializable"),
+	(il2cpp_utils::GetClassFromName("LiteNetLib.Utils", "INetSerializable"),
 	il2cpp_utils::GetClassFromName("", "IPoolablePacket")),
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
@@ -25,9 +27,13 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
 	DECLARE_INSTANCE_FIELD(unsigned int, difficulty);
 
-	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("LiteNetLib::Utils", "INetSerializable", "Serialize"), LiteNetLib::Utils::NetDataWriter*);
-	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethod("LiteNetLib::Utils", "INetSerializable", "Deserialize"), LiteNetLib::Utils::NetDataReader*);
-	DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethod("", "IPoolablePacket", "Release"));
+	//DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("LiteNetLib.Utils", "INetSerializable", "LiteNetLib_Utils_INetSerializable_Serialize"), LiteNetLib::Utils::NetDataWriter*);
+	//DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethod("LiteNetLib.Utils", "INetSerializable", "LiteNetLib_Utils_INetSerializable_Serialize"), LiteNetLib::Utils::NetDataReader*);
+	//DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethod("", "IPoolablePacket", "Release"));
+	
+	DECLARE_METHOD(void, Release);
+	DECLARE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter*);
+	DECLARE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader*);
 
 	REGISTER_FUNCTION(PreviewBeatmapPacket,
 		REGISTER_FIELD(levelId);
@@ -43,8 +49,8 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, 
 		REGISTER_FIELD(characteristic);
 		REGISTER_FIELD(difficulty);
 
+		REGISTER_METHOD(Release);
 		REGISTER_METHOD(Serialize);
 		REGISTER_METHOD(Deserialize);
-		REGISTER_METHOD(Release);
 	)
 )

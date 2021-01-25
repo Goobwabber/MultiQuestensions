@@ -3,6 +3,9 @@
 DEFINE_CLASS(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket);
 
 namespace MultiplayerExtensions::Beatmaps {
+	void PreviewBeatmapPacket::Release() {
+		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
+	}
 	void PreviewBeatmapPacket::Serialize(LiteNetLib::Utils::NetDataWriter* writer) {
 		writer->Put(levelId);
 		writer->Put(songName);
@@ -15,12 +18,12 @@ namespace MultiplayerExtensions::Beatmaps {
 		writer->Put(characteristic);
 		writer->Put(difficulty);
 
-		if (coverImage != nullptr) {
-			writer->PutBytesWithLength(coverImage);
-		}
-		else {
+		if (coverImage == nullptr) {
 			Array<uint8_t> emptyByteArray = Array<uint8_t>();
 			writer->PutBytesWithLength(&emptyByteArray);
+		}
+		else {
+			writer->PutBytesWithLength(coverImage);
 		}
 	}
 
@@ -36,15 +39,11 @@ namespace MultiplayerExtensions::Beatmaps {
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
 
-		if (reader->GetBytesWithLength() != nullptr) {
-			coverImage = reader->GetBytesWithLength();
-		} else {
+		if (reader->GetBytesWithLength() == nullptr) {
 			Array<uint8_t> emptyByteArray = Array<uint8_t>();
 			coverImage = &emptyByteArray;
+		} else {
+			coverImage = reader->GetBytesWithLength();
 		}
-	}
-
-	void PreviewBeatmapPacket::Release() {
-		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
 	}
 }
