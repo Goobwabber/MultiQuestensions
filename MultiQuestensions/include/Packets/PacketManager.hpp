@@ -22,9 +22,9 @@ namespace MultiQuestensions {
 
 		template <class TPacket>
 		void RegisterCallback(PacketCallback<TPacket> callback) {
-			Il2CppReflectionType* packetType = typeof(TPacket);
+			Il2CppReflectionType* packetType = csTypeOf(TPacket);
 			if (packetType == nullptr) {
-				getLogger().error("Packet Type null.");
+				getLogger().info("Packet Type null.");
 				return;
 			}
 			Il2CppString* identifier = packetType->ToString()->Replace(il2cpp_utils::createcsstr((std::string)"::"), il2cpp_utils::createcsstr((std::string)"."));

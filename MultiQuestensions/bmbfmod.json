@@ -7,7 +7,7 @@
     "Lightweight port of MultiplayerExtensions, the PC mod that adds features to official Multiplayer."
   ],
   "category": "Gameplay",
-  "gameVersion": "1.13.0",
+  "gameVersion": "1.13.2",
   "platform": "Quest",
   "components": [
     {
@@ -22,19 +22,13 @@
     {
       "type": "HookModLibrary",
       "installAction": {
-        "installLibraryFile": "libbeatsaber-hook_0_8_4.so"
+        "installLibraryFile": "libbeatsaber-hook_1_0_10.so"
       }
     },
 	  {
 	    "type": "HookModLibrary",
       "installAction": {
         "installLibraryFile": "libcustom-types.so"
-      }
-    },
-    {
-      "type": "HookModLibrary",
-      "installAction": {
-        "installLibraryFile": "libmodloader.so"
       }
     }
   ]

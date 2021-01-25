@@ -15,9 +15,9 @@ Configuration& getConfig() {
 }
 
 // Returns a logger, useful for printing debug messages
-const Logger& getLogger() {
-    static const Logger logger(modInfo);
-    return logger;
+Logger& getLogger() {
+    static Logger* myLogger = new Logger(modInfo, LoggerOptions(false, true));
+    return *myLogger;
 }
 
 
@@ -66,7 +66,7 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
 
-    packetManager->RegisterCallback<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>(HandlePreviewBeatmapPacket);
+    //packetManager->RegisterCallback<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>(HandlePreviewBeatmapPacket);
 }
 
 
@@ -149,10 +149,10 @@ extern "C" void load() {
     CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
 
     getLogger().info("Installing hooks...");
-    INSTALL_HOOK_OFFSETLESS(SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
-    INSTALL_HOOK_OFFSETLESS(LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));
-    INSTALL_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
-    INSTALL_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
+    INSTALL_HOOK_OFFSETLESS(getLogger(), SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
+    INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));
+    INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
+    INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
     
 
     getLogger().info("Installed all hooks!");

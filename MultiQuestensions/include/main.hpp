@@ -31,4 +31,4 @@
 
 // Define these functions here so that we can easily read configuration and log information from other files
 Configuration& getConfig();
-const Logger& getLogger();
+Logger& getLogger();
