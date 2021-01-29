@@ -17,7 +17,8 @@
 
 Il2CppString* LevelIdToHash(Il2CppString*);
 
-DECLARE_CLASS_CODEGEN(MultiQuestensions::Beatmaps, PreviewBeatmapStub, GlobalNamespace::IPreviewBeatmapLevel,
+DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "System", "Object", sizeof(Il2CppObject),
+	classof(GlobalNamespace::IPreviewBeatmapLevel*),
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, _coverGetter);
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<Array<uint8_t>*>*, _rawCoverGetter);
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, _audioGetter);

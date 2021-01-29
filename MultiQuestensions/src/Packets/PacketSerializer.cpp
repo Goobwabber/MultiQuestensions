@@ -3,9 +3,10 @@
 DEFINE_CLASS(MultiQuestensions::PacketSerializer);
 
 namespace MultiQuestensions {
-
-	CallbackDictionary* packetHandlers = CallbackDictionary::New_ctor();
-	StringList* registeredTypes = StringList::New_ctor();
+	void PacketSerializer::Construct() {
+		registeredTypes = std::move(StringList());
+		packetHandlers = std::move(CallbackDictionary());
+	}
 
 	void PacketSerializer::Serialize(LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet) {
 		Il2CppReflectionType* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
@@ -19,9 +20,9 @@ namespace MultiQuestensions {
 		Il2CppString* packetType = reader->GetString();
 		length -= reader->get_Position() - prevPosition;
 		prevPosition = reader->get_Position();
-		if (packetHandlers->ContainsKey(packetType)) {
+		if (packetHandlers.find(packetType) != packetHandlers.end()) {
 			try {
-				packetHandlers->get_Item(packetType)->Invoke(reader, length, data);
+				packetHandlers[packetType]->Invoke(reader, length, data);
 			} catch (const std::exception& e) {
 				getLogger().warning("An exception was thrown while processing custom packet");
 				getLogger().error(e.what());
@@ -33,19 +34,16 @@ namespace MultiQuestensions {
 	}
 
 	bool PacketSerializer::HandlesType(Il2CppReflectionType* type) {
-		return registeredTypes->Contains(type->ToString());
+		return std::find(registeredTypes.begin(), registeredTypes.end(), type->ToString()) != registeredTypes.end();
 	}
 
-	void PacketSerializer::RegisterCallback(Il2CppString* identifier, CallbackAction* callback) {
-		if (registeredTypes == nullptr) {
-			getLogger().info("Cannot register callback: registered types null.");
-			return;
-		} else {
-			getLogger().info("h-hewo??? ;w;");
-			registeredTypes->Add(identifier);
-			getLogger().info("m-m-mistuw obama????? QwQ");
-			packetHandlers->set_Item(identifier, callback);
-			getLogger().info("IZDAT YEW????????? QWQ");
-		}
+	void PacketSerializer::RegisterCallback(Il2CppString* identifier, CallbackBase* callback) {
+		registeredTypes.push_back(identifier);
+		packetHandlers[identifier] = callback;
+	}
+
+	void PacketSerializer::UnregisterCallback(Il2CppString* identifier) {
+		remove(registeredTypes.begin(), registeredTypes.end(), identifier);
+		packetHandlers.erase(identifier);
 	}
 }

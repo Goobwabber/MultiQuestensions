@@ -61,5 +61,8 @@
     <ClInclude Include="include\Packets\PacketSerializer.hpp">
       <Filter>include\Packets</Filter>
     </ClInclude>
+    <ClInclude Include="include\Packets\Callback.hpp">
+      <Filter>include\Packets</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

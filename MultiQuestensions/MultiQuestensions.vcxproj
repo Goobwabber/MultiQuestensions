@@ -29,6 +29,7 @@
     <ClInclude Include="include\Beatmaps\PreviewBeatmapPacket.hpp" />
     <ClInclude Include="include\Beatmaps\PreviewBeatmapStub.hpp" />
     <ClInclude Include="include\main.hpp" />
+    <ClInclude Include="include\Packets\Callback.hpp" />
     <ClInclude Include="include\Packets\PacketManager.hpp" />
     <ClInclude Include="include\Packets\PacketSerializer.hpp" />
   </ItemGroup>

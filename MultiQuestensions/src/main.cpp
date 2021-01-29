@@ -36,14 +36,14 @@ std::string beatmapDownloadedState = "beatmap_downloaded";
 
 static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
     GlobalNamespace::IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
-    MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = new MultiQuestensions::Beatmaps::PreviewBeatmapStub();
-    //MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = (MultiQuestensions::Beatmaps::PreviewBeatmapStub*)il2cpp_functions::object_new(MultiQuestensions::Beatmaps::PreviewBeatmapStub::klass);
+
+    MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview;
 
     if (localPreview == nullptr) {
-        preview->fromPacket(packet);
+        preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet));
     }
     else {
-        preview->fromPreview(localPreview);
+        preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(localPreview));
     }
 
     if (player->get_isConnectionOwner()) {
@@ -51,7 +51,7 @@ static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewB
     }
 
     GlobalNamespace::BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), preview, GlobalNamespace::BeatmapDifficulty(packet->difficulty), characteristic);
+    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(preview), GlobalNamespace::BeatmapDifficulty(packet->difficulty), characteristic);
 }
 
 
@@ -66,7 +66,7 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
     self->SetLocalPlayerState(il2cpp_utils::createcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
 
-    //packetManager->RegisterCallback<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>(HandlePreviewBeatmapPacket);
+    packetManager->RegisterCallback<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>(HandlePreviewBeatmapPacket);
 }
 
 
@@ -82,17 +82,16 @@ MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPl
     GlobalNamespace::IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
     if (localPreview != nullptr) {
         getLogger().info("Local user selected song '", levelId, "'.");
-        MultiQuestensions::Beatmaps::PreviewBeatmapStub preview = MultiQuestensions::Beatmaps::PreviewBeatmapStub();
-        preview.fromPreview(localPreview);
+        MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(localPreview));
 
-        if (preview.levelHash != nullptr) {
+        if (preview->levelHash != nullptr) {
             if (self->get_localUserId() == self->get_hostUserId()) {
                 sessionManager->SetLocalPlayerState(il2cpp_utils::createcsstr(beatmapDownloadedState), true);
             }
 
-            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(preview.GetPacket(characteristic->get_serializedName(), beatmapDifficulty)));
+            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(preview->GetPacket(characteristic->get_serializedName(), beatmapDifficulty)));
             self->menuRpcManager->SelectBeatmap(GlobalNamespace::BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
-            self->SetPlayerBeatmapLevel(self->get_localUserId(), &preview, beatmapDifficulty, characteristic);
+            self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
             return;
         }
     }
