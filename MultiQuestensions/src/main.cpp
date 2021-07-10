@@ -1,9 +1,11 @@
-#include "include/main.hpp"
-#include "include/Beatmaps/PreviewBeatmapPacket.hpp"
-#include "include/Beatmaps/PreviewBeatmapStub.hpp"
-#include "include/Packets/PacketManager.hpp"
-#include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "main.hpp"
+#include "Beatmaps/PreviewBeatmapPacket.hpp"
+#include "Beatmaps/PreviewBeatmapStub.hpp"
+#include "Packets/PacketManager.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
+#include "beatsaber-hook/shared/utils/hooking.hpp"
+using namespace GlobalNamespace;
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -34,8 +36,8 @@ std::string enforceModsState = "enforcemods";
 std::string beatmapDownloadedState = "beatmap_downloaded";
 
 
-static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
-    GlobalNamespace::IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
+static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet, IConnectedPlayer* player) {
+    IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
 
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview;
 
@@ -47,24 +49,24 @@ static void HandlePreviewBeatmapPacket(MultiplayerExtensions::Beatmaps::PreviewB
     }
 
     if (player->get_isConnectionOwner()) {
-        sessionManager->SetLocalPlayerState(il2cpp_utils::createcsstr(beatmapDownloadedState), preview->isDownloaded);
+        sessionManager->SetLocalPlayerState(il2cpp_utils::newcsstr(beatmapDownloadedState), preview->isDownloaded);
     }
 
-    GlobalNamespace::BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(preview), GlobalNamespace::BeatmapDifficulty(packet->difficulty), characteristic);
+    BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), GlobalNamespace::BeatmapDifficulty(packet->difficulty), characteristic);
 }
 
 
-MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSessionManager* self) {
+MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
     sessionManager = self;
     SessionManagerStart(sessionManager);
     packetManager = new MultiQuestensions::PacketManager(sessionManager);
     
-    self->SetLocalPlayerState(il2cpp_utils::createcsstr(moddedState), true);
-    self->SetLocalPlayerState(il2cpp_utils::createcsstr(questState), true);
-    self->SetLocalPlayerState(il2cpp_utils::createcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
-    self->SetLocalPlayerState(il2cpp_utils::createcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(moddedState), true);
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(questState), true);
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
 
     packetManager->RegisterCallback<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>(HandlePreviewBeatmapPacket);
 }
@@ -72,26 +74,26 @@ MAKE_HOOK_OFFSETLESS(SessionManagerStart, void, GlobalNamespace::MultiplayerSess
 
 
 // LobbyPlayersDataModel Activate
-MAKE_HOOK_OFFSETLESS(LobbyPlayersActivate, void, GlobalNamespace::LobbyPlayersDataModel* self) {
+MAKE_HOOK_MATCH(LobbyPlayersActivate, &LobbyPlayersDataModel::Activate, void, LobbyPlayersDataModel* self) {
     lobbyPlayersDataModel = self;
     LobbyPlayersActivate(lobbyPlayersDataModel);
 }
 
 // LobbyPlayersDataModel SetLocalPlayerBeatmapLevel
-MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPlayersDataModel* self, Il2CppString* levelId, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic) {
-    GlobalNamespace::IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
+MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, LobbyPlayersDataModel* self, Il2CppString* levelId, BeatmapDifficulty beatmapDifficulty, BeatmapCharacteristicSO* characteristic) {
+    IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
     if (localPreview != nullptr) {
-        getLogger().info("Local user selected song '", levelId, "'.");
+        getLogger().info("Local user selected song '%s'.", to_utf8(csstrtostr(levelId)).data());
         MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(localPreview));
 
         if (preview->levelHash != nullptr) {
             if (self->get_localUserId() == self->get_hostUserId()) {
-                sessionManager->SetLocalPlayerState(il2cpp_utils::createcsstr(beatmapDownloadedState), true);
+                sessionManager->SetLocalPlayerState(il2cpp_utils::newcsstr(beatmapDownloadedState), true);
             }
 
             packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(preview->GetPacket(characteristic->get_serializedName(), beatmapDifficulty)));
-            self->menuRpcManager->SelectBeatmap(GlobalNamespace::BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
-            self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
+            self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
+            self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
             return;
         }
     }
@@ -99,8 +101,8 @@ MAKE_HOOK_OFFSETLESS(LobbyPlayersSetLocalBeatmap, void, GlobalNamespace::LobbyPl
 }
 
 // LobbyPlayersDataModel HandleMenuRpcManagerSelectedBeatmap (DONT REMOVE THIS, without it a player's selected map will be cleared)
-MAKE_HOOK_OFFSETLESS(LobbyPlayersSelectedBeatmap, void, GlobalNamespace::LobbyPlayersDataModel* self, Il2CppString* userId, GlobalNamespace::BeatmapIdentifierNetSerializable* beatmapId) {
-    GlobalNamespace::IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(beatmapId->levelID);
+MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuRpcManagerSelectedBeatmap, void, LobbyPlayersDataModel* self, Il2CppString* userId, BeatmapIdentifierNetSerializable* beatmapId) {
+    IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(beatmapId->levelID);
     if (localPreview != nullptr) {
         LobbyPlayersSelectedBeatmap(self, userId, beatmapId);
     }
@@ -143,15 +145,24 @@ extern "C" void setup(ModInfo& info) {
 extern "C" void load() {
     il2cpp_functions::Init();
     
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
-    CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
+    custom_types::Register::AutoRegister();
+    //custom_types::TypeRegistrator;
+    //custom_types::Register::ExplicitRegister(&MultiQuestensions::PacketSerializer, &MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket, &MultiQuestensions::Beatmaps::PreviewBeatmapStub);
+    //CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
+    //CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
+    //CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
 
     getLogger().info("Installing hooks...");
-    INSTALL_HOOK_OFFSETLESS(getLogger(), SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
-    INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));
-    INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
-    INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
+    INSTALL_HOOK(getLogger(), SessionManagerStart);
+    INSTALL_HOOK(getLogger(), LobbyPlayersActivate);
+    INSTALL_HOOK(getLogger(), LobbyPlayersSetLocalBeatmap);
+    INSTALL_HOOK(getLogger(), LobbyPlayersSelectedBeatmap);
+
+    //INSTALL_HOOK_OFFSETLESS(getLogger(), SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
+    //INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));
+    //INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersSetLocalBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "SetLocalPlayerBeatmapLevel", 3));
+    //INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersSelectedBeatmap, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "HandleMenuRpcManagerSelectedBeatmap", 2));
+
     
 
     getLogger().info("Installed all hooks!");

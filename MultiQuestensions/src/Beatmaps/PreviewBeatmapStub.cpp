@@ -1,7 +1,7 @@
 #include "Beatmaps/PreviewBeatmapStub.hpp"
-#include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 
-DEFINE_CLASS(MultiQuestensions::Beatmaps::PreviewBeatmapStub);
+DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
 Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 	if (Il2CppString::IsNullOrWhiteSpace(levelId)) {

@@ -18,7 +18,7 @@
 Il2CppString* LevelIdToHash(Il2CppString*);
 
 DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "System", "Object", sizeof(Il2CppObject),
-	classof(GlobalNamespace::IPreviewBeatmapLevel*),
+	{ classof(GlobalNamespace::IPreviewBeatmapLevel*) },
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, _coverGetter);
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<Array<uint8_t>*>*, _rawCoverGetter);
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, _audioGetter);
@@ -39,31 +39,31 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	DECLARE_CTOR(fromPreview, GlobalNamespace::IPreviewBeatmapLevel*);
 	DECLARE_CTOR(fromPacket, MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*);
 	
-	DECLARE_METHOD(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
-	DECLARE_METHOD(System::Threading::Tasks::Task_1<Array<uint8_t>*>*, GetRawCoverAsync, System::Threading::CancellationToken);
-	DECLARE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, GetCoverImageAsync, System::Threading::CancellationToken);
-	DECLARE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, GetPreviewAudioClipAsync, System::Threading::CancellationToken);
+	DECLARE_INSTANCE_METHOD(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
+	DECLARE_INSTANCE_METHOD(System::Threading::Tasks::Task_1<Array<uint8_t>*>*, GetRawCoverAsync, System::Threading::CancellationToken);
+	DECLARE_INSTANCE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, GetCoverImageAsync, System::Threading::CancellationToken);
+	DECLARE_INSTANCE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, GetPreviewAudioClipAsync, System::Threading::CancellationToken);
 
-	REGISTER_FUNCTION(PreviewBeatmapStub,
-		REGISTER_FIELD(levelHash);
+	//REGISTER_FUNCTION(PreviewBeatmapStub,
+	//	REGISTER_FIELD(levelHash);
 
-		REGISTER_FIELD(isDownloaded);
-		REGISTER_FIELD(isDownloadable);
+	//	REGISTER_FIELD(isDownloaded);
+	//	REGISTER_FIELD(isDownloadable);
 
-		REGISTER_FIELD(levelID);
-		REGISTER_FIELD(songName);
-		REGISTER_FIELD(songSubName);
-		REGISTER_FIELD(songAuthorName);
-		REGISTER_FIELD(levelAuthorName);
-		REGISTER_FIELD(beatsPerMinute);
-		REGISTER_FIELD(songDuration);
+	//	REGISTER_FIELD(levelID);
+	//	REGISTER_FIELD(songName);
+	//	REGISTER_FIELD(songSubName);
+	//	REGISTER_FIELD(songAuthorName);
+	//	REGISTER_FIELD(levelAuthorName);
+	//	REGISTER_FIELD(beatsPerMinute);
+	//	REGISTER_FIELD(songDuration);
 
-		REGISTER_METHOD(fromPreview);
-		REGISTER_METHOD(fromPacket);
+	//	REGISTER_METHOD(fromPreview);
+	//	REGISTER_METHOD(fromPacket);
 
-		REGISTER_METHOD(GetPacket);
-		REGISTER_METHOD(GetRawCoverAsync);
-		REGISTER_METHOD(GetCoverImageAsync);
-		REGISTER_METHOD(GetPreviewAudioClipAsync);
-	)
+	//	REGISTER_METHOD(GetPacket);
+	//	REGISTER_METHOD(GetRawCoverAsync);
+	//	REGISTER_METHOD(GetCoverImageAsync);
+	//	REGISTER_METHOD(GetPreviewAudioClipAsync);
+	//)
 )

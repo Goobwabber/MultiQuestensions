@@ -7,6 +7,7 @@
     <None Include="qpm.json" />
     <None Include=".gitignore" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

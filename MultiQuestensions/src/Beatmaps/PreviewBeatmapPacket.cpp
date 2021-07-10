@@ -1,6 +1,6 @@
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 
-DEFINE_CLASS(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket);
+DEFINE_TYPE(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket);
 
 namespace MultiplayerExtensions::Beatmaps {
 	void PreviewBeatmapPacket::Release() {

@@ -1,6 +1,7 @@
 #include "Packets/PacketSerializer.hpp"
+#include "GlobalNamespace/BeatmapIdentifierNetSerializable.hpp"
 
-DEFINE_CLASS(MultiQuestensions::PacketSerializer);
+DEFINE_TYPE(MultiQuestensions, PacketSerializer);
 
 namespace MultiQuestensions {
 	void PacketSerializer::Construct() {
@@ -12,7 +13,7 @@ namespace MultiQuestensions {
 		Il2CppReflectionType* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
 		
 		writer->Put(packetType->ToString());
-		packet->LiteNetLib_Utils_INetSerializable_Serialize(writer);
+		reinterpret_cast<GlobalNamespace::BeatmapIdentifierNetSerializable*>(packet)->LiteNetLib_Utils_INetSerializable_Serialize(writer);
 	}
 
 	void PacketSerializer::Deserialize(LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data) {
@@ -25,7 +26,7 @@ namespace MultiQuestensions {
 				packetHandlers[packetType]->Invoke(reader, length, data);
 			} catch (const std::exception& e) {
 				getLogger().warning("An exception was thrown while processing custom packet");
-				getLogger().error(e.what());
+				getLogger().error("%s", e.what());
 			}
 		}
 

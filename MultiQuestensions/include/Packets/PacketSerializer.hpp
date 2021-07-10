@@ -4,12 +4,13 @@
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 
-#include "vector"
+#include <vector>
 #include "System/Action_3.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
 #include "System/Collections/Generic/Dictionary_2.hpp"
 #include "System/Collections/Generic/List_1.hpp"
 #include "GlobalNamespace/INetworkPacketSubSerializer_1.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "System/Type.hpp"
 
 /*DECLARE_CLASS_INTERFACES(Il2CppNamespace, MyCustomBeatmapLevelPackCollection, "System", "Object", sizeof(Il2CppObject),
@@ -30,19 +31,24 @@ using CallbackDictionary = std::map<Il2CppString*, MultiQuestensions::CallbackBa
 using StringList = std::vector<Il2CppString*>;
 
 DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object", sizeof(Il2CppObject),
-	classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*),
-	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("", "IConnectedPlayer", "Serialize"), LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
-	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethod("", "IConnectedPlayer", "Deserialize"), LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
-	DECLARE_OVERRIDE_METHOD(bool, HandlesType, il2cpp_utils::FindMethod("", "IConnectedPlayer", "HandlesType"), Il2CppReflectionType* type);
-	
+	{ classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*) },
+	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("", "INetworkPacketSubSerializer`1", "Serialize"), LiteNetLib::Utils::NetDataWriter writer, LiteNetLib::Utils::INetSerializable packet);
+	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethodUnsafe("", "INetworkPacketSubSerializer`1", "Deserialize", 3), LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
+	DECLARE_OVERRIDE_METHOD(bool, HandlesType, il2cpp_utils::FindMethodUnsafe("", "INetworkPacketSubSerializer`1", "HandlesType", 1), Il2CppReflectionType* type);
+										//bool global::INetworkPacketSubSerializer<TData>.HandlesType(System.Type type)
+
+	//DECLARE_INSTANCE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
+	//DECLARE_INSTANCE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
+	//DECLARE_INSTANCE_METHOD(bool, HandlesType, Il2CppReflectionType* type);
+
 	DECLARE_CTOR(Construct);
 
-	REGISTER_FUNCTION(PacketSerializer,
-		REGISTER_METHOD(Serialize);
-		REGISTER_METHOD(Deserialize);
-		REGISTER_METHOD(HandlesType);
-		REGISTER_METHOD(Construct);
-	)
+	//REGISTER_FUNCTION(PacketSerializer,
+	//	REGISTER_METHOD(Serialize);
+	//	REGISTER_METHOD(Deserialize);
+	//	REGISTER_METHOD(HandlesType);
+	//	REGISTER_METHOD(Construct);
+	//)
 
 	private:
 		CallbackDictionary packetHandlers;
