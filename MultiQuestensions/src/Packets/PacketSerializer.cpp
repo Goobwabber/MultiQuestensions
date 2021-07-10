@@ -38,11 +38,6 @@ namespace MultiQuestensions {
 		return std::find(registeredTypes.begin(), registeredTypes.end(), type->ToString()) != registeredTypes.end();
 	}
 
-	void PacketSerializer::RegisterCallback(Il2CppString* identifier, CallbackBase* callback) {
-		registeredTypes.push_back(identifier);
-		packetHandlers[identifier] = callback;
-	}
-
 	void PacketSerializer::UnregisterCallback(Il2CppString* identifier) {
 		remove(registeredTypes.begin(), registeredTypes.end(), identifier);
 		packetHandlers.erase(identifier);

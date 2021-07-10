@@ -90,8 +90,12 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
             if (self->get_localUserId() == self->get_hostUserId()) {
                 sessionManager->SetLocalPlayerState(il2cpp_utils::newcsstr(beatmapDownloadedState), true);
             }
-
-            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(preview->GetPacket(characteristic->get_serializedName(), beatmapDifficulty)));
+            MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* Packet = preview->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
+            if (il2cpp_functions::class_is_assignable_from(classof(LiteNetLib::Utils::INetSerializable*), classof(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*))) {
+                if (packetManager) packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(Packet));
+                else getLogger().error("PacketManager is nullptr");
+            }
+            else getLogger().error("Can't assign as LiteNetLib::Utils::INetSerializable*");
             self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
             self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
             return;
@@ -145,6 +149,8 @@ extern "C" void setup(ModInfo& info) {
 extern "C" void load() {
     il2cpp_functions::Init();
     
+    //MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket::Install();
+
     custom_types::Register::AutoRegister();
     //custom_types::TypeRegistrator;
     //custom_types::Register::ExplicitRegister(&MultiQuestensions::PacketSerializer, &MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket, &MultiQuestensions::Beatmaps::PreviewBeatmapStub);

@@ -32,10 +32,9 @@ using StringList = std::vector<Il2CppString*>;
 
 DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object", sizeof(Il2CppObject),
 	{ classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*) },
-	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("", "INetworkPacketSubSerializer`1", "Serialize"), LiteNetLib::Utils::NetDataWriter writer, LiteNetLib::Utils::INetSerializable packet);
-	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethodUnsafe("", "INetworkPacketSubSerializer`1", "Deserialize", 3), LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
-	DECLARE_OVERRIDE_METHOD(bool, HandlesType, il2cpp_utils::FindMethodUnsafe("", "INetworkPacketSubSerializer`1", "HandlesType", 1), Il2CppReflectionType* type);
-										//bool global::INetworkPacketSubSerializer<TData>.HandlesType(System.Type type)
+	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*), "Serialize", 2), LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
+	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*), "Deserialize", 3), LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
+	DECLARE_OVERRIDE_METHOD(bool, HandlesType, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*), "HandlesType", 1), Il2CppReflectionType* type);
 
 	//DECLARE_INSTANCE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
 	//DECLARE_INSTANCE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
@@ -55,6 +54,10 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object"
 		StringList registeredTypes;
 
 	public:
-		void RegisterCallback(Il2CppString* identifier, CallbackBase* callback);
+		template <class TPacket>
+		void RegisterCallback(Il2CppString* identifier, CallbackWrapper<TPacket>* callback) {
+			registeredTypes.push_back(identifier);
+			packetHandlers[identifier] = callback;
+		}
 		void UnregisterCallback(Il2CppString* identifier);
 )

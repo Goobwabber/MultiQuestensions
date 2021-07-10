@@ -11,9 +11,13 @@
 #include "GlobalNamespace/IPoolablePacket.hpp"
 #include "System/Object.hpp"
 
-DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	{ (il2cpp_utils::GetClassFromName("LiteNetLib.Utils", "INetSerializable"),
-	il2cpp_utils::GetClassFromName("", "IPoolablePacket")) },
+namespace MultiplayerExtensions::Beatmaps {
+	std::vector<Il2CppClass*> GetPBPInterfaces();
+}
+
+DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, 
+	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
+	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);
@@ -28,13 +32,16 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket, 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
 	DECLARE_INSTANCE_FIELD(unsigned int, difficulty);
 
-	//DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethod("LiteNetLib.Utils", "INetSerializable", "LiteNetLib_Utils_INetSerializable_Serialize"), LiteNetLib::Utils::NetDataWriter*);
-	//DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethod("LiteNetLib.Utils", "INetSerializable", "LiteNetLib_Utils_INetSerializable_Serialize"), LiteNetLib::Utils::NetDataReader*);
-	//DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethod("", "IPoolablePacket", "Release"));
+	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Serialize", 1), LiteNetLib::Utils::NetDataWriter* writer);
+	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Deserialize", 1), LiteNetLib::Utils::NetDataReader* reader);
+	DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPoolablePacket*), "Release", 0));
 	
-	DECLARE_INSTANCE_METHOD(void, Release);
-	DECLARE_INSTANCE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter*);
-	DECLARE_INSTANCE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader*);
+	//DECLARE_INSTANCE_METHOD(void, Release);
+	//DECLARE_INSTANCE_METHOD(void, Serialize, LiteNetLib::Utils::NetDataWriter*);
+	//DECLARE_INSTANCE_METHOD(void, Deserialize, LiteNetLib::Utils::NetDataReader*);
+
+	//public:
+	//	static void Install();
 
 	//REGISTER_FUNCTION(PreviewBeatmapPacket,
 	//	REGISTER_FIELD(levelId);

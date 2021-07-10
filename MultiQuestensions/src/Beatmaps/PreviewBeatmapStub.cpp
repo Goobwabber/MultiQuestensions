@@ -20,14 +20,17 @@ namespace MultiQuestensions::Beatmaps {
 		levelID = preview->get_levelID();
 		levelHash = LevelIdToHash(levelID);
 		isDownloaded = true;
-
+		
+		getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).data(), to_utf8(csstrtostr(levelHash)).data());
 		songName = preview->get_songName();
 		songSubName = preview->get_songSubName();
 		songAuthorName = preview->get_songAuthorName();
 		levelAuthorName = preview->get_levelAuthorName();
-
+		getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).data(), to_utf8(csstrtostr(songSubName)).data(), to_utf8(csstrtostr(songAuthorName)).data(), to_utf8(csstrtostr(levelAuthorName)).data());
+		
 		beatsPerMinute = preview->get_beatsPerMinute();
 		songDuration = preview->get_songDuration();
+		getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
 		
 		// Need this declared before getter to prevent early freeing
 		static Unity::Collections::NativeArray_1<uint8_t> rawCover;
@@ -75,7 +78,10 @@ namespace MultiQuestensions::Beatmaps {
 
 	MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
 		//MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = (MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*)*il2cpp_utils::New(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket());
+		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
+		// TODO: Calling new on a codegen class seems sus
 		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = new MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket();
+		getLogger().debug("New PreviewBeatmapPacket*");
 
 		packet->levelId = levelID;
 
@@ -86,11 +92,14 @@ namespace MultiQuestensions::Beatmaps {
 
 		packet->beatsPerMinute = beatsPerMinute;
 
-		_rawCoverGetter->Wait();
-		packet->coverImage = _rawCoverGetter->get_Result();
+
+		//_rawCoverGetter->Wait();
+		//packet->coverImage = _rawCoverGetter->get_Result();
 
 		packet->characteristic = characteristic;
 		packet->difficulty = difficulty;
+
+		getLogger().debug("BeatmapData placed");
 
 		return packet;
 	}

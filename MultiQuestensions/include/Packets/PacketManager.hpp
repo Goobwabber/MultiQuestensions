@@ -26,7 +26,7 @@ namespace MultiQuestensions {
 				return;
 			}
 
-			Il2CppString* identifier = packetType->ToString()->Replace(il2cpp_utils::createcsstr((std::string)"::"), il2cpp_utils::createcsstr((std::string)"."));
+			Il2CppString* identifier = packetType->ToString()->Replace(il2cpp_utils::newcsstr((std::string)"::"), il2cpp_utils::newcsstr((std::string)"."));
 			getLogger().info("%s", to_utf8(csstrtostr(identifier)).data());
 
 			CallbackWrapper<TPacket> newCallback = CallbackWrapper<TPacket>(callback);
@@ -35,7 +35,7 @@ namespace MultiQuestensions {
 				getLogger().error("Cannot register callback: Identifier null.");
 				return;
 			} else {
-				packetSerializer->RegisterCallback(identifier, reinterpret_cast<CallbackBase*>(&newCallback));
+				packetSerializer->RegisterCallback(identifier, &newCallback);
 			}
 		}
 	};
