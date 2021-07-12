@@ -5,6 +5,9 @@
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
+
+#include "GlobalNamespace/StandardScoreSyncStateNetSerializable.hpp"
+
 using namespace GlobalNamespace;
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -91,13 +94,17 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
                 sessionManager->SetLocalPlayerState(il2cpp_utils::newcsstr(beatmapDownloadedState), true);
             }
             MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* Packet = preview->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
-            if (il2cpp_functions::class_is_assignable_from(classof(LiteNetLib::Utils::INetSerializable*), classof(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*))) {
-                if (packetManager) packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(Packet));
-                else getLogger().error("PacketManager is nullptr");
-            }
-            else getLogger().error("Can't assign as LiteNetLib::Utils::INetSerializable*");
+            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(Packet));
             self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
-            self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
+            if (il2cpp_functions::class_is_assignable_from(classof(IPreviewBeatmapLevel*), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
+                getLogger().debug("localUserId: %s", to_utf8(csstrtostr(self->get_localUserId())).data());
+                //IPreviewBeatmapLevel* IPBLevel = THROW_UNLESS(il2cpp_utils::RunMethod())
+                getLogger().debug("levelID: %s", to_utf8(csstrtostr(reinterpret_cast<IPreviewBeatmapLevel*>(preview)->get_levelID())).data());
+                getLogger().debug("previewDuration: %f", reinterpret_cast<IPreviewBeatmapLevel*>(preview)->get_previewDuration());
+                self->SetPlayerBeatmapLevel(self->get_localUserId(), (IPreviewBeatmapLevel*)preview/*reinterpret_cast<IPreviewBeatmapLevel*>(preview)*/, beatmapDifficulty, characteristic);
+            }
+            else getLogger().error("Can't assign as IPreviewBeatmapLevel*");
+            getLogger().debug("LobbyPlayersSetLocalBeatmap Finished");
             return;
         }
     }
@@ -152,8 +159,6 @@ extern "C" void load() {
     //MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket::Install();
 
     custom_types::Register::AutoRegister();
-    //custom_types::TypeRegistrator;
-    //custom_types::Register::ExplicitRegister(&MultiQuestensions::PacketSerializer, &MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket, &MultiQuestensions::Beatmaps::PreviewBeatmapStub);
     //CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::PacketSerializer>());
     //CRASH_UNLESS(custom_types::Register::RegisterType<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket>());
     //CRASH_UNLESS(custom_types::Register::RegisterType<MultiQuestensions::Beatmaps::PreviewBeatmapStub>());
@@ -163,6 +168,17 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbyPlayersActivate);
     INSTALL_HOOK(getLogger(), LobbyPlayersSetLocalBeatmap);
     INSTALL_HOOK(getLogger(), LobbyPlayersSelectedBeatmap);
+
+    //custom_types::logVtable(classof(IRemoteProcedureCall*)->vtable);
+
+    //custom_types::logVtable(&classof(StandardScoreSyncStateNetSerializable*)->vtable[0]);
+
+    //getLogger().debug("vtable_count %d", classof(StandardScoreSyncStateNetSerializable*)->vtable_count);
+
+    //il2cpp_functions::Class_Init(classof(StandardScoreSyncStateNetSerializable*));
+    //for (uint16_t i = 0; i < classof(StandardScoreSyncStateNetSerializable*)->vtable_count; i++) {
+    //    custom_types::logVtable(&classof(StandardScoreSyncStateNetSerializable*)->vtable[i]);
+    //}
 
     //INSTALL_HOOK_OFFSETLESS(getLogger(), SessionManagerStart, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "Start", 0));
     //INSTALL_HOOK_OFFSETLESS(getLogger(), LobbyPlayersActivate, il2cpp_utils::FindMethodUnsafe("", "LobbyPlayersDataModel", "Activate", 0));

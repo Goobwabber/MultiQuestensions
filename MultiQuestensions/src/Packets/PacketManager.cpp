@@ -3,6 +3,8 @@
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "UnityEngine/GameObject.hpp"
 
+#include "GlobalNamespace/StandardScoreSyncStateNetSerializable.hpp"
+
 namespace MultiQuestensions {
 	PacketManager::PacketManager(GlobalNamespace::MultiplayerSessionManager* sessionManager) {
 		//if (packetSerializer == nullptr) {
@@ -27,7 +29,15 @@ namespace MultiQuestensions {
 		} else if (message == nullptr) getLogger().error("Aborting send, message is nullptr");
 			getLogger().debug("Got MultiplayerSessionManager");
 			//_sessionManager->Send<LiteNetLib::Utils::INetSerializable*>(message);
-			_sessionManager->Send(message);
+			try {
+				for (uint16_t i = 0; i < classof(GlobalNamespace::StandardScoreSyncStateNetSerializable*)->vtable_count; i++) {
+					custom_types::logVtable(&classof(GlobalNamespace::StandardScoreSyncStateNetSerializable*)->vtable[i]);
+				}
+				_sessionManager->Send(message);
+			}
+			catch (il2cpp_utils::RunMethodException ex) {
+				getLogger().debug("Exception while running Send: %s", ex.what());
+			}
 			//				 ^
 			// TODO: Figure out crash here
 			getLogger().debug("Sent message");

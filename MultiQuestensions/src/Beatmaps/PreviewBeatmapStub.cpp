@@ -80,7 +80,7 @@ namespace MultiQuestensions::Beatmaps {
 		//MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = (MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*)*il2cpp_utils::New(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket());
 		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
 		// TODO: Calling new on a codegen class seems sus
-		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = new MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket();
+		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>());
 		getLogger().debug("New PreviewBeatmapPacket*");
 
 		packet->levelId = levelID;
@@ -115,4 +115,69 @@ namespace MultiQuestensions::Beatmaps {
 	System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>* PreviewBeatmapStub::GetPreviewAudioClipAsync(System::Threading::CancellationToken cancellationToken) {
 		return _audioGetter;
 	}
+
+#pragma region All the pain in form of getter functions
+
+	Il2CppString* PreviewBeatmapStub::get_levelID() {
+		return levelID;
+	}
+
+	Il2CppString* PreviewBeatmapStub::get_songName() {
+		return songName;
+	}
+
+	Il2CppString* PreviewBeatmapStub::get_songSubName() {
+		return songSubName;
+	}
+
+	Il2CppString* PreviewBeatmapStub::get_songAuthorName() {
+		return songAuthorName;
+	}
+
+	Il2CppString* PreviewBeatmapStub::get_levelAuthorName() {
+		return levelAuthorName;
+	}
+
+	float PreviewBeatmapStub::get_beatsPerMinute() {
+		return beatsPerMinute;
+	}
+
+	float PreviewBeatmapStub::get_songDuration() {
+		return songDuration;
+	}
+
+	float PreviewBeatmapStub::get_songTimeOffset() {
+		return songTimeOffset;
+	}
+
+	float PreviewBeatmapStub::get_previewDuration() {
+		return previewDuration;
+	}
+
+	float PreviewBeatmapStub::get_previewStartTime() {
+		return previewStartTime;
+	}
+
+	float PreviewBeatmapStub::get_shuffle() {
+		return shuffle;
+	}
+
+	float PreviewBeatmapStub::get_shufflePeriod() {
+		return shufflePeriod;
+	}
+
+	GlobalNamespace::EnvironmentInfoSO* PreviewBeatmapStub::get_allDirectionsEnvironmentInfo() {
+		return allDirectionsEnvironmentInfo;
+	}
+
+	GlobalNamespace::EnvironmentInfoSO* PreviewBeatmapStub::get_environmentInfo() {
+		return environmentInfo;
+	}
+
+	Array<GlobalNamespace::PreviewDifficultyBeatmapSet*>* PreviewBeatmapStub::get_previewDifficultyBeatmapSets() {
+		return previewDifficultyBeatmapSets;
+	}
+
+#pragma endregion
+
 }
