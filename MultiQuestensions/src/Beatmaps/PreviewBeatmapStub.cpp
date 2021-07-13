@@ -1,5 +1,7 @@
 #include "Beatmaps/PreviewBeatmapStub.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "System/Threading/Tasks/TaskStatus.hpp"
+#include "UnityEngine/ImageConversion.hpp"
 
 DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
@@ -17,16 +19,17 @@ Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 
 namespace MultiQuestensions::Beatmaps {
 	void PreviewBeatmapStub::fromPreview(GlobalNamespace::IPreviewBeatmapLevel* preview) {
+		getLogger().debug("PreviewBeatmapStub::fromPreview");
 		levelID = preview->get_levelID();
 		levelHash = LevelIdToHash(levelID);
 		isDownloaded = true;
 		
-		getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).data(), to_utf8(csstrtostr(levelHash)).data());
+		getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
 		songName = preview->get_songName();
 		songSubName = preview->get_songSubName();
 		songAuthorName = preview->get_songAuthorName();
 		levelAuthorName = preview->get_levelAuthorName();
-		getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).data(), to_utf8(csstrtostr(songSubName)).data(), to_utf8(csstrtostr(songAuthorName)).data(), to_utf8(csstrtostr(levelAuthorName)).data());
+		getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).c_str(), to_utf8(csstrtostr(songSubName)).c_str(), to_utf8(csstrtostr(songAuthorName)).c_str(), to_utf8(csstrtostr(levelAuthorName)).c_str());
 		
 		beatsPerMinute = preview->get_beatsPerMinute();
 		songDuration = preview->get_songDuration();
@@ -37,16 +40,22 @@ namespace MultiQuestensions::Beatmaps {
 
 		_audioGetter = preview->GetPreviewAudioClipAsync(System::Threading::CancellationToken::get_None());
 		_coverGetter = preview->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
-		/*_rawCoverGetter = _coverGetter->ContinueWith<Array<uint8_t>*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, Array<uint8_t>*>*>(
-			*[](System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* spriteTask)->Array<uint8_t>*{
-				UnityEngine::Sprite* sprite = spriteTask->get_Result();
-				rawCover = sprite->get_texture()->GetRawTextureData<uint8_t>();
-				return reinterpret_cast<Array<uint8_t>*>(&rawCover);
-			}
-		));*/
+		UnityEngine::Sprite* coverSprite = _coverGetter->get_ResultOnSuccess();
+		UnityEngine::Texture2D* coverTexture_temp = coverSprite->get_texture();
+		coverBytes = UnityEngine::ImageConversion::EncodeToPNG(coverTexture_temp);
+		//rawCover = coverTexture_temp->GetRawTextureData<uint8_t>();
+		//coverBytes = reinterpret_cast<Array<uint8_t>*>(&rawCover);
+		//_rawCoverGetter = _coverGetter->ContinueWith<Array<uint8_t>*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, Array<uint8_t>*>*>(
+		//	*[](System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* spriteTask)->Array<uint8_t>*{
+		//		UnityEngine::Sprite* sprite = spriteTask->get_Result();
+		//		rawCover = sprite->get_texture()->GetRawTextureData<uint8_t>();
+		//		return reinterpret_cast<Array<uint8_t>*>(&rawCover);
+		//	}
+		//));
 	}
 
 	void PreviewBeatmapStub::fromPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet) {
+		getLogger().debug("PreviewBeatmapStub::fromPacket");
 		levelID = packet->levelId;
 		levelHash = LevelIdToHash(levelID);
 		isDownloaded = false;
@@ -59,27 +68,40 @@ namespace MultiQuestensions::Beatmaps {
 		beatsPerMinute = packet->beatsPerMinute;
 		songDuration = packet->songDuration;
 
+		getLogger().debug("PreviewBeatmapStub::fromPacket: _rawCoverGetter");
 		_rawCoverGetter = System::Threading::Tasks::Task_1<Array<uint8_t>*>::New_ctor(packet->coverImage);
-		/*_coverGetter = _rawCoverGetter->ContinueWith<UnityEngine::Sprite*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<Array<uint8_t>*>*, UnityEngine::Sprite*>*>(
-			*[](System::Threading::Tasks::Task_1<Array<uint8_t>*>* rawCoverTask)->UnityEngine::Sprite* {
-				Array<uint8_t>* rawCover = rawCoverTask->get_Result();
-				UnityEngine::Texture2D* texture;
-				if (rawCover == nullptr || rawCover->Length() == 0) {
-					texture = UnityEngine::Texture2D::get_whiteTexture();
-				}
-				else {
-					// in the future make this actually load bytes
-					texture = UnityEngine::Texture2D::get_whiteTexture();
-				}
-				return UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0, 0, 2, 2), UnityEngine::Vector2(0, 0), 100, 0, UnityEngine::SpriteMeshType::_get_FullRect(), UnityEngine::Vector4(2, 2, 2, 2), false);
+		if (_rawCoverGetter->get_Status() == 5) {
+			coverBytes = _rawCoverGetter->get_Result();
+			_rawCoverGetter->Dispose();
+			UnityEngine::Texture2D* texture;
+			if (coverBytes == nullptr || coverBytes->Length() == 0) {
+				texture = UnityEngine::Texture2D::get_whiteTexture();
 			}
-		));*/
+			else {
+				UnityEngine::ImageConversion::LoadImage(texture, coverBytes, false);
+			}
+			coverImage = UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0, 0, 2, 2), UnityEngine::Vector2(0, 0), 100, 0, UnityEngine::SpriteMeshType::FullRect, UnityEngine::Vector4(2, 2, 2, 2), false);
+		}
+
+		//_coverGetter = _rawCoverGetter->ContinueWith<UnityEngine::Sprite*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<Array<uint8_t>*>*, UnityEngine::Sprite*>*>(
+		//	*[](System::Threading::Tasks::Task_1<Array<uint8_t>*>* rawCoverTask)->UnityEngine::Sprite* {
+		//		Array<uint8_t>* rawCover = rawCoverTask->get_Result();
+		//		UnityEngine::Texture2D* texture;
+		//		if (rawCover == nullptr || rawCover->Length() == 0) {
+		//			texture = UnityEngine::Texture2D::get_whiteTexture();
+		//		}
+		//		else {
+		//			// in the future make this actually load bytes
+		//			texture = UnityEngine::Texture2D::get_whiteTexture();
+		//		}
+		//		return UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0, 0, 2, 2), UnityEngine::Vector2(0, 0), 100, 0, UnityEngine::SpriteMeshType::_get_FullRect(), UnityEngine::Vector4(2, 2, 2, 2), false);
+		//	}
+		//));
 	}
 
 	MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
 		//MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = (MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*)*il2cpp_utils::New(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket());
 		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
-		// TODO: Calling new on a codegen class seems sus
 		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>());
 		getLogger().debug("New PreviewBeatmapPacket*");
 
@@ -92,9 +114,19 @@ namespace MultiQuestensions::Beatmaps {
 
 		packet->beatsPerMinute = beatsPerMinute;
 
+		getLogger().debug("PreviewBeatmapPacket Getting Cover");
 
-		//_rawCoverGetter->Wait();
-		//packet->coverImage = _rawCoverGetter->get_Result();
+		if (_rawCoverGetter != nullptr && (int)_rawCoverGetter->get_Status() == 5) {
+			//_rawCoverGetter->Wait();
+			getLogger().debug("%d", (int)_rawCoverGetter->get_Status());
+			packet->coverImage = _rawCoverGetter->get_ResultOnSuccess();
+			//if (coverBytes != nullptr) packet->coverImage = coverBytes;
+		}
+		else if (coverBytes != nullptr) {
+			getLogger().debug("Use coverBytes");
+			packet->coverImage = coverBytes;
+		}
+		else getLogger().error("Could not get coverImage");
 
 		packet->characteristic = characteristic;
 		packet->difficulty = difficulty;

@@ -65,5 +65,28 @@
     <ClInclude Include="include\Packets\Callback.hpp">
       <Filter>include\Packets</Filter>
     </ClInclude>
+    <ClInclude Include="extern\songloader\shared\API.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Beatmap.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristic.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristicDifficulty.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Difficulties.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Metadata.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Page.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Stats.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\TypeMacros.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\BeatSaverAPI.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreen.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenManager.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenMoverPointer.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Settings\IncrementSetting.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\ExternalComponents.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\MainThreadScheduler.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Data\CustomDataType.hpp" />
+    <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />
+    <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp" />
+    <ClInclude Include="extern\questui\shared\eventmacros.hpp" />
+    <ClInclude Include="extern\questui\shared\QuestUI.hpp" />
   </ItemGroup>
 </Project>

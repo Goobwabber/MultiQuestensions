@@ -41,6 +41,7 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object"
 	//DECLARE_INSTANCE_METHOD(bool, HandlesType, Il2CppReflectionType* type);
 
 	DECLARE_CTOR(Construct);
+	DECLARE_DTOR(Deconstruct);
 
 	//REGISTER_FUNCTION(PacketSerializer,
 	//	REGISTER_METHOD(Serialize);

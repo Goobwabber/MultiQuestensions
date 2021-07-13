@@ -54,6 +54,3 @@ namespace MultiplayerExtensions::Beatmaps {
 		}
 	}
 }
-//void PreviewBeatmapPacket::Install() {
-//	//custom_types::Register::ExplicitRegister({ &__registration_instance_PreviewBeatmapPacket });
-//}

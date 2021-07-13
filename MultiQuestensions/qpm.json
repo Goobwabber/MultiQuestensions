@@ -27,6 +27,16 @@
       "id": "custom-types",
       "versionRange": "*",
       "additionalData": {}
+    },
+    {
+      "id": "songloader",
+      "versionRange": "*",
+      "additionalData": {}
+    },
+    {
+      "id": "questui",
+      "versionRange": "*",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

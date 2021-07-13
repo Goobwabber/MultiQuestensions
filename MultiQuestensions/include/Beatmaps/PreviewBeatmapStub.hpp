@@ -45,6 +45,11 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<Array<uint8_t>*>*, _rawCoverGetter);
 	DECLARE_INSTANCE_FIELD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, _audioGetter);
 
+	DECLARE_INSTANCE_FIELD(Array<uint8_t>*, coverBytes);
+	DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, coverImage);
+	DECLARE_INSTANCE_FIELD(UnityEngine::AudioClip*, previewAudioClip);
+
+
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelHash);
 
 	DECLARE_INSTANCE_FIELD(bool, isDownloaded);

@@ -24,6 +24,8 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps,
 	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
 	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
 
+	//DECLARE_CTOR(New_ctor, )
+
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songSubName);
