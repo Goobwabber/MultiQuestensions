@@ -27,9 +27,10 @@ namespace MultiQuestensions {
 
 		void Invoke(LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
 			getLogger().debug("Running Invoke creating packet");
-			TPacket packet = THROW_UNLESS(il2cpp_utils::New<TPacket>());
-			getLogger().debug("Assigning from ThreadStaticPacketPool");
-			packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
+			//TPacket packet = THROW_UNLESS(il2cpp_utils::New<TPacket>());
+			//getLogger().debug("Assigning from ThreadStaticPacketPool");
+			//packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
+			TPacket packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
 			if (packet == nullptr) {
 				getLogger().debug("Packet is nullptr");
 				reader->SkipBytes(size);

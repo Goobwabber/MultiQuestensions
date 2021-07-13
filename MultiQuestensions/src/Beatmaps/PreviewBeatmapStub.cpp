@@ -38,11 +38,11 @@ namespace MultiQuestensions::Beatmaps {
 		// Need this declared before getter to prevent early freeing
 		static Unity::Collections::NativeArray_1<uint8_t> rawCover;
 
-		_audioGetter = preview->GetPreviewAudioClipAsync(System::Threading::CancellationToken::get_None());
-		_coverGetter = preview->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
-		UnityEngine::Sprite* coverSprite = _coverGetter->get_ResultOnSuccess();
-		UnityEngine::Texture2D* coverTexture_temp = coverSprite->get_texture();
-		coverBytes = UnityEngine::ImageConversion::EncodeToPNG(coverTexture_temp);
+		//_audioGetter = preview->GetPreviewAudioClipAsync(System::Threading::CancellationToken::get_None());
+		//_coverGetter = preview->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
+		//UnityEngine::Sprite* coverSprite = _coverGetter->get_ResultOnSuccess();
+		//UnityEngine::Texture2D* coverTexture_temp = coverSprite->get_texture();
+		//coverBytes = UnityEngine::ImageConversion::EncodeToPNG(coverTexture_temp);
 		//rawCover = coverTexture_temp->GetRawTextureData<uint8_t>();
 		//coverBytes = reinterpret_cast<Array<uint8_t>*>(&rawCover);
 		//_rawCoverGetter = _coverGetter->ContinueWith<Array<uint8_t>*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, Array<uint8_t>*>*>(

@@ -5,6 +5,10 @@ DEFINE_TYPE(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket);
 
 namespace MultiplayerExtensions::Beatmaps {
 
+	void PreviewBeatmapPacket::New_ctor() {
+
+	}
+
 	void PreviewBeatmapPacket::Release() {
 		getLogger().debug("Running Release");
 		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
@@ -44,13 +48,13 @@ namespace MultiplayerExtensions::Beatmaps {
 
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
-		getLogger().debug("Deserialize CoverImage");
+		//getLogger().debug("Deserialize CoverImage");
 
-		if (reader->GetBytesWithLength() == nullptr) {
-			Array<uint8_t> emptyByteArray = Array<uint8_t>();
-			coverImage = &emptyByteArray;
-		} else {
-			coverImage = reader->GetBytesWithLength();
-		}
+		//if (reader->GetBytesWithLength() == nullptr) {
+		//	Array<uint8_t> emptyByteArray = Array<uint8_t>();
+		//	coverImage = &emptyByteArray;
+		//} else {
+		//	coverImage = reader->GetBytesWithLength();
+		//}
 	}
 }
