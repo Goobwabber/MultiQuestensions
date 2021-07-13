@@ -20,34 +20,18 @@ namespace MultiQuestensions {
 		//}
 	}
 	void PacketManager::Send(LiteNetLib::Utils::INetSerializable* message) { 
-		//if (_sessionManager) _sessionManager->Send(message);
-		//else {
 		getLogger().debug("Running send");
-			//_sessionManager = UnityEngine::GameObject::FindObjectOfType<GlobalNamespace::MultiplayerSessionManager*>();
-		if (_sessionManager == nullptr) {
-			getLogger().error("Aborting send, no sessionManager instance");
-		} else if (message == nullptr) getLogger().error("Aborting send, message is nullptr");
-			getLogger().debug("Got MultiplayerSessionManager");
-			//_sessionManager->Send<LiteNetLib::Utils::INetSerializable*>(message);
-			try {
-				for (uint16_t i = 0; i < classof(GlobalNamespace::StandardScoreSyncStateNetSerializable*)->vtable_count; i++) {
-					custom_types::logVtable(&classof(GlobalNamespace::StandardScoreSyncStateNetSerializable*)->vtable[i]);
-				}
-				_sessionManager->Send(message);
-			}
-			catch (il2cpp_utils::RunMethodException ex) {
-				getLogger().debug("Exception while running Send: %s", ex.what());
-			}
-			//				 ^
-			// TODO: Figure out crash here
+		if (_sessionManager != nullptr && message != nullptr) {
+			_sessionManager->Send(message);
 			getLogger().debug("Sent message");
-		//}
+		}
+		else getLogger().error("Failed to Send message");
 	}
 	void PacketManager::SendUnreliable(LiteNetLib::Utils::INetSerializable* message) { 
-		//if (_sessionManager) _sessionManager->SendUnreliable(message);
-		//else {
-			_sessionManager = UnityEngine::GameObject::FindObjectOfType<GlobalNamespace::MultiplayerSessionManager*>();
+		if (_sessionManager != nullptr && message != nullptr) {
 			_sessionManager->SendUnreliable(message);
-		//}
+			getLogger().debug("Sent message");
+		}
+		else getLogger().error("Failed to SendUnreliable message");
 	}
 }

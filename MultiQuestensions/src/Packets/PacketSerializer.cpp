@@ -18,7 +18,7 @@ namespace MultiQuestensions {
 
 	void PacketSerializer::Deserialize(LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data) {
 		int prevPosition = reader->get_Position();
-		Il2CppString* packetType = reader->GetString();
+		std::string packetType = to_utf8(csstrtostr(reader->GetString()));
 		length -= reader->get_Position() - prevPosition;
 		prevPosition = reader->get_Position();
 		if (packetHandlers.find(packetType) != packetHandlers.end()) {
@@ -35,10 +35,10 @@ namespace MultiQuestensions {
 	}
 
 	bool PacketSerializer::HandlesType(Il2CppReflectionType* type) {
-		return std::find(registeredTypes.begin(), registeredTypes.end(), type->ToString()) != registeredTypes.end();
+		return std::find(registeredTypes.begin(), registeredTypes.end(), to_utf8(csstrtostr(type->ToString()))) != registeredTypes.end();
 	}
 
-	void PacketSerializer::UnregisterCallback(Il2CppString* identifier) {
+	void PacketSerializer::UnregisterCallback(std::string identifier) {
 		remove(registeredTypes.begin(), registeredTypes.end(), identifier);
 		packetHandlers.erase(identifier);
 	}

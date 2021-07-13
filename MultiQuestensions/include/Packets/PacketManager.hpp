@@ -26,12 +26,14 @@ namespace MultiQuestensions {
 				return;
 			}
 
-			Il2CppString* identifier = packetType->ToString()->Replace(il2cpp_utils::newcsstr((std::string)"::"), il2cpp_utils::newcsstr((std::string)"."));
-			getLogger().info("%s", to_utf8(csstrtostr(identifier)).data());
+			std::string identifier = to_utf8(csstrtostr(packetType->ToString()));
+			identifier.replace(identifier.begin(), identifier.end(), "::", ".");
+			//Il2CppString* identifier_old = packetType->ToString()->Replace(il2cpp_utils::newcsstr("::"), il2cpp_utils::newcsstr("."));
+			getLogger().info("%s", identifier.c_str());
 
 			CallbackWrapper<TPacket> newCallback = CallbackWrapper<TPacket>(callback);
 
-			if (identifier == nullptr) {
+			if (identifier.empty()) {
 				getLogger().error("Cannot register callback: Identifier null.");
 				return;
 			} else {

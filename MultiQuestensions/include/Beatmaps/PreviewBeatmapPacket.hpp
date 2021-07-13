@@ -12,12 +12,13 @@
 #include "System/Object.hpp"
 
 namespace MultiplayerExtensions::Beatmaps {
-	std::vector<Il2CppClass*> GetPBPInterfaces();
+	//constexpr std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*)};
+	static std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
 }
 
 DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, 
 	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
+	MultiplayerExtensions::Beatmaps::PBPinterfaces,
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);

@@ -1,14 +1,9 @@
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "custom-types/shared/register.hpp"
-using namespace MultiplayerExtensions::Beatmaps;
 
 DEFINE_TYPE(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket);
 
 namespace MultiplayerExtensions::Beatmaps {
-	std::vector<Il2CppClass*> GetPBPInterfaces() {
-		std::vector<Il2CppClass*> MpExInterfaces = { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
-		return MpExInterfaces;
-	}
 
 	void PreviewBeatmapPacket::Release() {
 		getLogger().debug("Running Release");

@@ -86,7 +86,7 @@ MAKE_HOOK_MATCH(LobbyPlayersActivate, &LobbyPlayersDataModel::Activate, void, Lo
 MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, LobbyPlayersDataModel* self, Il2CppString* levelId, BeatmapDifficulty beatmapDifficulty, BeatmapCharacteristicSO* characteristic) {
     IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
     if (localPreview != nullptr) {
-        getLogger().info("Local user selected song '%s'.", to_utf8(csstrtostr(levelId)).data());
+        getLogger().info("Local user selected song '%s'.", to_utf8(csstrtostr(levelId)).c_str());
         MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(localPreview));
 
         if (preview->levelHash != nullptr) {
@@ -101,7 +101,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
                 //IPreviewBeatmapLevel* IPBLevel = THROW_UNLESS(il2cpp_utils::RunMethod())
                 getLogger().debug("levelID: %s", to_utf8(csstrtostr(reinterpret_cast<IPreviewBeatmapLevel*>(preview)->get_levelID())).data());
                 getLogger().debug("previewDuration: %f", reinterpret_cast<IPreviewBeatmapLevel*>(preview)->get_previewDuration());
-                self->SetPlayerBeatmapLevel(self->get_localUserId(), (IPreviewBeatmapLevel*)preview/*reinterpret_cast<IPreviewBeatmapLevel*>(preview)*/, beatmapDifficulty, characteristic);
+                self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
             }
             else getLogger().error("Can't assign as IPreviewBeatmapLevel*");
             getLogger().debug("LobbyPlayersSetLocalBeatmap Finished");
