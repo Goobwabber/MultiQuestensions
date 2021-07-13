@@ -3,7 +3,8 @@
 #include "Callback.hpp"
 #include "PacketSerializer.hpp"
 
-#include "future"
+#include <future>
+#include <algorithm>
 #include "GlobalNamespace/MultiplayerSessionManager_MessageType.hpp"
 #include "GlobalNamespace/PacketPool_1.hpp"
 
@@ -27,9 +28,15 @@ namespace MultiQuestensions {
 			}
 
 			std::string identifier = to_utf8(csstrtostr(packetType->ToString()));
-			identifier.replace(identifier.begin(), identifier.end(), "::", ".");
+			getLogger().info("Before replace %s", identifier.c_str());
+			int pos = 0;
+			while ((pos = identifier.find("::")) != std::string::npos)
+			{
+				identifier.replace(pos, 2, ".");
+				pos++;
+			}
 			//Il2CppString* identifier_old = packetType->ToString()->Replace(il2cpp_utils::newcsstr("::"), il2cpp_utils::newcsstr("."));
-			getLogger().info("%s", identifier.c_str());
+			getLogger().info("After replace %s", identifier.c_str());
 
 			CallbackWrapper<TPacket> newCallback = CallbackWrapper<TPacket>(callback);
 

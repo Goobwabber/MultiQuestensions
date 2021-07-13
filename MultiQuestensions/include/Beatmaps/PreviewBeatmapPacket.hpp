@@ -13,12 +13,16 @@
 
 namespace MultiplayerExtensions::Beatmaps {
 	//constexpr std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*)};
-	static std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
+	//static std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
+	//static std::vector<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
+	static std::vector<Il2CppClass*> GetPBPInterfaces() {
+		return { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
+	}
 }
 
 DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, 
 	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	MultiplayerExtensions::Beatmaps::PBPinterfaces,
+	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);
