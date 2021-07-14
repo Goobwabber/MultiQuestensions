@@ -14,7 +14,6 @@
 using namespace GlobalNamespace;
 
 #include "songloader/shared/API.hpp"
-#include "songdownloader/shared/BeatSaverAPI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 

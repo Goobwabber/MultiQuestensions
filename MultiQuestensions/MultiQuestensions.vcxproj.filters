@@ -8,6 +8,7 @@
     <None Include=".gitignore" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
     <None Include="cpp.hint" />
+    <None Include="ndkbuild.props" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -27,6 +28,9 @@
     </Filter>
     <Filter Include="include\Packets">
       <UniqueIdentifier>{887c95fa-1cf7-4668-bea7-e022d31b7a98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extern">
+      <UniqueIdentifier>{fcee4a01-7013-456d-844d-3ee6263d7ddd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,28 +69,71 @@
     <ClInclude Include="include\Packets\Callback.hpp">
       <Filter>include\Packets</Filter>
     </ClInclude>
-    <ClInclude Include="extern\songloader\shared\API.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Beatmap.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristic.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristicDifficulty.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Difficulties.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Metadata.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Page.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Stats.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\Types\TypeMacros.hpp" />
-    <ClInclude Include="extern\songdownloader\shared\BeatSaverAPI.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreen.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenManager.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenMoverPointer.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Settings\IncrementSetting.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\ExternalComponents.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Components\MainThreadScheduler.hpp" />
-    <ClInclude Include="extern\questui\shared\CustomTypes\Data\CustomDataType.hpp" />
-    <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />
-    <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp" />
-    <ClInclude Include="extern\questui\shared\eventmacros.hpp" />
-    <ClInclude Include="extern\questui\shared\QuestUI.hpp" />
+    <ClInclude Include="extern\songloader\shared\API.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\ArrayUtil.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Beatmap.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristic.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristicDifficulty.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Data\CustomDataType.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Difficulties.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\eventmacros.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\ExternalComponents.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreen.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenManager.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenMoverPointer.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Settings\IncrementSetting.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\MainThreadScheduler.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Metadata.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Page.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\QuestUI.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Stats.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\TypeMacros.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
