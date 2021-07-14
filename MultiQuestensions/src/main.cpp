@@ -341,6 +341,10 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbyPlayersSetLocalBeatmap);
     INSTALL_HOOK(getLogger(), LobbyPlayersSelectedBeatmap);
 
+    if (Modloader::getMods().find("BeatTogether") != Modloader::getMods().end()) {
+        getLogger().info("Hello BeatTogether!");
+    }
+    else getLogger().warning("BeatTogether was not found! Is Multiplayer modded?");
     //INSTALL_HOOK(getLogger(), MultiplayerLevelLoader_LoadLevel);
     //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
     //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
