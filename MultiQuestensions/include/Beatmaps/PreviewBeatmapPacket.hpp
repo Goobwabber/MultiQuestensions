@@ -11,7 +11,7 @@
 #include "GlobalNamespace/IPoolablePacket.hpp"
 #include "System/Object.hpp"
 
-namespace MultiplayerExtensions::Beatmaps {
+namespace MultiQuestensions::Beatmaps {
 	//constexpr std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*)};
 	//static std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
 	//static std::vector<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
@@ -20,9 +20,9 @@ namespace MultiplayerExtensions::Beatmaps {
 	}
 }
 
-DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps, 
+DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, 
 	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
+	MultiQuestensions::Beatmaps::GetPBPInterfaces(),
 
 	DECLARE_CTOR(New_ctor);
 

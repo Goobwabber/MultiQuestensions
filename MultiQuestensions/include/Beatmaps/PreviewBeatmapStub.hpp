@@ -26,9 +26,9 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	{ classof(GlobalNamespace::IPreviewBeatmapLevel*) },
 
 	DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
-	DECLARE_CTOR(FromPacket, MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*);
+	DECLARE_CTOR(FromPacket, MultiQuestensions::Beatmaps::PreviewBeatmapPacket*);
 
-	DECLARE_INSTANCE_METHOD(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
+	DECLARE_INSTANCE_METHOD(MultiQuestensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
 
 	DECLARE_INSTANCE_FIELD(GlobalNamespace::IPreviewBeatmapLevel*, _preview);
 	DECLARE_INSTANCE_FIELD(bool, isDownloaded);

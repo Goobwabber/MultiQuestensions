@@ -28,7 +28,7 @@
 )*/
 
 using CallbackDictionary = std::map<std::string, MultiQuestensions::CallbackBase*>;
-using StringList = std::vector<std::string>;
+using TypeDictionary = std::map<Il2CppReflectionType*, std::string>;
 
 DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object", sizeof(Il2CppObject),
 	{ classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*) },
@@ -52,13 +52,14 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object"
 
 	private:
 		CallbackDictionary packetHandlers;
-		StringList registeredTypes;
+		TypeDictionary registeredTypes;
 
 	public:
 		template <class TPacket>
 		void RegisterCallback(std::string identifier, CallbackWrapper<TPacket>* callback) {
-			registeredTypes.push_back(identifier);
+			registeredTypes[csTypeOf(TPacket)] = identifier;
 			packetHandlers[identifier] = callback;
 		}
+
 		void UnregisterCallback(std::string identifier);
 )

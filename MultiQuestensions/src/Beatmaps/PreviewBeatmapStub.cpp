@@ -28,7 +28,7 @@ namespace MultiQuestensions::Beatmaps {
 		getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
 	}
 
-	void PreviewBeatmapStub::FromPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet) {
+	void PreviewBeatmapStub::FromPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet) {
 		getLogger().debug("PreviewBeatmapStub::FromPacket");
 
 		isDownloaded = false;
@@ -53,9 +53,9 @@ namespace MultiQuestensions::Beatmaps {
 		return _preview->GetPreviewAudioClipAsync(cancellationToken);
 	}
 
-	MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
+	MultiQuestensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
 		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
-		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>());
+		MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>());
 
 		packet->levelHash = levelHash;
 		packet->levelId = levelID;

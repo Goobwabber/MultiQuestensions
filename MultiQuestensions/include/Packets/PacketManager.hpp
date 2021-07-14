@@ -20,6 +20,18 @@ namespace MultiQuestensions {
 		void SendUnreliable(LiteNetLib::Utils::INetSerializable* message);
 
 		template <class TPacket>
+		void RegisterCallback(std::string identifier, PacketCallback<TPacket> callback) {
+			CallbackWrapper<TPacket>* newCallback = new CallbackWrapper<TPacket>(callback);
+			if (identifier.empty()) {
+				getLogger().error("Cannot register callback: Identifier null.");
+				return;
+			}
+			else {
+				packetSerializer->RegisterCallback(identifier, newCallback);
+			}
+		}
+
+		template <class TPacket>
 		void RegisterCallback(PacketCallback<TPacket> callback) {
 			Il2CppReflectionType* packetType = csTypeOf(TPacket);
 			if (packetType == nullptr) {
@@ -35,14 +47,7 @@ namespace MultiQuestensions {
 				pos++;
 			}
 
-			CallbackWrapper<TPacket>* newCallback = new CallbackWrapper<TPacket>(callback);
-
-			if (identifier.empty()) {
-				getLogger().error("Cannot register callback: Identifier null.");
-				return;
-			} else {
-				packetSerializer->RegisterCallback(identifier, newCallback);
-			}
+			RegisterCallback<TPacket>(identifier, callback);
 		}
 	};
 }

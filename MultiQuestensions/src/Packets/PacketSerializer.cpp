@@ -6,7 +6,7 @@ DEFINE_TYPE(MultiQuestensions, PacketSerializer);
 
 namespace MultiQuestensions {
 	void PacketSerializer::Construct() {
-		registeredTypes = std::move(StringList());
+		registeredTypes = std::move(TypeDictionary());
 		packetHandlers = std::move(CallbackDictionary());
 	}
 
@@ -20,8 +20,7 @@ namespace MultiQuestensions {
 
 	void PacketSerializer::Serialize(LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet) {
 		Il2CppReflectionType* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
-		
-		writer->Put(packetType->ToString());
+		writer->Put(il2cpp_utils::newcsstr(registeredTypes[packetType]));
 		reinterpret_cast<GlobalNamespace::BeatmapIdentifierNetSerializable*>(packet)->LiteNetLib_Utils_INetSerializable_Serialize(writer);
 	}
 
@@ -52,13 +51,20 @@ namespace MultiQuestensions {
 	}
 
 	bool PacketSerializer::HandlesType(Il2CppReflectionType* type) {
-		getLogger().debug("HandlesType: %s", to_utf8(csstrtostr(type->ToString())).c_str());
-		return std::find(registeredTypes.begin(), registeredTypes.end(), to_utf8(csstrtostr(type->ToString()))) != registeredTypes.end();
+		if (registeredTypes.find(type) != registeredTypes.end()) {
+			getLogger().debug("HandlesType: %s", registeredTypes[type].c_str());
+			return true;
+		}
+		return false;
 	}
 
 	void PacketSerializer::UnregisterCallback(std::string identifier) {
 		getLogger().debug("UnregisterCallback called");
-		remove(registeredTypes.begin(), registeredTypes.end(), identifier);
+
+		for (auto it = registeredTypes.begin(); it != registeredTypes.end(); it++) {
+			if (it->second == identifier) registeredTypes.erase(it);
+		}
+
 		auto itr = packetHandlers.find(identifier);
 		if (itr != packetHandlers.end()) {
 			delete itr->second;

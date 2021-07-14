@@ -1,9 +1,9 @@
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "custom-types/shared/register.hpp"
 
-DEFINE_TYPE(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket);
+DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket);
 
-namespace MultiplayerExtensions::Beatmaps {
+namespace MultiQuestensions::Beatmaps {
 
 	void PreviewBeatmapPacket::New_ctor() {}
 
