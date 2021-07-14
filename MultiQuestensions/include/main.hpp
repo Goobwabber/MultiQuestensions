@@ -31,9 +31,6 @@
 #include <set>
 #include <string>
 
-#include "Beatmaps/PreviewBeatmapStub.hpp"
-#include "Beatmaps/PreviewBeatmapPacket.hpp"
-
 
 
 // Define these functions here so that we can easily read configuration and log information from other files
