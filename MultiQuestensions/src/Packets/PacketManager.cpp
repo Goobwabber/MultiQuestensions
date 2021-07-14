@@ -19,6 +19,7 @@ namespace MultiQuestensions {
 		//	getLogger().info("Packet serializer already exists.");
 		//}
 	}
+
 	void PacketManager::Send(LiteNetLib::Utils::INetSerializable* message) { 
 		getLogger().debug("Running send");
 		if (_sessionManager != nullptr && message != nullptr) {
@@ -27,11 +28,16 @@ namespace MultiQuestensions {
 		}
 		else getLogger().error("Failed to Send message");
 	}
+
 	void PacketManager::SendUnreliable(LiteNetLib::Utils::INetSerializable* message) { 
 		if (_sessionManager != nullptr && message != nullptr) {
 			_sessionManager->SendUnreliable(message);
 			getLogger().debug("Sent message");
 		}
 		else getLogger().error("Failed to SendUnreliable message");
+	}
+
+	void PacketManager::UnregisterCallback(std::string identifier) {
+		packetSerializer->UnregisterCallback(identifier);
 	}
 }

@@ -61,5 +61,19 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions, PacketSerializer, "System", "Object"
 			packetHandlers[identifier] = callback;
 		}
 
+		template <class TPacket>
+		void UnregisterCallback() {
+			getLogger().debug("UnregisterCallback called");
+
+			auto it = registeredTypes.find(csTypeOf(TPacket));
+			if (it != registeredTypes.end()) registeredTypes.erase(it);
+
+			auto itr = packetHandlers.find(csTypeOf(TPacket)->ToString());
+			if (itr != packetHandlers.end()) {
+				delete itr->second;
+				packetHandlers.erase(itr);
+			}
+		}
+
 		void UnregisterCallback(std::string identifier);
 )

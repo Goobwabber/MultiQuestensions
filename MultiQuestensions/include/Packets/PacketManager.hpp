@@ -49,5 +49,12 @@ namespace MultiQuestensions {
 
 			RegisterCallback<TPacket>(identifier, callback);
 		}
+
+		template <class TPacket>
+		void UnregisterCallback() {
+			packetSerializer->UnregisterCallback<TPacket>();
+		}
+
+		void UnregisterCallback(std::string identifier);
 	};
 }

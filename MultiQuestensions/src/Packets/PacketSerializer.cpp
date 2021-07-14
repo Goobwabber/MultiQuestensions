@@ -51,8 +51,9 @@ namespace MultiQuestensions {
 	}
 
 	bool PacketSerializer::HandlesType(Il2CppReflectionType* type) {
-		if (registeredTypes.find(type) != registeredTypes.end()) {
-			getLogger().debug("HandlesType: %s", registeredTypes[type].c_str());
+		auto it = registeredTypes.find(type);
+		if (it != registeredTypes.end()) {
+			getLogger().debug("HandlesType: %s", it->second.c_str());
 			return true;
 		}
 		return false;
