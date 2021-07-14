@@ -1,13 +1,22 @@
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
+#include "custom-types/shared/register.hpp"
 
-DEFINE_CLASS(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket);
+DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket);
 
-namespace MultiplayerExtensions::Beatmaps {
+namespace MultiQuestensions::Beatmaps {
+
+	void PreviewBeatmapPacket::New_ctor() {}
+
 	void PreviewBeatmapPacket::Release() {
+		getLogger().debug("PreviewBeatmapPacket::Release");
 		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
 	}
+
 	void PreviewBeatmapPacket::Serialize(LiteNetLib::Utils::NetDataWriter* writer) {
+		getLogger().debug("PreviewBeatmapPacket::Serialize");
+
 		writer->Put(levelId);
+		writer->Put(levelHash);
 		writer->Put(songName);
 		writer->Put(songSubName);
 		writer->Put(songAuthorName);
@@ -17,18 +26,13 @@ namespace MultiplayerExtensions::Beatmaps {
 
 		writer->Put(characteristic);
 		writer->Put(difficulty);
-
-		if (coverImage == nullptr) {
-			Array<uint8_t> emptyByteArray = Array<uint8_t>();
-			writer->PutBytesWithLength(&emptyByteArray);
-		}
-		else {
-			writer->PutBytesWithLength(coverImage);
-		}
 	}
 
 	void PreviewBeatmapPacket::Deserialize(LiteNetLib::Utils::NetDataReader* reader) {
+		getLogger().debug("PreviewBeatmapPacket::Deserialize");
+
 		levelId = reader->GetString();
+		levelHash = reader->GetString();
 		songName = reader->GetString();
 		songSubName = reader->GetString();
 		songAuthorName = reader->GetString();
@@ -38,12 +42,5 @@ namespace MultiplayerExtensions::Beatmaps {
 
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
-
-		if (reader->GetBytesWithLength() == nullptr) {
-			Array<uint8_t> emptyByteArray = Array<uint8_t>();
-			coverImage = &emptyByteArray;
-		} else {
-			coverImage = reader->GetBytesWithLength();
-		}
 	}
 }
