@@ -71,7 +71,7 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 
 
 	DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
-	DECLARE_CTOR(FromPacket, MultiQuestensions::Beatmaps::PreviewBeatmapPacket*);
+	DECLARE_CTOR(FromPacket, MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*);
 
 	DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, GetCoverImageAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetCoverImageAsync", 1), System::Threading::CancellationToken cancellationToken);
 	DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, GetPreviewAudioClipAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetPreviewAudioClipAsync", 1), System::Threading::CancellationToken cancellationToken);

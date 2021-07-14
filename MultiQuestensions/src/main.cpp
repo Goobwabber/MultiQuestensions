@@ -48,6 +48,20 @@ Il2CppString* LevelIdToHash(Il2CppString* levelId) {
     return (hash != nullptr && hash->get_Length() == 40) ? hash : nullptr;
 }
 
+
+
+// Plugin setup stuff
+GlobalNamespace::MultiplayerSessionManager* sessionManager;
+GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
+MultiQuestensions::PacketManager* packetManager;
+
+std::string moddedState = "modded";
+std::string questState = "platformquest";
+std::string customSongsState = "customsongs";
+std::string enforceModsState = "enforcemods";
+
+
+
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
     for (int i = 0; i < lobbyPlayersDataModel->playersData->get_Values()->get_Count(); i++) {
         ILevelGameplaySetupData* playerData = reinterpret_cast<System::Collections::Generic::List_1<ILevelGameplaySetupData*>*>(lobbyPlayersDataModel->playersData->get_Values())->get_Item(i);
@@ -67,18 +81,6 @@ bool AllPlayersModded() {
     }
     return result;
 }
-
-
-
-// Plugin setup stuff
-GlobalNamespace::MultiplayerSessionManager* sessionManager;
-GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
-MultiQuestensions::PacketManager* packetManager;
-
-std::string moddedState = "modded";
-std::string questState = "platformquest";
-std::string customSongsState = "customsongs";
-std::string enforceModsState = "enforcemods";
 
 
 
