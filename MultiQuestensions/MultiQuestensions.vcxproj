@@ -17,7 +17,6 @@
     <None Include="bmbfmod.json" />
     <None Include="cpp.hint" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
-    <None Include="ndkbuild.props" />
     <None Include="qpm.json" />
   </ItemGroup>
   <ItemGroup>
@@ -28,7 +27,6 @@
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\littl\AppData\Local\QPM_Temp\codegen\0.10.2\src\include\GlobalNamespace\HMMainThreadDispatcher.hpp" />
     <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />
     <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp" />
     <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp" />
@@ -100,6 +98,7 @@
     <NMakeBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" NDK_PROJECT_PATH=$(ProjectDir) APP_BUILD_SCRIPT=$(ProjectDir)Android.mk NDK_APPLICATION_MK=$(ProjectDir)Application.mk</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" -B</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(NdkPath)\build\ndk-build.cmd" clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeForcedIncludes>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
   </ItemDefinitionGroup>

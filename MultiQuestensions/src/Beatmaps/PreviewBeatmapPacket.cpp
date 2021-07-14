@@ -8,12 +8,12 @@ namespace MultiplayerExtensions::Beatmaps {
 	void PreviewBeatmapPacket::New_ctor() {}
 
 	void PreviewBeatmapPacket::Release() {
-		getLogger().debug("Running Release");
+		getLogger().debug("PreviewBeatmapPacket::Release");
 		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
 	}
 
 	void PreviewBeatmapPacket::Serialize(LiteNetLib::Utils::NetDataWriter* writer) {
-		getLogger().debug("Starting Serialize");
+		getLogger().debug("PreviewBeatmapPacket::Serialize");
 
 		writer->Put(levelId);
 		writer->Put(levelHash);
@@ -29,7 +29,7 @@ namespace MultiplayerExtensions::Beatmaps {
 	}
 
 	void PreviewBeatmapPacket::Deserialize(LiteNetLib::Utils::NetDataReader* reader) {
-		getLogger().debug("Starting Deserialize");
+		getLogger().debug("PreviewBeatmapPacket::Deserialize");
 
 		levelId = reader->GetString();
 		levelHash = reader->GetString();
