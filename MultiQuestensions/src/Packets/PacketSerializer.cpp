@@ -42,7 +42,7 @@ namespace MultiQuestensions {
 				getLogger().error("%s", e.what());
 			} catch (const System::Exception* ex) {
 				getLogger().warning("An C# exception was thrown while processing custom packet: %s", to_utf8(csstrtostr(ex->message)).c_str());
-				getLogger().error("%s\n", ex); // This needs to have \n after %s as the char* is not terminated
+				getLogger().error("%s\n", (char*)ex); // This needs to have \n after %s as the char* is not terminated
 			}
 
 		}
