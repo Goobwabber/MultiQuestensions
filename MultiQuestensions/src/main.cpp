@@ -16,6 +16,7 @@
 #include "GlobalNamespace/LevelSelectionNavigationController.hpp"
 #include "GlobalNamespace/HostLobbySetupViewController.hpp"
 #include "GlobalNamespace/HostLobbySetupViewController_CannotStartGameReason.hpp"
+#include "System/Action_1.hpp"
 using namespace GlobalNamespace;
 
 #include "songloader/shared/API.hpp"
@@ -63,7 +64,10 @@ MultiQuestensions::PacketManager* packetManager;
 std::string moddedState = "modded";
 std::string questState = "platformquest";
 std::string customSongsState = "customsongs";
-std::string enforceModsState = "enforcemods";
+std::string freeModState = "freemod";
+std::string hostPickState = "hostpick";
+
+bool customSongsEnabled = true;
 
 
 
@@ -98,6 +102,13 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
     lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), GlobalNamespace::BeatmapDifficulty((int)packet->difficulty), characteristic);
 }
 
+static void HandlePlayerStateChanged(GlobalNamespace::IConnectedPlayer* player) {
+    if (player->get_isConnectionOwner()) {
+        customSongsEnabled = player->HasState(il2cpp_utils::newcsstr(customSongsState));
+    }
+}
+
+
 
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
@@ -105,15 +116,19 @@ MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, Mu
     SessionManagerStart(sessionManager);
     packetManager = new MultiQuestensions::PacketManager(sessionManager);
 
-    getLogger().debug("customsongsState is: %d, enforceModsState is: %d", getConfig().config["customsongs"].GetBool(), getConfig().config["enforcemods"].GetBool());
+    customSongsEnabled = getConfig().config["customsongs"].GetBool();
+
+    getLogger().debug("customsongs: %d", customSongsEnabled);
     
     // TODO: Add the SetLocalPlayerState stuff to BeatTogether
     self->SetLocalPlayerState(il2cpp_utils::newcsstr(moddedState), true);
     self->SetLocalPlayerState(il2cpp_utils::newcsstr(questState), true);
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), getConfig().config["customsongs"].GetBool());
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), customSongsEnabled);
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(freeModState), false);
+    self->SetLocalPlayerState(il2cpp_utils::newcsstr(hostPickState), true);
     //self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), true);
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(enforceModsState), getConfig().config["enforcemods"].GetBool());
 
+    self->add_playerStateChangedEvent(il2cpp_utils::MakeAction<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(HandlePlayerStateChanged));
     packetManager->RegisterCallback<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>("MultiplayerExtensions.Beatmaps.PreviewBeatmapPacket", HandlePreviewBeatmapPacket);
 }
 
@@ -342,7 +357,7 @@ void saveDefaultConfig() {
     getLogger().info("Creating config file...");
     ConfigDocument& config = getConfig().config;
 
-    if (config.HasMember("customsongs")) {
+    if (config.HasMember("customsongs") && config.HasMember("freemod")) {
         getLogger().info("Config file already exists.");
         return;
     }
@@ -352,7 +367,8 @@ void saveDefaultConfig() {
     auto& allocator = config.GetAllocator();
 
     config.AddMember("customsongs", true, allocator);
-    config.AddMember("enforcemods", true, allocator);
+    config.AddMember("freemod", false, allocator);
+    config.AddMember("hostpick", true, allocator);
     //config["customsongs"].SetBool(true);
     //config["enforcemods"].SetBool(true);
 
