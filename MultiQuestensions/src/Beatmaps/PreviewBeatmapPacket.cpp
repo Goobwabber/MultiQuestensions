@@ -7,22 +7,6 @@ namespace MultiplayerExtensions::Beatmaps {
 
 	void PreviewBeatmapPacket::New_ctor() {}
 
-	void PreviewBeatmapPacket::FromPreview(MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview, Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
-		getLogger().debug("PreviewBeatmapPacket::FromPreview");
-
-		levelId = preview->levelID;
-		levelHash = preview->levelHash;
-		songName = preview->songName;
-		songSubName = preview->songSubName;
-		songAuthorName = preview->songAuthorName;
-		levelAuthorName = preview->levelAuthorName;
-		beatsPerMinute = preview->beatsPerMinute;
-		songDuration = preview->songDuration;
-
-		characteristic = characteristic;
-		difficulty = difficulty;
-	}
-
 	void PreviewBeatmapPacket::Release() {
 		getLogger().debug("Running Release");
 		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);

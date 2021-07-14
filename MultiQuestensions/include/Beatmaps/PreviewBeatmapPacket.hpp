@@ -3,7 +3,6 @@
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 
-#include "PreviewBeatmapStub.hpp"
 #include "LiteNetLib/Utils/NetDataReader.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
 #include "LiteNetLib/Utils/INetSerializable.hpp"
@@ -26,7 +25,6 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps,
 	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
 
 	DECLARE_CTOR(New_ctor);
-	DECLARE_CTOR(FromPreview, MultiQuestensions::Beatmaps::PreviewBeatmapStub*, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
 
 	// Basic Song Info/Metadata
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);

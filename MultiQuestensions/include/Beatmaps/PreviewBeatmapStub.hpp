@@ -25,6 +25,11 @@ namespace MultiQuestensions::Beatmaps {
 DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "System", "Object", sizeof(Il2CppObject),
 	{ classof(GlobalNamespace::IPreviewBeatmapLevel*) },
 
+	DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
+	DECLARE_CTOR(FromPacket, MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*);
+
+	DECLARE_INSTANCE_METHOD(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
+
 	DECLARE_INSTANCE_FIELD(GlobalNamespace::IPreviewBeatmapLevel*, _preview);
 	DECLARE_INSTANCE_FIELD(bool, isDownloaded);
 	DECLARE_INSTANCE_FIELD(bool, isDownloadable);
@@ -50,8 +55,6 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	DECLARE_INSTANCE_FIELD(GlobalNamespace::EnvironmentInfoSO*, environmentInfo);
 	DECLARE_INSTANCE_FIELD(Array<GlobalNamespace::PreviewDifficultyBeatmapSet*>*, previewDifficultyBeatmapSets);
 
-
-
 	DECLARE_OVERRIDE_METHOD(Il2CppString*, get_levelID, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_levelID", 0));
 	DECLARE_OVERRIDE_METHOD(Il2CppString*, get_songName, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_songName", 0));
 	DECLARE_OVERRIDE_METHOD(Il2CppString*, get_songSubName, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_songSubName", 0));
@@ -67,11 +70,6 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	DECLARE_OVERRIDE_METHOD(GlobalNamespace::EnvironmentInfoSO*, get_allDirectionsEnvironmentInfo, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_allDirectionsEnvironmentInfo", 0));
 	DECLARE_OVERRIDE_METHOD(GlobalNamespace::EnvironmentInfoSO*, get_environmentInfo, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_environmentInfo", 0));
 	DECLARE_OVERRIDE_METHOD(Array<GlobalNamespace::PreviewDifficultyBeatmapSet*>*, get_previewDifficultyBeatmapSets, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_previewDifficultyBeatmapSets", 0));
-
-
-
-	DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
-	DECLARE_CTOR(FromPacket, MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*);
 
 	DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, GetCoverImageAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetCoverImageAsync", 1), System::Threading::CancellationToken cancellationToken);
 	DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, GetPreviewAudioClipAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetPreviewAudioClipAsync", 1), System::Threading::CancellationToken cancellationToken);

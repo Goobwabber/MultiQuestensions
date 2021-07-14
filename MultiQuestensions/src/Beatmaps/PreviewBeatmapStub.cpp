@@ -53,6 +53,26 @@ namespace MultiQuestensions::Beatmaps {
 		return _preview->GetPreviewAudioClipAsync(cancellationToken);
 	}
 
+	MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
+		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
+		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*>());
+
+		packet->levelHash = levelHash;
+		packet->levelId = levelID;
+
+		packet->songName = songName;
+		packet->songSubName = songSubName;
+		packet->songAuthorName = songAuthorName;
+		packet->levelAuthorName = levelAuthorName;
+
+		packet->beatsPerMinute = beatsPerMinute;
+		packet->songDuration = songDuration;
+
+		packet->characteristic = characteristic;
+		packet->difficulty = difficulty;
+		return packet;
+	}
+
 #pragma region All the pain in form of getter functions
 
 	Il2CppString* PreviewBeatmapStub::get_levelID() {
