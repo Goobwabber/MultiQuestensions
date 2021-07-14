@@ -28,6 +28,7 @@
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\littl\AppData\Local\QPM_Temp\codegen\0.10.2\src\include\GlobalNamespace\HMMainThreadDispatcher.hpp" />
     <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />
     <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp" />
     <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp" />

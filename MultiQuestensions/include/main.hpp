@@ -15,6 +15,7 @@
 #include "GlobalNamespace/MultiplayerSessionManager.hpp"
 #include "GlobalNamespace/IMenuRpcManager.hpp"
 #include "GlobalNamespace/LobbyPlayersDataModel.hpp"
+#include "GlobalNamespace/ILobbyPlayerDataModel.hpp"
 #include "GlobalNamespace/BeatmapLevelsModel.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 
@@ -23,6 +24,7 @@
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicCollectionSO.hpp"
+#include "GlobalNamespace/HMMainThreadDispatcher.hpp"
 
 // Cpp includes
 #include <map>
@@ -32,3 +34,6 @@
 // Define these functions here so that we can easily read configuration and log information from other files
 Configuration& getConfig();
 Logger& getLogger();
+
+// Utilities
+Il2CppString* LevelIdToHash(Il2CppString*);

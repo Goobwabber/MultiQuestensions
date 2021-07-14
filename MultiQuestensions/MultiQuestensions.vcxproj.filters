@@ -135,5 +135,8 @@
     <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp">
       <Filter>extern</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\littl\AppData\Local\QPM_Temp\codegen\0.10.2\src\include\GlobalNamespace\HMMainThreadDispatcher.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

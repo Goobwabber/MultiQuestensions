@@ -3,6 +3,7 @@
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 
+#include "PreviewBeatmapStub.hpp"
 #include "LiteNetLib/Utils/NetDataReader.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
 #include "LiteNetLib/Utils/INetSerializable.hpp"
@@ -25,9 +26,11 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps,
 	MultiplayerExtensions::Beatmaps::GetPBPInterfaces(),
 
 	DECLARE_CTOR(New_ctor);
-	//DECLARE_DEFAULT_CTOR();
+	DECLARE_CTOR(FromPreview, MultiQuestensions::Beatmaps::PreviewBeatmapStub*, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
 
+	// Basic Song Info/Metadata
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
+	DECLARE_INSTANCE_FIELD(Il2CppString*, levelHash);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songSubName);
 	DECLARE_INSTANCE_FIELD(Il2CppString*, songAuthorName);
@@ -35,8 +38,7 @@ DECLARE_CLASS_INTERFACES(MultiplayerExtensions::Beatmaps,
 	DECLARE_INSTANCE_FIELD(float, beatsPerMinute);
 	DECLARE_INSTANCE_FIELD(float, songDuration);
 
-	DECLARE_INSTANCE_FIELD(Array<uint8_t>*, coverImage);
-
+	// Selection Info
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
 	DECLARE_INSTANCE_FIELD(unsigned int, difficulty);
 

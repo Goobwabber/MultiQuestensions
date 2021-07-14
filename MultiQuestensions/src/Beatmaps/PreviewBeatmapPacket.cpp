@@ -5,17 +5,34 @@ DEFINE_TYPE(MultiplayerExtensions::Beatmaps, PreviewBeatmapPacket);
 
 namespace MultiplayerExtensions::Beatmaps {
 
-	void PreviewBeatmapPacket::New_ctor() {
+	void PreviewBeatmapPacket::New_ctor() {}
 
+	void PreviewBeatmapPacket::FromPreview(MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview, Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
+		getLogger().debug("PreviewBeatmapPacket::FromPreview");
+
+		levelId = preview->levelID;
+		levelHash = preview->levelHash;
+		songName = preview->songName;
+		songSubName = preview->songSubName;
+		songAuthorName = preview->songAuthorName;
+		levelAuthorName = preview->levelAuthorName;
+		beatsPerMinute = preview->beatsPerMinute;
+		songDuration = preview->songDuration;
+
+		characteristic = characteristic;
+		difficulty = difficulty;
 	}
 
 	void PreviewBeatmapPacket::Release() {
 		getLogger().debug("Running Release");
 		GlobalNamespace::ThreadStaticPacketPool_1<PreviewBeatmapPacket*>::get_pool()->Release(this);
 	}
+
 	void PreviewBeatmapPacket::Serialize(LiteNetLib::Utils::NetDataWriter* writer) {
 		getLogger().debug("Starting Serialize");
+
 		writer->Put(levelId);
+		writer->Put(levelHash);
 		writer->Put(songName);
 		writer->Put(songSubName);
 		writer->Put(songAuthorName);
@@ -25,20 +42,13 @@ namespace MultiplayerExtensions::Beatmaps {
 
 		writer->Put(characteristic);
 		writer->Put(difficulty);
-		getLogger().debug("Serialize CoverImage");
-
-		if (coverImage == nullptr) {
-			Array<uint8_t> emptyByteArray = Array<uint8_t>();
-			writer->PutBytesWithLength(&emptyByteArray);
-		}
-		else {
-			writer->PutBytesWithLength(coverImage);
-		}
 	}
 
 	void PreviewBeatmapPacket::Deserialize(LiteNetLib::Utils::NetDataReader* reader) {
 		getLogger().debug("Starting Deserialize");
+
 		levelId = reader->GetString();
+		levelHash = reader->GetString();
 		songName = reader->GetString();
 		songSubName = reader->GetString();
 		songAuthorName = reader->GetString();
@@ -48,13 +58,5 @@ namespace MultiplayerExtensions::Beatmaps {
 
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
-		//getLogger().debug("Deserialize CoverImage");
-
-		//if (reader->GetBytesWithLength() == nullptr) {
-		//	Array<uint8_t> emptyByteArray = Array<uint8_t>();
-		//	coverImage = &emptyByteArray;
-		//} else {
-		//	coverImage = reader->GetBytesWithLength();
-		//}
 	}
 }
