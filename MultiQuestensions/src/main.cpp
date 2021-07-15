@@ -67,12 +67,28 @@ std::string customSongsState = "customsongs";
 std::string freeModState = "freemod";
 std::string hostPickState = "hostpick";
 
+Il2CppString* getCustomSongsStateStr() {
+    static auto* customSongStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("customsongs");
+    return customSongStateStr;
+}
+
+Il2CppString* getFreeModStateStr() {
+    static auto* freeModStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("freemod");
+    return freeModStateStr;
+}
+
+Il2CppString* getHostPickStateStr() {
+    static auto* hostPickStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("hostpick");
+    return hostPickStateStr;
+}
+
 bool customSongsEnabled = true;
 
 
 
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
     for (int i = 0; i < lobbyPlayersDataModel->playersData->get_Values()->get_Count(); i++) {
+                                                                     //   ^ Crash here
         ILevelGameplaySetupData* playerData = reinterpret_cast<System::Collections::Generic::List_1<ILevelGameplaySetupData*>*>(lobbyPlayersDataModel->playersData->get_Values())->get_Item(i);
         if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
             if (il2cpp_functions::class_is_assignable_from((Il2CppClass*)playerData->get_beatmapLevel(), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
@@ -101,13 +117,19 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
     lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), GlobalNamespace::BeatmapDifficulty((int)packet->difficulty), characteristic);
 }
 
-static void HandlePlayerStateChanged(GlobalNamespace::IConnectedPlayer* player) {
+//static void HandlePlayerStateChanged(GlobalNamespace::IConnectedPlayer* player) {
+//    if (player->get_isConnectionOwner()) {
+//        customSongsEnabled = player->HasState(il2cpp_utils::newcsstr(customSongsState));
+//    }
+//}
+
+// Checks if a MPEX player has customsongs enabled or not
+MAKE_HOOK_MATCH(MultiplayerSessionManager_HandlePlayerStateChanged, &MultiplayerSessionManager::HandlePlayerStateChanged, void, MultiplayerSessionManager* self, IConnectedPlayer* player) {
+    MultiplayerSessionManager_HandlePlayerStateChanged(self, player);
     if (player->get_isConnectionOwner()) {
-        customSongsEnabled = player->HasState(il2cpp_utils::newcsstr(customSongsState));
+        customSongsEnabled = player->HasState(getCustomSongsStateStr());
     }
 }
-
-
 
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
@@ -122,12 +144,12 @@ MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, Mu
     // TODO: Add the SetLocalPlayerState stuff to BeatTogether
     self->SetLocalPlayerState(il2cpp_utils::newcsstr(moddedState), true);
     self->SetLocalPlayerState(il2cpp_utils::newcsstr(questState), true);
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), customSongsEnabled);
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(freeModState), false);
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(hostPickState), true);
+    self->SetLocalPlayerState(getCustomSongsStateStr(), customSongsEnabled);
+    self->SetLocalPlayerState(getFreeModStateStr(), false);
+    self->SetLocalPlayerState(getHostPickStateStr(), true);
     //self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), true);
 
-    self->add_playerStateChangedEvent(il2cpp_utils::MakeAction<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(HandlePlayerStateChanged));
+    //self->add_playerStateChangedEvent(il2cpp_utils::MakeAction<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(HandlePlayerStateChanged));
     packetManager->RegisterCallback<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>("MultiplayerExtensions.Beatmaps.PreviewBeatmapPacket", HandlePreviewBeatmapPacket);
 }
 
@@ -144,6 +166,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
     if (hash != nullptr) {
         getLogger().info("Local user selected song '%s'.", to_utf8(csstrtostr(hash)).c_str());
         MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = GetExistingPreview(levelId);
+                                                                // ^ Also crash here
         if (preview != nullptr) {
             self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
             self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
@@ -407,5 +430,6 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), HostLobbySetupViewController_SetPlayersMissingLevelText);
     INSTALL_HOOK(getLogger(), HostLobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
+    INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerStateChanged);
     getLogger().info("Installed all hooks!");
 }
