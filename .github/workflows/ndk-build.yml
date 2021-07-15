@@ -124,7 +124,7 @@ jobs:
     - name: Build
       run: |
         cd ./MultiQuestensions
-        ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk VERSION=${{ env.version }}
+        pwsh -Command ./build.ps1
         pwsh -Command ./buildQMOD.ps1 --package
         
     - name: Upload debug Artifact
