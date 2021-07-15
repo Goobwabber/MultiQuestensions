@@ -113,10 +113,10 @@ jobs:
         ls -lh ${GITHUB_WORKSPACE}/MultiQuestensions/extern/
         echo ""
         echo "Checking QPM_Temp Folders"
-        ls -lh ${GITHUB_WORKSPACE}/QPM_Temp/
+        ls -lh ${GITHUB_WORKSPACE}/MultiQuestensions/QPM_Temp/
         echo ""
         echo "Listing beatsaber-hook folder"
-        ls QPM_Temp/beatsaber-hook/
+        ls ${GITHUB_WORKSPACE}/MultiQuestensions/QPM_Temp/beatsaber-hook/
         echo ""
         echo "Listing all .so files in QPM_Temp"
         find ${GITHUB_WORKSPACE}/QPM_Temp -type f -name "*.so"
