@@ -119,7 +119,7 @@ jobs:
         ls ${GITHUB_WORKSPACE}/MultiQuestensions/QPM_Temp/beatsaber-hook/
         echo ""
         echo "Listing all .so files in QPM_Temp"
-        find ${GITHUB_WORKSPACE}/QPM_Temp -type f -name "*.so"
+        find ${GITHUB_WORKSPACE}/MultiQuestensions/QPM_Temp -type f -name "*.so"
 
     - name: Build
       run: |
