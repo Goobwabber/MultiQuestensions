@@ -83,12 +83,11 @@ MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString
     return nullptr;
 }
 
-bool AllPlayersModded() {
-    bool result = true;
+bool AllPlayersModded() {    
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
-        result = result && sessionManager->connectedPlayers->get_Item(i)->HasState(il2cpp_utils::newcsstr(moddedState));
+        if (!sessionManager->connectedPlayers->get_Item(i)->HasState(il2cpp_utils::newcsstr(moddedState))) return false;
     }
-    return result;
+    return true;
 }
 
 
@@ -178,9 +177,9 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigat
     SongPackMask songPackMask, BeatmapDifficultyMask allowedBeatmapDifficultyMask, Array<GlobalNamespace::BeatmapCharacteristicSO*>* notAllowedCharacteristics,
     bool hidePacksIfOneOrNone, bool hidePracticeButton, bool showPlayerStatsInDetailView, Il2CppString* actionButtonText, IBeatmapLevelPack* levelPackToBeSelectedAfterPresent,
     SelectLevelCategoryViewController::LevelCategory startLevelCategory, IPreviewBeatmapLevel* beatmapLevelToBeSelectedAfterPresent, bool enableCustomLevels) {
-    getLogger().info("LevelSelectionNavigationController_Setup enabling custom songs . . .");
+    getLogger().info("LevelSelectionNavigationController_Setup setting custom songs . . .");
     LevelSelectionNavigationController_Setup(self, songPackMask, allowedBeatmapDifficultyMask, notAllowedCharacteristics, hidePacksIfOneOrNone, hidePracticeButton, showPlayerStatsInDetailView,
-        actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, true);
+        actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, customSongsEnabled);
 }
 
 
