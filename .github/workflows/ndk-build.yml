@@ -1,15 +1,49 @@
 name: NDK Build
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, rewrite ]
     paths:
       - 'MultiQuestensions/**'
       - '.github/workflows/ndk-build.yml'
+      - '!**.yml'
+      - '.github/workflows/ndk-build.yml'
+      - '!**.json'
+      - 'qpm.json'
+      - 'bmbfmod.json'
+      - 'mod.json'
+      - '!**.ps1'
+      - 'build.ps1'
+      - 'buildQMOD.ps1'
+      - 'buildBMBF.ps1'
+      - '!**.hint'
+      - '!**.md'
+      - '!.gitignore'
   pull_request:
-    branches: [ main ]
+    branches: [ main, rewrite ]
     paths:
       - 'MultiQuestensions/**'
+      - '!**.yml'
+      - '.github/workflows/ndk-build.yml'
+      - '!**.json'
+      - 'qpm.json'
+      - 'bmbfmod.json'
+      - 'mod.json'
+      - '!**.ps1'
+      - 'build.ps1'
+      - 'buildQMOD.ps1'
+      - 'buildBMBF.ps1'
+      - '!**.hint'
+      - '!**.md'
+      - '!.gitignore'
+      
+env:
+     module_id: multiquestensions
+     version: 0.1.0-Dev-${{ github.run_number }}
+     bs_hook: 2_0_3
+     BS_Version: 1.16.2
+     ndkname: android-ndk-r22
 
 jobs:
   build:
@@ -18,44 +52,95 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       name: Checkout
+        
+    - name: Install Powershell
+      run: sudo apt-get install -y powershell
+      
+    - name: Cache Android NDK
+      id: cache-ndk
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ndk
+      with:
+        path: ndk
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
     
-    - name: Download QPM
+    - name: Install Android NDK
+      if: steps.cache-ndk.outputs.cache-hit != 'true'
+      run: |
+        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+        unzip -q ndk.zip
+        mv ${ndkname} ndk
+      
+    - name: Create ndkpath.txt
+      run: |
+        cd ndk
+        pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+        
+    - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
       with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
         workflow: main.yml
         name: QPM-ubuntu-x64
         path: QPM
         repo: sc2ad/QuestPackageManager
-        
-    - name: Install Powershell
-      run: sudo apt-get install -y powershell
+
+    - name: QPM Dependencies Cache
+      id: cache-qpm-deps
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-qpm-deps
+      with:
+        path: QPM_Temp
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm.json', '.github/workflows/ndk-build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-
+          ${{ runner.os }}-${{ env.cache-name }}
       
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
         cd ./MultiQuestensions
         ../QPM/QPM restore
-    
-    - name: Setup NDK
-      uses: nttld/setup-ndk@v1.0.3
-      with:
-        ndk-version: r21
+        
+    - name: Check dependency Folders
+      run: |
+        echo "Checking extern Folder"
+        ls -lh ${GITHUB_WORKSPACE}/MultiQuestensions/extern/
+        echo ""
+        echo "Checking QPM_Temp Folders"
+        ls -lh ${GITHUB_WORKSPACE}/QPM_Temp/
+        echo ""
+        echo "Listing beatsaber-hook folder"
+        ls QPM_Temp/beatsaber-hook/
+        echo ""
+        echo "Listing all .so files in QPM_Temp"
+        find ${GITHUB_WORKSPACE}/QPM_Temp -type f -name "*.so"
 
     - name: Build
       run: |
         cd ./MultiQuestensions
-        ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
-        pwsh -Command ./buildBMBF.ps1
+        ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk VERSION=${{ env.version }}
+        pwsh -Command ./buildQMOD.ps1 --package
         
+    - name: Upload debug Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: debug_libmultiquestensions.so
+        path: ./MultiQuestensions/obj/local/arm64-v8a/libmultiquestensions.so
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: libmultiquestensions.so
-        path: ./MultiQuestensions/obj/local/arm64-v8a/libmultiquestensions.so
+        path: ./MultiQuestensions/libs/arm64-v8a/libmultiquestensions.so
 
-    - name: Upload BMBF build
+    - name: Upload QMOD build
       uses: actions/upload-artifact@v2
       with:
-        name: multiquestensions.zip
-        path: ./MultiQuestensions/${(multiquestensions*.zip)[0]}
+        name: multiquestensions.qmod
+        path: ./MultiQuestensions/${(multiquestensions*.qmod)[0]}

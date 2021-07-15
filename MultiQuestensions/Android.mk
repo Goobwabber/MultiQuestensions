@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+VERSION ?= 0.1.0
 
 LOCAL_PATH := $(call my-dir)
 TARGET_ARCH_ABI := $(APP_ABI)
@@ -68,7 +69,7 @@ LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += songloader
 LOCAL_SHARED_LIBRARIES += questui
 LOCAL_LDLIBS += -llog
-LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"multiquestensions"' -DVERSION='"0.1.0"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
+LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"multiquestensions"' -DVERSION='"$(VERSION)"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a
 LOCAL_C_INCLUDES += ./include ./src
 include $(BUILD_SHARED_LIBRARY)

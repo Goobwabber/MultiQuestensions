@@ -25,8 +25,8 @@
         "installLibraryFile": "libbeatsaber-hook_1_0_10.so"
       }
     },
-	  {
-	    "type": "HookModLibrary",
+    {
+      "type": "HookModLibrary",
       "installAction": {
         "installLibraryFile": "libcustom-types.so"
       }
