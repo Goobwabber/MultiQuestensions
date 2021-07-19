@@ -1,6 +1,5 @@
 #include "Packets/PacketSerializer.hpp"
 #include "GlobalNamespace/BeatmapIdentifierNetSerializable.hpp"
-#include "System/Exception.hpp"
 
 DEFINE_TYPE(MultiQuestensions, PacketSerializer);
 
@@ -20,8 +19,15 @@ namespace MultiQuestensions {
 
 	void PacketSerializer::Serialize(LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet) {
 		Il2CppReflectionType* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
+		getLogger().debug("Serialize packetType is: %s", to_utf8(csstrtostr(packetType->ToString())).c_str());
+		getLogger().debug("Registered types check: %s", registeredTypes[packetType].c_str());
 		writer->Put(il2cpp_utils::newcsstr(registeredTypes[packetType]));
+		//writer->Put(packetType->ToString());
+		getLogger().debug("Writer Put");
+		getLogger().debug("Nullptr checking: packet: %p, writer: %p", packet, writer);
 		reinterpret_cast<GlobalNamespace::BeatmapIdentifierNetSerializable*>(packet)->LiteNetLib_Utils_INetSerializable_Serialize(writer);
+																			//		  ^ nullptr
+		getLogger().debug("Serialize Finished");
 	}
 
 	void PacketSerializer::Deserialize(LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data) {
@@ -36,18 +42,14 @@ namespace MultiQuestensions {
 			getLogger().debug("packetHandlers found PacketType, try Invoke");
 			try {
 				packetHandlers[packetType]->Invoke(reader, length, data);
-			} catch (const std::exception& e) {
+			}
+			catch (const std::exception& e) {
 				getLogger().warning("An C++ exception was thrown while processing custom packet");
 				getLogger().error("%s", e.what());
-			} catch (const System::Exception* ex) {
-				getLogger().warning("An C# exception was thrown while processing custom packet: %s", to_utf8(csstrtostr(ex->message)).c_str());
-				getLogger().error("%s\n", (char*)ex); // This needs to have \n after %s as the char* is not terminated
 			}
-
+			int processedBytes = reader->get_Position() - prevPosition;
+			reader->SkipBytes(length - processedBytes);
 		}
-
-		int processedBytes = reader->get_Position() - prevPosition;
-		reader->SkipBytes(length - processedBytes);
 	}
 
 	bool PacketSerializer::HandlesType(Il2CppReflectionType* type) {

@@ -6,7 +6,7 @@
 DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
 namespace MultiQuestensions::Beatmaps {
-	void PreviewBeatmapStub::FromPreview(Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel* preview) {
+	void PreviewBeatmapStub::FromPreview(Il2CppString* levelHashStr, GlobalNamespace::IPreviewBeatmapLevel* preview) {
 		getLogger().debug("PreviewBeatmapStub::FromPreview");
 
 		_preview = preview;
@@ -14,7 +14,7 @@ namespace MultiQuestensions::Beatmaps {
 		_downloadable = DownloadableState::Unchecked;
 
 		levelID = preview->get_levelID();
-		levelHash = levelHash;
+		levelHash = levelHashStr;
 		getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
 
 		songName = preview->get_songName();
@@ -35,12 +35,13 @@ namespace MultiQuestensions::Beatmaps {
 		_downloadable = DownloadableState::Unchecked;
 		
 		levelID = packet->levelId;
-		levelHash = packet->levelHash;
+		levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
 
 		songName = packet->songName;
 		songSubName = packet->songSubName;
 		songAuthorName = packet->songAuthorName;
 		levelAuthorName = packet->levelAuthorName;
+
 		beatsPerMinute = packet->beatsPerMinute;
 		songDuration = packet->songDuration;
 	}
@@ -57,8 +58,8 @@ namespace MultiQuestensions::Beatmaps {
 		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
 		MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>());
 
-		packet->levelHash = levelHash;
 		packet->levelId = levelID;
+		packet->levelHash = levelHash;
 
 		packet->songName = songName;
 		packet->songSubName = songSubName;
