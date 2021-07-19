@@ -7,6 +7,8 @@
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
 #include "System/Collections/Generic/Dictionary_2.hpp"
+#include "System/Collections/Hashtable.hpp"
+#include "System/Collections/Hashtable_ValueCollection.hpp"
 
 #include "GlobalNamespace/BeatmapIdentifierNetSerializable.hpp"
 #include "GlobalNamespace/MultiplayerLevelLoader.hpp"
@@ -84,20 +86,42 @@ Il2CppString* getHostPickStateStr() {
 
 bool customSongsEnabled = true;
 
-
+//using PD_ValueCollection = System::Collections::Generic::Dictionary_2<Il2CppString*, ILobbyPlayerDataModel*>::ValueCollection;
 
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
-    for (int i = 0; i < lobbyPlayersDataModel->playersData->get_Values()->get_Count(); i++) {
-                                                                     //   ^ Crash here
-        ILevelGameplaySetupData* playerData = reinterpret_cast<System::Collections::Generic::List_1<ILevelGameplaySetupData*>*>(lobbyPlayersDataModel->playersData->get_Values())->get_Item(i);
-        if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
-            if (il2cpp_functions::class_is_assignable_from((Il2CppClass*)playerData->get_beatmapLevel(), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
-                return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
-            }
-        }
-    }
+    //if (lobbyPlayersDataModel->get_hostUserId() != lobbyPlayersDataModel->get_localUserId()) {
+    //    GlobalNamespace::IPreviewBeatmapLevel* hostBeatmap;
+    //    hostBeatmap = lobbyPlayersDataModel->GetPlayerBeatmapLevel(lobbyPlayersDataModel->get_hostUserId());
+    //    if (hostBeatmap != nullptr) {
+    //        return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hostBeatmap);
+    //    }
+    //    //for (int i = 0; i < lobbyPlayersDataModel->playersData->entries->Length(); i++) {
+    //    //    //ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->values); // TODO: Fix this
+    //    //    //if (playerData && playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
+    //    //    //    if (il2cpp_functions::class_is_assignable_from((Il2CppClass*)playerData->get_beatmapLevel(), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
+    //    //    //        return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
+    //    //    //    }
+    //    //    //}
+    //    //}
+    //}
     return nullptr;
 }
+
+/*
+* 
+* 
+*     //PD_ValueCollection* lPDM = lobbyPlayersDataModel->playersData->get_Values();
+    //int count = THROW_UNLESS(il2cpp_utils::GetPropertyValue<int>(lPDM, "count"));
+    //                                                  System.Collections.Generic::Dictionary`2/ValueCollection<string, ILobbyPlayerDataModel>
+    //const MethodInfo* getCount = il2cpp_utils::FindMethodUnsafe("System.Collections.Generic", "Dictionary`2/ValueCollection<string, ILobbyPlayerDataModel>", "get_Count", 0);
+    //const MethodInfo* getCount = il2cpp_utils::FindMethodUnsafe(lPDM, "get_Count", 0);
+    //Il2CppClass* ValueCollection = il2cpp_utils::GetClassFromName("System.Collections.Generic", "Dictionary`2/ValueCollection");
+    //const MethodInfo* getCount = il2cpp_utils::FindMethodUnsafe(ValueCollection, "get_Count", 0);
+    //int count = THROW_UNLESS(il2cpp_utils::RunMethod<int>(lPDM, getCount));
+
+* 
+* 
+*/
 
 bool AllPlayersModded() {    
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
@@ -141,7 +165,6 @@ MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, Mu
 
     getLogger().debug("customsongs: %d", customSongsEnabled);
     
-    // TODO: Add the SetLocalPlayerState stuff to BeatTogether
     self->SetLocalPlayerState(il2cpp_utils::newcsstr(moddedState), true);
     self->SetLocalPlayerState(il2cpp_utils::newcsstr(questState), true);
     self->SetLocalPlayerState(getCustomSongsStateStr(), customSongsEnabled);
@@ -175,9 +198,9 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
         else {
             IPreviewBeatmapLevel* localIPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
             if (localIPreview != nullptr) {
-                MultiQuestensions::Beatmaps::PreviewBeatmapStub* localPreview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview));
-                self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
-                MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>(localPreview));
+                MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview));
+                self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(previewStub), beatmapDifficulty, characteristic);
+                MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
                 packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(packet));
                 if (!AllPlayersModded()) self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
                 return;
