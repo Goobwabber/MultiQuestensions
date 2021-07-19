@@ -31,19 +31,33 @@ namespace MultiQuestensions::Beatmaps {
 	void PreviewBeatmapStub::FromPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet) {
 		getLogger().debug("PreviewBeatmapStub::FromPacket");
 
+		getLogger().debug("Set downloadstates");
 		isDownloaded = false;
 		_downloadable = DownloadableState::Unchecked;
 		
+		getLogger().debug("Get levelId and Hash");
 		levelID = packet->levelId;
 		levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
-
+		getLogger().debug("levelID: %s\n Hash: %s", 
+			to_utf8(csstrtostr(levelID)).c_str(),
+			to_utf8(csstrtostr(levelHash)).c_str());
+		getLogger().debug("SongInfo strings");
 		songName = packet->songName;
 		songSubName = packet->songSubName;
 		songAuthorName = packet->songAuthorName;
 		levelAuthorName = packet->levelAuthorName;
+		getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
+			to_utf8(csstrtostr(songName)).c_str(),
+			to_utf8(csstrtostr(songSubName)).c_str(),
+			to_utf8(csstrtostr(songAuthorName)).c_str(),
+			to_utf8(csstrtostr(levelAuthorName)).c_str());
 
+		getLogger().debug("SongInfo floats");
 		beatsPerMinute = packet->beatsPerMinute;
 		songDuration = packet->songDuration;
+		getLogger().debug("beatsPerMinute: %f\n songDuration: %f",
+			beatsPerMinute,
+			songDuration);
 	}
 
 	System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* PreviewBeatmapStub::GetCoverImageAsync(System::Threading::CancellationToken cancellationToken) {
