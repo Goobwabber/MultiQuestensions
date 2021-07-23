@@ -16,7 +16,7 @@ namespace MultiQuestensions::Beatmaps {
 		getLogger().debug("PreviewBeatmapPacket::Serialize");
 
 		writer->Put(levelId);
-		//writer->Put(levelHash);
+		writer->Put(levelHash);
 		writer->Put(songName);
 		writer->Put(songSubName);
 		writer->Put(songAuthorName);
@@ -32,17 +32,14 @@ namespace MultiQuestensions::Beatmaps {
 		getLogger().debug("PreviewBeatmapPacket::Deserialize");
 
 		levelId = reader->GetString();
-
-		//levelHash = reader->GetString();
-		levelHash = LevelIdToHash(levelId);
-
+		getLogger().debug("levelID: %s", to_utf8(csstrtostr(levelId)).c_str());
+		levelHash = reader->GetString();
+		getLogger().debug("levelHash: %s", to_utf8(csstrtostr(levelHash)).c_str());
 		songName = reader->GetString();
 		songSubName = reader->GetString();
 		songAuthorName = reader->GetString();
 		levelAuthorName = reader->GetString();
-		getLogger().debug("levelID: %s\n levelHash: %s\n songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
-			to_utf8(csstrtostr(levelId)).c_str(),
-			to_utf8(csstrtostr(levelHash)).c_str(),
+		getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
 			to_utf8(csstrtostr(songName)).c_str(),
 			to_utf8(csstrtostr(songSubName)).c_str(),
 			to_utf8(csstrtostr(songAuthorName)).c_str(),

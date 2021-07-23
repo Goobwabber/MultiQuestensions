@@ -25,7 +25,8 @@ namespace MultiQuestensions {
 		//writer->Put(packetType->ToString());
 		getLogger().debug("Writer Put");
 		getLogger().debug("Nullptr checking: packet: %p, writer: %p", packet, writer);
-		reinterpret_cast<GlobalNamespace::BeatmapIdentifierNetSerializable*>(packet)->LiteNetLib_Utils_INetSerializable_Serialize(writer);
+		packet->Serialize(writer);
+		//reinterpret_cast<GlobalNamespace::BeatmapIdentifierNetSerializable*>(packet)->LiteNetLib_Utils_INetSerializable_Serialize(writer);
 																			//		  ^ nullptr
 		getLogger().debug("Serialize Finished");
 	}
@@ -46,6 +47,9 @@ namespace MultiQuestensions {
 			catch (const std::exception& e) {
 				getLogger().warning("An C++ exception was thrown while processing custom packet");
 				getLogger().error("%s", e.what());
+			}
+			catch (...) {
+				getLogger().warning("An Unknown exception was thrown while processing custom packet");
 			}
 			int processedBytes = reader->get_Position() - prevPosition;
 			reader->SkipBytes(length - processedBytes);

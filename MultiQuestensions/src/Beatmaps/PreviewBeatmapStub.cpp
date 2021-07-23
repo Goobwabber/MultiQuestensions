@@ -2,6 +2,7 @@
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "System/Threading/Tasks/TaskStatus.hpp"
 #include "UnityEngine/ImageConversion.hpp"
+#include "GlobalNamespace/MediaAsyncLoader.hpp"
 
 DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
@@ -37,7 +38,8 @@ namespace MultiQuestensions::Beatmaps {
 		
 		getLogger().debug("Get levelId and Hash");
 		levelID = packet->levelId;
-		levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
+		levelHash = packet->levelHash;
+		//levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
 		getLogger().debug("levelID: %s\n Hash: %s", 
 			to_utf8(csstrtostr(levelID)).c_str(),
 			to_utf8(csstrtostr(levelHash)).c_str());
@@ -61,11 +63,21 @@ namespace MultiQuestensions::Beatmaps {
 	}
 
 	System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* PreviewBeatmapStub::GetCoverImageAsync(System::Threading::CancellationToken cancellationToken) {
-		return _preview->GetCoverImageAsync(cancellationToken);
+		if (_preview) {
+			return _preview->GetCoverImageAsync(cancellationToken);
+		}
+		else {
+			return nullptr;
+		}
 	}
 
 	System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>* PreviewBeatmapStub::GetPreviewAudioClipAsync(System::Threading::CancellationToken cancellationToken) {
-		return _preview->GetPreviewAudioClipAsync(cancellationToken);
+		if (_preview) {
+			return _preview->GetPreviewAudioClipAsync(cancellationToken);
+		}
+		else {
+			return nullptr;
+		}
 	}
 
 	MultiQuestensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {

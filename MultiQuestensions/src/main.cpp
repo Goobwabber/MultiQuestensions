@@ -144,7 +144,17 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
         preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview));
     }
     BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), GlobalNamespace::BeatmapDifficulty((int)packet->difficulty), characteristic);
+    getLogger().debug("Check difficulty as unsigned int: %d", (unsigned int)packet->difficulty);
+    getLogger().debug("Check difficulty as int: %d", (int)packet->difficulty);
+    try {
+        lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
+    }
+    catch (const std::exception& e) {
+        getLogger().debug("Exception running SetPlayerBeatmapLevel: %s", e.what());
+    }
+    catch (...) {
+        getLogger().debug("Unknown exception running SetPlayerBeatmapLevel");
+    }
 }
 
 //static void HandlePlayerStateChanged(GlobalNamespace::IConnectedPlayer* player) {
@@ -461,5 +471,6 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), HostLobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
     INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerStateChanged);
+
     getLogger().info("Installed all hooks!");
 }

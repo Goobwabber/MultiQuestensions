@@ -37,17 +37,28 @@ namespace MultiQuestensions {
 			}
 			else {
 				getLogger().debug("packet->Deserialize(reader);");
-				packet->Deserialize(reader);
+				try {
+					packet->Deserialize(reader);
+				}
+				catch (const std::exception& e) {
+					getLogger().debug("Exception Deserializing Packet");
+					getLogger().error("%s", e.what());
+				}
+				catch (...) {
+					getLogger().debug("Unknown exception Deserializing Packet");
+				}
 			}
 			if (action != nullptr) {
 				getLogger().debug("action(packet, player);");
 				try {
 					action(packet, player);
 				}
-				catch (std::exception e) {
+				catch (const std::exception& e) {
 					getLogger().error("Exception running action");
 					getLogger().error("%s", e.what());
-
+				}
+				catch (...) {
+					getLogger().debug("Unknown exception Deserializing Packet");
 				}
 			}
 			else getLogger().debug("action is nullptr");
