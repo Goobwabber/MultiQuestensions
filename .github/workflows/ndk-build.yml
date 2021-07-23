@@ -121,9 +121,17 @@ jobs:
         echo "Listing all .so files in QPM_Temp"
         find ${GITHUB_WORKSPACE}/MultiQuestensions/QPM_Temp -type f -name "*.so"
 
+    - name: Get SongDownloader
+      env:
+        URL: ${{ secrets.SONGDOWNLOADER }}
+      run: |
+        cd ${GITHUB_WORKSPACE}/MultiQuestensions/extern
+        wget -q -O songdownloader.zip "$URL"
+        unzip -q songdownloader.zip
+
     - name: Build
       run: |
-        cd ./MultiQuestensions
+        cd ${GITHUB_WORKSPACE}/MultiQuestensions
         pwsh -Command ./build.ps1
         pwsh -Command ./buildQMOD.ps1 --package
         

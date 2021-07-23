@@ -57,6 +57,13 @@ LOCAL_EXPORT_C_INCLUDES := extern/questui
 LOCAL_SRC_FILES := extern/libquestui.so
 include $(PREBUILT_SHARED_LIBRARY)
 
+# Creating prebuilt for dependency: songdownloader - version: 0.5.0
+include $(CLEAR_VARS)
+LOCAL_MODULE := songdownloader
+LOCAL_EXPORT_C_INCLUDES := extern/songdownloader
+LOCAL_SRC_FILES := extern/libsongdownloader.so
+include $(PREBUILT_SHARED_LIBRARY)
+
 include $(CLEAR_VARS)
 LOCAL_MODULE := multiquestensions
 LOCAL_SRC_FILES += $(call rwildcard,src/,*.cpp)
@@ -68,6 +75,7 @@ LOCAL_SHARED_LIBRARIES += codegen_0_10_2
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += songloader
 LOCAL_SHARED_LIBRARIES += questui
+LOCAL_SHARED_LIBRARIES += songdownloader
 LOCAL_LDLIBS += -llog
 LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"multiquestensions"' -DVERSION='"$(VERSION)"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a
