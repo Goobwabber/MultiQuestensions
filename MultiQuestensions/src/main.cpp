@@ -94,21 +94,14 @@ bool customSongsEnabled = true;
 //using PD_ValueCollection = System::Collections::Generic::Dictionary_2<Il2CppString*, ILobbyPlayerDataModel*>::ValueCollection;
 
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
-    //if (lobbyPlayersDataModel->get_hostUserId() != lobbyPlayersDataModel->get_localUserId()) {
-    //    GlobalNamespace::IPreviewBeatmapLevel* hostBeatmap;
-    //    hostBeatmap = lobbyPlayersDataModel->GetPlayerBeatmapLevel(lobbyPlayersDataModel->get_hostUserId());
-    //    if (hostBeatmap != nullptr) {
-    //        return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hostBeatmap);
-    //    }
-    //    //for (int i = 0; i < lobbyPlayersDataModel->playersData->entries->Length(); i++) {
-    //    //    //ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->values); // TODO: Fix this
-    //    //    //if (playerData && playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
-    //    //    //    if (il2cpp_functions::class_is_assignable_from((Il2CppClass*)playerData->get_beatmapLevel(), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
-    //    //    //        return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
-    //    //    //    }
-    //    //    //}
-    //    //}
-    //}
+    for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
+        ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
+        if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
+            if (il2cpp_functions::class_is_assignable_from((Il2CppClass*)playerData->get_beatmapLevel(), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
+                return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
+            }
+        }
+    }
     return nullptr;
 }
 

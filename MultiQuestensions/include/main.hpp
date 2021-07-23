@@ -16,6 +16,8 @@
 #include "GlobalNamespace/IMenuRpcManager.hpp"
 #include "GlobalNamespace/LobbyPlayersDataModel.hpp"
 #include "GlobalNamespace/ILobbyPlayersDataModel.hpp"
+#include "GlobalNamespace/ILobbyPlayerDataModel.hpp"
+#include "GlobalNamespace/ILevelGameplaySetupData.hpp"
 #include "GlobalNamespace/BeatmapLevelsModel.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 
