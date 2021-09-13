@@ -5,7 +5,9 @@ DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket);
 
 namespace MultiQuestensions::Beatmaps {
 
-	void PreviewBeatmapPacket::New_ctor() {}
+	//void PreviewBeatmapPacket::New_ctor() {}
+	//PreviewBeatmapPacket::PreviewBeatmapPacket() {}
+	void PreviewBeatmapPacket::New() {}
 
 	void PreviewBeatmapPacket::Release() {
 		getLogger().debug("PreviewBeatmapPacket::Release");

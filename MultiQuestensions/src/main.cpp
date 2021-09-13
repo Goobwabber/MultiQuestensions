@@ -2,6 +2,8 @@
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "Beatmaps/PreviewBeatmapStub.hpp"
 #include "Packets/PacketManager.hpp"
+#include "UI/HostLobbySetupPanel.hpp"
+
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
@@ -19,8 +21,10 @@
 #include "GlobalNamespace/StandardScoreSyncStateNetSerializable.hpp"
 #include "GlobalNamespace/NetworkPlayerEntitlementChecker.hpp"
 #include "GlobalNamespace/LevelSelectionNavigationController.hpp"
-#include "GlobalNamespace/HostLobbySetupViewController.hpp"
-#include "GlobalNamespace/HostLobbySetupViewController_CannotStartGameReason.hpp"
+#include "GlobalNamespace/LobbySetupViewController.hpp"
+#include "GlobalNamespace/CannotStartGameReason.hpp"
+//#include "GlobalNamespace/LobbySetupViewController.hpp"
+//#include "GlobalNamespace/LobbySetupViewController_CannotStartGameReason.hpp"
 using namespace GlobalNamespace;
 using namespace System::Threading::Tasks;
 
@@ -28,6 +32,8 @@ using namespace System::Threading::Tasks;
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 #include "songdownloader/shared/BeatSaverAPI.hpp"
+
+std::vector<EntitlementsStatus> playerEntitlements;
 
 
 
@@ -142,8 +148,7 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
         preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview));
     }
     BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-    getLogger().debug("Check difficulty as unsigned int: %d", (unsigned int)packet->difficulty);
-    getLogger().debug("Check difficulty as int: %d", (int)packet->difficulty);
+    getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
     try {
         lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
     }
@@ -206,7 +211,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
                                                                 // ^ Also crash here
         if (preview != nullptr) {
             self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
-            self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
+            self->menuRpcManager->SetSelectedBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
             return;
         }
         else {
@@ -217,7 +222,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
                 self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(previewStub), beatmapDifficulty, characteristic);
                 MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
                 packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(packet));
-                if (!AllPlayersModded()) self->menuRpcManager->SelectBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
+                if (!AllPlayersModded()) self->menuRpcManager->SetSelectedBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
                 return;
             }
         }
@@ -226,11 +231,16 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
 }
 
 // LobbyPlayersDataModel HandleMenuRpcManagerSelectedBeatmap (DONT REMOVE THIS, without it a player's selected map will be cleared)
-MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuRpcManagerSelectedBeatmap, void, LobbyPlayersDataModel* self, Il2CppString* userId, BeatmapIdentifierNetSerializable* beatmapId) {
+MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuRpcManagerRecommendBeatmap, void, LobbyPlayersDataModel* self, Il2CppString* userId, BeatmapIdentifierNetSerializable* beatmapId) {
     IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(beatmapId->levelID);
     if (localPreview != nullptr) {
         LobbyPlayersSelectedBeatmap(self, userId, beatmapId);
     }
+}
+
+MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    MultiQuestensions::UI::HostLobbySetupPanel::AddSetupPanel(self->get_rectTransform(), sessionManager);
 }
 
 // Show the custom levels tab in multiplayer
@@ -245,45 +255,45 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigat
 
 
 //// Prevent the button becoming shown when we're force disabling it, as pressing it would crash
-//MAKE_HOOK_MATCH(HostLobbySetupViewController_SetStartGameEnabled, &HostLobbySetupViewController::SetStartGameEnabled, void, HostLobbySetupViewController* self, bool startGameEnabled, HostLobbySetupViewController::CannotStartGameReason cannotStartGameReason) {
-//    getLogger().info("HostLobbySetupViewController_SetStartGameEnabled. Enabled: %d. Reason: %d", startGameEnabled, (int)cannotStartGameReason);
-//    if (isMissingLevel && cannotStartGameReason == HostLobbySetupViewController::CannotStartGameReason::None) {
+//MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewController::SetStartGameEnabled, void, LobbySetupViewController* self, bool startGameEnabled, LobbySetupViewController::CannotStartGameReason cannotStartGameReason) {
+//    getLogger().info("LobbySetupViewController_SetStartGameEnabled. Enabled: %d. Reason: %d", startGameEnabled, (int)cannotStartGameReason);
+//    if (isMissingLevel && cannotStartGameReason == LobbySetupViewController::CannotStartGameReason::None) {
 //        getLogger().info("Game attempted to enable the play button when the level was missing, stopping it!");
 //        startGameEnabled = false;
-//        cannotStartGameReason = HostLobbySetupViewController::CannotStartGameReason::DoNotOwnSong;
+//        cannotStartGameReason = LobbySetupViewController::CannotStartGameReason::DoNotOwnSong;
 //    }
-//    HostLobbySetupViewController_SetStartGameEnabled(self, startGameEnabled, cannotStartGameReason);
+//    LobbySetupViewController_SetStartGameEnabled(self, startGameEnabled, cannotStartGameReason);
 //}
 
 static bool isMissingLevel = false;
 
 // This hook makes sure to grey-out the play button so that players can't start a level that someone doesn't have.
 // This prevents crashes.
-MAKE_HOOK_MATCH(HostLobbySetupViewController_SetPlayersMissingLevelText , &HostLobbySetupViewController::SetPlayersMissingLevelText, void, HostLobbySetupViewController* self, Il2CppString* playersMissingLevelText) {
-    getLogger().info("HostLobbySetupViewController_SetPlayersMissingLevelText");
+MAKE_HOOK_MATCH(LobbySetupViewController_SetPlayersMissingLevelText , &LobbySetupViewController::SetPlayersMissingLevelText, void, LobbySetupViewController* self, Il2CppString* playersMissingLevelText) {
+    getLogger().info("LobbySetupViewController_SetPlayersMissingLevelText");
     if (playersMissingLevelText && !isMissingLevel) {
         getLogger().info("Disabling start game as missing level text exists . . .");
         isMissingLevel = true;
-        self->SetStartGameEnabled(false, HostLobbySetupViewController::CannotStartGameReason::DoNotOwnSong);
+        self->SetStartGameEnabled(CannotStartGameReason::DoNotOwnSong);
     }
     else if (!playersMissingLevelText && isMissingLevel) {
         getLogger().info("Enabling start game as missing level text does not exist . . .");
         isMissingLevel = false;
-        self->SetStartGameEnabled(true, HostLobbySetupViewController::CannotStartGameReason::None);
+        self->SetStartGameEnabled(CannotStartGameReason::None);
     }
 
-    HostLobbySetupViewController_SetPlayersMissingLevelText(self, playersMissingLevelText);
+    LobbySetupViewController_SetPlayersMissingLevelText(self, playersMissingLevelText);
 }
 
 // Prevent the button becoming shown when we're force disabling it, as pressing it would crash
-MAKE_HOOK_MATCH(HostLobbySetupViewController_SetStartGameEnabled, &HostLobbySetupViewController::SetStartGameEnabled, void, HostLobbySetupViewController* self, bool startGameEnabled, HostLobbySetupViewController::CannotStartGameReason cannotStartGameReason) {
-    getLogger().info("HostLobbySetupViewController_SetStartGameEnabled. Enabled: %d. Reason: %d", startGameEnabled, (int)cannotStartGameReason);
-    if (isMissingLevel && cannotStartGameReason == HostLobbySetupViewController::CannotStartGameReason::None) {
+MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewController::SetStartGameEnabled, void, LobbySetupViewController* self, bool startGameEnabled, CannotStartGameReason cannotStartGameReason) {
+    getLogger().info("LobbySetupViewController_SetStartGameEnabled. Enabled: %d. Reason: %d", startGameEnabled, (int)cannotStartGameReason);
+    if (isMissingLevel && cannotStartGameReason == CannotStartGameReason::None) {
         getLogger().info("Game attempted to enable the play button when the level was missing, stopping it!");
         startGameEnabled = false;
-        cannotStartGameReason = HostLobbySetupViewController::CannotStartGameReason::DoNotOwnSong;
+        cannotStartGameReason = CannotStartGameReason::DoNotOwnSong;
     }
-    HostLobbySetupViewController_SetStartGameEnabled(self, startGameEnabled, cannotStartGameReason);
+    LobbySetupViewController_SetStartGameEnabled(self, startGameEnabled, cannotStartGameReason);
 }
 
 bool IsCustomLevel(const std::string& levelId) {
@@ -378,20 +388,41 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPl
     }
 }
 
-MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync, &NetworkPlayerEntitlementChecker::GetPlayerLevelEntitlementsAsync, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, IConnectedPlayer* player, Il2CppString* levelId, System::Threading::CancellationToken token) {
-    auto task = Task_1<EntitlementsStatus>::New_ctor();
-    HMTask::New_ctor(il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
-        (std::function<void()>)[self, player, levelId, token, task] {
-            auto returnTask = NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync(self, player, levelId, token);
-            auto result = returnTask->get_Result();
-            if (result == EntitlementsStatus::NotDownloaded) {
-                result = EntitlementsStatus::Ok;
-            }
-            task->TrySetResult(result);
-        }
-    ), nullptr)->Run();
-    return task;
+//MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync, &NetworkPlayerEntitlementChecker::GetPlayerLevelEntitlementsAsync, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, IConnectedPlayer* player, Il2CppString* levelId, System::Threading::CancellationToken token) {
+//    auto task = Task_1<EntitlementsStatus>::New_ctor();
+//    HMTask::New_ctor(il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
+//        (std::function<void()>)[self, player, levelId, token, task] {
+//            auto returnTask = NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync(self, player, levelId, token);
+//            auto result = returnTask->get_Result();
+//            if (result == EntitlementsStatus::NotDownloaded) {
+//                result = EntitlementsStatus::Ok;
+//            }
+//            task->TrySetResult(result);
+//        }
+//    ), nullptr)->Run();
+//    return task;
+//}
+
+System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
+
+MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
+    entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
+        playerEntitlements.emplace_back(status);
+        });
+    self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
+    NetworkPlayerEntitlementChecker_Start(self);
 }
+
+MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
+    if (entitlementAction)
+        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
+    NetworkPlayerEntitlementChecker_OnDestroy(self);
+}
+
+MAKE_HOOK_MATCH(LobbyStateDataModel_HandleMultiplayerLevelLoaderCountDownFinished, &LobbyStateDataModel::HandleMultiplayerLevelLoaderCountDownFinished(), void, LobbyStateDataModel* self) { 
+    LobbyStateDataModel_HandleMultiplayerLevelLoaderCountDownFinished(self);
+}
+
 
 void saveDefaultConfig() {
     getLogger().info("Creating config file...");
@@ -442,14 +473,16 @@ extern "C" void load() {
 
     INSTALL_HOOK(getLogger(), MultiplayerLevelLoader_LoadLevel);
     INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
-    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
+    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
+    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
+    //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
     if (Modloader::getMods().find("BeatTogether") != Modloader::getMods().end()) {
         getLogger().info("Hello BeatTogether!");
     }
     else getLogger().warning("BeatTogether was not found! Is Multiplayer modded?");
 
-    INSTALL_HOOK(getLogger(), HostLobbySetupViewController_SetPlayersMissingLevelText);
-    INSTALL_HOOK(getLogger(), HostLobbySetupViewController_SetStartGameEnabled);
+    INSTALL_HOOK(getLogger(), LobbySetupViewController_SetPlayersMissingLevelText);
+    INSTALL_HOOK(getLogger(), LobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
     INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerStateChanged);
 

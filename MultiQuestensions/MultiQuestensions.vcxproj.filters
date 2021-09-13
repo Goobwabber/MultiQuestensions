@@ -48,6 +48,7 @@
     <ClCompile Include="src\Beatmaps\PreviewBeatmapStub.cpp">
       <Filter>src\Beatmaps</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\HostLobbySetupPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -134,5 +135,6 @@
     <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp">
       <Filter>extern</Filter>
     </ClInclude>
+    <ClInclude Include="include\UI\HostLobbySetupPanel.hpp" />
   </ItemGroup>
 </Project>

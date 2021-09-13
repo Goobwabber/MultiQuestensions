@@ -3,7 +3,7 @@ name: NDK Build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, rewrite ]
+    branches: [ main, rewrite, 1.17.1-Update ]
     paths:
       - 'MultiQuestensions/**'
       - '.github/workflows/ndk-build.yml'
@@ -107,18 +107,18 @@ jobs:
         cd ./MultiQuestensions
         ../QPM/QPM restore
         
-    - name: Get SongDownloader
-      shell: bash
-      env:
-        URL: ${{ secrets.SONGDOWNLOADER }}
-      run: |
-        cd ${GITHUB_WORKSPACE}/MultiQuestensions/extern
-        wget -q -O songdownloader.zip "$URL"
-        unzip -q songdownloader.zip
-        echo 
-        echo Listing Folder
-        echo 
-        ls
+    #- name: Get SongDownloader
+    #  shell: bash
+    #  env:
+    #    URL: ${{ secrets.SONGDOWNLOADER }}
+    #  run: |
+    #    cd ${GITHUB_WORKSPACE}/MultiQuestensions/extern
+    #    wget -q -O songdownloader.zip "$URL"
+    #    unzip -q songdownloader.zip
+    #    echo 
+    #    echo Listing Folder
+    #    echo 
+    #    ls
 
 
     - name: Check dependency Folders

@@ -24,7 +24,11 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps,
 	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
 	MultiQuestensions::Beatmaps::GetPBPInterfaces(),
 
-	DECLARE_CTOR(New_ctor);
+	//DECLARE_DEFAULT_CTOR();
+	//PreviewBeatmapPacket();
+	//DECLARE_CTOR(New_ctor);
+	DECLARE_CTOR(New);
+
 
 	// Basic Song Info/Metadata
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);

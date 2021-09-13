@@ -25,6 +25,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Packets\PacketManager.cpp" />
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />
+    <ClCompile Include="src\UI\HostLobbySetupPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="include\Packets\Callback.hpp" />
     <ClInclude Include="include\Packets\PacketManager.hpp" />
     <ClInclude Include="include\Packets\PacketSerializer.hpp" />
+    <ClInclude Include="include\UI\HostLobbySetupPanel.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1c603531-cd52-4be0-a840-ba695bb7e0c7}</ProjectGuid>
