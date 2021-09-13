@@ -23,6 +23,8 @@
 #include "GlobalNamespace/LevelSelectionNavigationController.hpp"
 #include "GlobalNamespace/LobbySetupViewController.hpp"
 #include "GlobalNamespace/CannotStartGameReason.hpp"
+#include "GlobalNamespace/LobbyGameStateController.hpp"
+#include "GlobalNamespace/ILobbyPlayerData.hpp"
 //#include "GlobalNamespace/LobbySetupViewController.hpp"
 //#include "GlobalNamespace/LobbySetupViewController_CannotStartGameReason.hpp"
 using namespace GlobalNamespace;
@@ -134,15 +136,13 @@ bool AllPlayersModded() {
     return true;
 }
 
-
-
 // Handles a PreviewBeatmapPacket used to transmit data about a custom song.
 static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
     getLogger().debug("'%s' selected song '%s'", to_utf8(csstrtostr(player->get_userId())).c_str(), to_utf8(csstrtostr(packet->levelHash)).c_str());
     IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview;
     if (localPreview == nullptr) {
-        preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet));
+        preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(nullptr, nullptr, packet));
     }
     else {
         preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview));
@@ -286,14 +286,13 @@ MAKE_HOOK_MATCH(LobbySetupViewController_SetPlayersMissingLevelText , &LobbySetu
 }
 
 // Prevent the button becoming shown when we're force disabling it, as pressing it would crash
-MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewController::SetStartGameEnabled, void, LobbySetupViewController* self, bool startGameEnabled, CannotStartGameReason cannotStartGameReason) {
-    getLogger().info("LobbySetupViewController_SetStartGameEnabled. Enabled: %d. Reason: %d", startGameEnabled, (int)cannotStartGameReason);
+MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewController::SetStartGameEnabled, void, LobbySetupViewController* self, CannotStartGameReason cannotStartGameReason) {
+    getLogger().info("LobbySetupViewController_SetStartGameEnabled. Reason: %d", (int)cannotStartGameReason);
     if (isMissingLevel && cannotStartGameReason == CannotStartGameReason::None) {
         getLogger().info("Game attempted to enable the play button when the level was missing, stopping it!");
-        startGameEnabled = false;
         cannotStartGameReason = CannotStartGameReason::DoNotOwnSong;
     }
-    LobbySetupViewController_SetStartGameEnabled(self, startGameEnabled, cannotStartGameReason);
+    LobbySetupViewController_SetStartGameEnabled(self, cannotStartGameReason);
 }
 
 bool IsCustomLevel(const std::string& levelId) {
@@ -419,8 +418,9 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitle
     NetworkPlayerEntitlementChecker_OnDestroy(self);
 }
 
-MAKE_HOOK_MATCH(LobbyStateDataModel_HandleMultiplayerLevelLoaderCountDownFinished, &LobbyStateDataModel::HandleMultiplayerLevelLoaderCountDownFinished(), void, LobbyStateDataModel* self) { 
-    LobbyStateDataModel_HandleMultiplayerLevelLoaderCountDownFinished(self);
+MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
+    // TODO: I honestly forgot what I had to add in here
+    LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
 }
 
 
@@ -481,6 +481,7 @@ extern "C" void load() {
     }
     else getLogger().warning("BeatTogether was not found! Is Multiplayer modded?");
 
+    INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetPlayersMissingLevelText);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);

@@ -7,59 +7,116 @@
 DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
 namespace MultiQuestensions::Beatmaps {
-	void PreviewBeatmapStub::FromPreview(Il2CppString* levelHashStr, GlobalNamespace::IPreviewBeatmapLevel* preview) {
-		getLogger().debug("PreviewBeatmapStub::FromPreview");
+	//void PreviewBeatmapStub::FromPreview(Il2CppString* levelHashStr, GlobalNamespace::IPreviewBeatmapLevel* preview) {
+	//	getLogger().debug("PreviewBeatmapStub::FromPreview");
 
-		_preview = preview;
-		isDownloaded = true;
-		_downloadable = DownloadableState::Unchecked;
+	//	_preview = preview;
+	//	isDownloaded = true;
+	//	_downloadable = DownloadableState::Unchecked;
 
-		levelID = preview->get_levelID();
-		levelHash = levelHashStr;
-		getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
+	//	levelID = preview->get_levelID();
+	//	levelHash = levelHashStr;
+	//	getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
 
-		songName = preview->get_songName();
-		songSubName = preview->get_songSubName();
-		songAuthorName = preview->get_songAuthorName();
-		levelAuthorName = preview->get_levelAuthorName();
-		getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).c_str(), to_utf8(csstrtostr(songSubName)).c_str(), to_utf8(csstrtostr(songAuthorName)).c_str(), to_utf8(csstrtostr(levelAuthorName)).c_str());
-		
-		beatsPerMinute = preview->get_beatsPerMinute();
-		songDuration = preview->get_songDuration();
-		getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
-	}
+	//	songName = preview->get_songName();
+	//	songSubName = preview->get_songSubName();
+	//	songAuthorName = preview->get_songAuthorName();
+	//	levelAuthorName = preview->get_levelAuthorName();
+	//	getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).c_str(), to_utf8(csstrtostr(songSubName)).c_str(), to_utf8(csstrtostr(songAuthorName)).c_str(), to_utf8(csstrtostr(levelAuthorName)).c_str());
+	//	
+	//	beatsPerMinute = preview->get_beatsPerMinute();
+	//	songDuration = preview->get_songDuration();
+	//	getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
+	//}
 
-	void PreviewBeatmapStub::FromPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet) {
-		getLogger().debug("PreviewBeatmapStub::FromPacket");
+	//void PreviewBeatmapStub::FromPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet) {
+	//	getLogger().debug("PreviewBeatmapStub::FromPacket");
 
-		getLogger().debug("Set downloadstates");
-		isDownloaded = false;
-		_downloadable = DownloadableState::Unchecked;
-		
-		getLogger().debug("Get levelId and Hash");
-		levelID = packet->levelId;
-		levelHash = packet->levelHash;
-		//levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
-		getLogger().debug("levelID: %s\n Hash: %s", 
-			to_utf8(csstrtostr(levelID)).c_str(),
-			to_utf8(csstrtostr(levelHash)).c_str());
-		getLogger().debug("SongInfo strings");
-		songName = packet->songName;
-		songSubName = packet->songSubName;
-		songAuthorName = packet->songAuthorName;
-		levelAuthorName = packet->levelAuthorName;
-		getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
-			to_utf8(csstrtostr(songName)).c_str(),
-			to_utf8(csstrtostr(songSubName)).c_str(),
-			to_utf8(csstrtostr(songAuthorName)).c_str(),
-			to_utf8(csstrtostr(levelAuthorName)).c_str());
+	//	getLogger().debug("Set downloadstates");
+	//	isDownloaded = false;
+	//	_downloadable = DownloadableState::Unchecked;
+	//	
+	//	getLogger().debug("Get levelId and Hash");
+	//	levelID = packet->levelId;
+	//	levelHash = packet->levelHash;
+	//	//levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
+	//	getLogger().debug("levelID: %s\n Hash: %s", 
+	//		to_utf8(csstrtostr(levelID)).c_str(),
+	//		to_utf8(csstrtostr(levelHash)).c_str());
+	//	getLogger().debug("SongInfo strings");
+	//	songName = packet->songName;
+	//	songSubName = packet->songSubName;
+	//	songAuthorName = packet->songAuthorName;
+	//	levelAuthorName = packet->levelAuthorName;
+	//	getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
+	//		to_utf8(csstrtostr(songName)).c_str(),
+	//		to_utf8(csstrtostr(songSubName)).c_str(),
+	//		to_utf8(csstrtostr(songAuthorName)).c_str(),
+	//		to_utf8(csstrtostr(levelAuthorName)).c_str());
 
-		getLogger().debug("SongInfo floats");
-		beatsPerMinute = packet->beatsPerMinute;
-		songDuration = packet->songDuration;
-		getLogger().debug("beatsPerMinute: %f\n songDuration: %f",
-			beatsPerMinute,
-			songDuration);
+	//	getLogger().debug("SongInfo floats");
+	//	beatsPerMinute = packet->beatsPerMinute;
+	//	songDuration = packet->songDuration;
+	//	getLogger().debug("beatsPerMinute: %f\n songDuration: %f",
+	//		beatsPerMinute,
+	//		songDuration);
+	//}
+
+	void PreviewBeatmapStub::FromPreviewPacket(Il2CppString* levelhash, GlobalNamespace::IPreviewBeatmapLevel* level, PreviewBeatmapPacket* lvl) {
+		if (levelhash && level) {
+			getLogger().debug("PreviewBeatmapStub::FromPreview");
+
+			_preview = level;
+			isDownloaded = true;
+			_downloadable = DownloadableState::Unchecked;
+
+			levelID = level->get_levelID();
+			levelHash = levelhash;
+			getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
+
+			songName = level->get_songName();
+			songSubName = level->get_songSubName();
+			songAuthorName = level->get_songAuthorName();
+			levelAuthorName = level->get_levelAuthorName();
+			getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).c_str(), to_utf8(csstrtostr(songSubName)).c_str(), to_utf8(csstrtostr(songAuthorName)).c_str(), to_utf8(csstrtostr(levelAuthorName)).c_str());
+
+			beatsPerMinute = level->get_beatsPerMinute();
+			songDuration = level->get_songDuration();
+			getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
+		}
+		else {
+			getLogger().debug("PreviewBeatmapStub::FromPacket");
+
+			getLogger().debug("Set downloadstates");
+			isDownloaded = false;
+			_downloadable = DownloadableState::Unchecked;
+
+			getLogger().debug("Get levelId and Hash");
+			levelID = lvl->levelId;
+			levelHash = lvl->levelHash;
+			//levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
+			getLogger().debug("levelID: %s\n Hash: %s",
+				to_utf8(csstrtostr(levelID)).c_str(),
+				to_utf8(csstrtostr(levelHash)).c_str());
+			getLogger().debug("SongInfo strings");
+			songName = lvl->songName;
+			songSubName = lvl->songSubName;
+			songAuthorName = lvl->songAuthorName;
+			levelAuthorName = lvl->levelAuthorName;
+			getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
+				to_utf8(csstrtostr(songName)).c_str(),
+				to_utf8(csstrtostr(songSubName)).c_str(),
+				to_utf8(csstrtostr(songAuthorName)).c_str(),
+				to_utf8(csstrtostr(levelAuthorName)).c_str());
+
+			getLogger().debug("SongInfo floats");
+			beatsPerMinute = lvl->beatsPerMinute;
+			songDuration = lvl->songDuration;
+			getLogger().debug("beatsPerMinute: %f\n songDuration: %f",
+				beatsPerMinute,
+				songDuration);
+		}
+
 	}
 
 	System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* PreviewBeatmapStub::GetCoverImageAsync(System::Threading::CancellationToken cancellationToken) {

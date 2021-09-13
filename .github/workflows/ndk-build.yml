@@ -41,9 +41,9 @@ on:
 env:
      module_id: multiquestensions
      version: 0.1.0-Dev-${{ github.run_number }}
-     bs_hook: 2_0_3
-     BS_Version: 1.16.2
-     ndkname: android-ndk-r22
+     bs_hook: 2_3_0
+     BS_Version: 1.17.4
+     #ndkname: android-ndk-r22
 
 jobs:
   build:
@@ -56,28 +56,28 @@ jobs:
     - name: Install Powershell
       run: sudo apt-get install -y powershell
       
-    - name: Cache Android NDK
-      id: cache-ndk
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ndk
-      with:
-        path: ndk
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-        restore-keys: |
-          ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+    #- name: Cache Android NDK
+    #  id: cache-ndk
+    #  uses: actions/cache@v2
+    #  env:
+    #    cache-name: cache-ndk
+    #  with:
+    #    path: ndk
+    #    key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+    #    restore-keys: |
+    #      ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
     
-    - name: Install Android NDK
-      if: steps.cache-ndk.outputs.cache-hit != 'true'
-      run: |
-        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
-        unzip -q ndk.zip
-        mv ${ndkname} ndk
+    #- name: Install Android NDK
+    #  if: steps.cache-ndk.outputs.cache-hit != 'true'
+    #  run: |
+    #    wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+    #    unzip -q ndk.zip
+    #    mv ${ndkname} ndk
       
-    - name: Create ndkpath.txt
-      run: |
-        cd ndk
-        pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+    #- name: Create ndkpath.txt
+    #  run: |
+    #    cd ndk
+    #    pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
         
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
@@ -157,4 +157,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: multiquestensions.qmod
-        path: ./MultiQuestensions/${(multiquestensions*.qmod)[0]}
+        path: ./MultiQuestensions/multiquestensions.qmod
