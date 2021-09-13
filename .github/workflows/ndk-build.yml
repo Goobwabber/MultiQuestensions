@@ -42,7 +42,7 @@ env:
      module_id: multiquestensions
      version: 0.1.0-Dev-${{ github.run_number }}
      bs_hook: 2_3_0
-     BS_Version: 1.17.4
+     BS_Version: 1.17.1
      #ndkname: android-ndk-r22
 
 jobs:
@@ -81,8 +81,8 @@ jobs:
 
     - name: Create ndkpath.txt
       run: |
-        echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
-        cat ${GITHUB_WORKSPACE}/ndkpath.txt
+        echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+        cat ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
         
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
