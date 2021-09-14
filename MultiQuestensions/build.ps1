@@ -1,9 +1,11 @@
 $NDKPath = Get-Content $PSScriptRoot/ndkpath.txt -First 1
 $VERSION = $env:version
 
-if ($VERSION -eq "") {
+if (!$VERSION) {
     $VERSION = "0.1.0"
 }
+
+echo "Building MultiQuestensions Version: $VERSION"
 
 $buildScript = "$NDKPath/build/ndk-build"
 if (-not ($PSVersionTable.PSEdition -eq "Core")) {

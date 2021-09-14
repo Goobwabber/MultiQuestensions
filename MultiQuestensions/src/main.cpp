@@ -37,7 +37,10 @@ using namespace System::Threading::Tasks;
 
 std::vector<EntitlementsStatus> playerEntitlements;
 
-
+#ifndef VERSION
+#warning No Version set
+#define VERSION "0.1.0"
+#endif
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -141,22 +144,30 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
     getLogger().debug("'%s' selected song '%s'", to_utf8(csstrtostr(player->get_userId())).c_str(), to_utf8(csstrtostr(packet->levelHash)).c_str());
     IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview;
-    if (localPreview == nullptr) {
-        preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(nullptr, nullptr, packet));
-    }
-    else {
-        preview = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview));
-    }
-    BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-    getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
     try {
-        lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
+        if (localPreview == nullptr) {
+            Il2CppString* nullString = nullptr;
+            IPreviewBeatmapLevel* nullLvl = nullptr;
+            preview = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(nullString, nullLvl, packet));
+        }
+        else {
+            MultiQuestensions::Beatmaps::PreviewBeatmapPacket* nullpacket = nullptr;
+            preview = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview, nullpacket));
+        }
+        BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+        getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
+        try {
+            lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
+        }
+        catch (const std::runtime_error& e) {
+            getLogger().debug("Exception running SetPlayerBeatmapLevel: %s", e.what());
+        }
+        catch (...) {
+            getLogger().debug("Unknown exception running SetPlayerBeatmapLevel");
+        }
     }
-    catch (const std::exception& e) {
-        getLogger().debug("Exception running SetPlayerBeatmapLevel: %s", e.what());
-    }
-    catch (...) {
-        getLogger().debug("Unknown exception running SetPlayerBeatmapLevel");
+    catch (const std::runtime_error& e) {
+        getLogger().error("%s", e.what());
     }
 }
 
@@ -217,13 +228,20 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
         else {
             IPreviewBeatmapLevel* localIPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
             if (localIPreview != nullptr) {
-                MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = CRASH_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview));
-                getLogger().debug("Check 'LobbyPlayersSetLocalBeatmap' levelID: %s", to_utf8(csstrtostr(reinterpret_cast<IPreviewBeatmapLevel*>(previewStub)->get_levelID())).c_str());
-                self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(previewStub), beatmapDifficulty, characteristic);
-                MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
-                packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(packet));
-                if (!AllPlayersModded()) self->menuRpcManager->SetSelectedBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
-                return;
+                try {
+                    MultiQuestensions::Beatmaps::PreviewBeatmapPacket* nullPacket = nullptr;
+                    MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview, nullPacket));
+                    //MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = MultiQuestensions::Beatmaps::PreviewBeatmapStub::New_ctor(hash, localIPreview);
+                    getLogger().debug("Check 'LobbyPlayersSetLocalBeatmap' levelID: %s", to_utf8(csstrtostr(reinterpret_cast<IPreviewBeatmapLevel*>(previewStub)->get_levelID())).c_str());
+                    self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(previewStub), beatmapDifficulty, characteristic);
+                    MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
+                    packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(packet));
+                    if (!AllPlayersModded()) self->menuRpcManager->SetSelectedBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
+                    return;
+                }
+                catch (const std::runtime_error& e) {
+                    getLogger().error("An Exception occured during class creation: %s", e.what());
+                }
             }
         }
     }
