@@ -51,5 +51,6 @@ namespace MultiQuestensions::Beatmaps {
 
 		characteristic = reader->GetString();
 		difficulty = reader->GetUInt();
+		getLogger().debug("Deserialize PreviewBeatmapPacket done");
 	}
 }

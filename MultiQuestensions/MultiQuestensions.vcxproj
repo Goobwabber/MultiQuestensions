@@ -92,7 +92,7 @@
     <NMakeBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" NDK_PROJECT_PATH=$(ProjectDir) APP_BUILD_SCRIPT=$(ProjectDir)Android.mk NDK_APPLICATION_MK=$(ProjectDir)Application.mk</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" -B</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(NdkPath)\build\ndk-build.cmd" clean</NMakeCleanCommandLine>
-    <NMakeForcedIncludes>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeForcedIncludes>
+    <NMakeForcedIncludes>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared;..\android-ndk-r23\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\**;..\android-ndk-r23\sources\cxx-stl\system\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++abi\include</NMakeForcedIncludes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeIncludeSearchPath>

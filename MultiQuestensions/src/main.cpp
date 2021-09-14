@@ -106,13 +106,18 @@ bool customSongsEnabled = true;
 
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
+        getLogger().debug(__FILE__ " Line: %d", __LINE__);
         ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
+        getLogger().debug(__FILE__ " Line: %d", __LINE__);
         if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
-            if (il2cpp_functions::class_is_assignable_from((Il2CppClass*)playerData->get_beatmapLevel(), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
+            getLogger().debug(__FILE__ " Line: %d", __LINE__);
+            if (il2cpp_functions::class_is_assignable_from(classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())))) {
+                getLogger().debug(__FILE__ " Line: %d", __LINE__);
                 return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
             }
         }
     }
+    getLogger().debug("Return nullptr " __FILE__ " Line: %d", __LINE__);
     return nullptr;
 }
 
@@ -156,19 +161,15 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
         }
         BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
         getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
-        try {
-            lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
-        }
-        catch (const std::runtime_error& e) {
-            getLogger().debug("Exception running SetPlayerBeatmapLevel: %s", e.what());
-        }
-        catch (...) {
-            getLogger().debug("Unknown exception running SetPlayerBeatmapLevel");
-        }
+        lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
     }
     catch (const std::runtime_error& e) {
         getLogger().error("%s", e.what());
     }
+    catch (...) {
+        getLogger().debug("Unknown exception in HandlePreviewBeatmapPacket");
+    }
+
 }
 
 //static void HandlePlayerStateChanged(GlobalNamespace::IConnectedPlayer* player) {
@@ -432,15 +433,16 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlement
 
 MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
     if (entitlementAction)
+        playerEntitlements.clear();
         self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
     NetworkPlayerEntitlementChecker_OnDestroy(self);
 }
 
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     // TODO: I honestly forgot what I had to add in here
+    self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
     LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
 }
-
 
 void saveDefaultConfig() {
     getLogger().info("Creating config file...");
@@ -502,6 +504,7 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetPlayersMissingLevelText);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetStartGameEnabled);
+    INSTALL_HOOK(getLogger(), LobbySetupViewController_DidActivate);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
     INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerStateChanged);
 
