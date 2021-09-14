@@ -336,6 +336,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
     getLogger().info("MultiplayerLevelLoader_LoadLevel: %s", levelId.c_str());
     if (IsCustomLevel(levelId)) {
         if (HasSong(levelId)) {
+            getLogger().debug("MultiplayerLevelLoader_LoadLevel, HasSong, calling original");
             MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
         }
         else {
@@ -357,6 +358,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                             RuntimeSongLoader::API::RefreshSongs(false,
                                                 [self, beatmapId, gameplayModifiers, initialStartTime](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
                                                     self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
+                                                    //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
                                                     MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
                                                 }
                                             );
@@ -371,6 +373,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
         }
     }
     else {
+        getLogger().debug("MultiplayerLevelLoader_LoadLevel, calling original");
         MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
     }
 }
@@ -440,6 +443,7 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitle
 
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     // TODO: I honestly forgot what I had to add in here
+    getLogger().debug("LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished");
     self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
     LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
 }
