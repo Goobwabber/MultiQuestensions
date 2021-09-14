@@ -5,7 +5,7 @@
 #include "UnityEngine/RectTransform.hpp"
 
 namespace MultiQuestensions::UI {
-	class HostLobbySetupPanel {
+	class LobbySetupPanel {
 	private:
 		//static GlobalNamespace::IMultiplayerSessionManager* sessionManager;
 		//HMUI::CurvedTextMeshPro* modifierText;
