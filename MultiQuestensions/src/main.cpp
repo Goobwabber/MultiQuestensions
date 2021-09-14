@@ -80,25 +80,6 @@ GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
 MultiQuestensions::PacketManager* packetManager;
 
 std::string moddedState = "modded";
-std::string questState = "platformquest";
-std::string customSongsState = "customsongs";
-std::string freeModState = "freemod";
-std::string hostPickState = "hostpick";
-
-Il2CppString* getCustomSongsStateStr() {
-    static auto* customSongStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("customsongs");
-    return customSongStateStr;
-}
-
-Il2CppString* getFreeModStateStr() {
-    static auto* freeModStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("freemod");
-    return freeModStateStr;
-}
-
-Il2CppString* getHostPickStateStr() {
-    static auto* hostPickStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("hostpick");
-    return hostPickStateStr;
-}
 
 bool customSongsEnabled = true;
 
@@ -120,22 +101,6 @@ MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString
     getLogger().debug("Return nullptr " __FILE__ " Line: %d", __LINE__);
     return nullptr;
 }
-
-/*
-* 
-* 
-*     //PD_ValueCollection* lPDM = lobbyPlayersDataModel->playersData->get_Values();
-    //int count = THROW_UNLESS(il2cpp_utils::GetPropertyValue<int>(lPDM, "count"));
-    //                                                  System.Collections.Generic::Dictionary`2/ValueCollection<string, ILobbyPlayerDataModel>
-    //const MethodInfo* getCount = il2cpp_utils::FindMethodUnsafe("System.Collections.Generic", "Dictionary`2/ValueCollection<string, ILobbyPlayerDataModel>", "get_Count", 0);
-    //const MethodInfo* getCount = il2cpp_utils::FindMethodUnsafe(lPDM, "get_Count", 0);
-    //Il2CppClass* ValueCollection = il2cpp_utils::GetClassFromName("System.Collections.Generic", "Dictionary`2/ValueCollection");
-    //const MethodInfo* getCount = il2cpp_utils::FindMethodUnsafe(ValueCollection, "get_Count", 0);
-    //int count = THROW_UNLESS(il2cpp_utils::RunMethod<int>(lPDM, getCount));
-
-* 
-* 
-*/
 
 bool AllPlayersModded() {    
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
@@ -172,38 +137,12 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
 
 }
 
-//static void HandlePlayerStateChanged(GlobalNamespace::IConnectedPlayer* player) {
-//    if (player->get_isConnectionOwner()) {
-//        customSongsEnabled = player->HasState(il2cpp_utils::newcsstr(customSongsState));
-//    }
-//}
-
-// Checks if a MPEX player has customsongs enabled or not
-MAKE_HOOK_MATCH(MultiplayerSessionManager_HandlePlayerStateChanged, &MultiplayerSessionManager::HandlePlayerStateChanged, void, MultiplayerSessionManager* self, IConnectedPlayer* player) {
-    MultiplayerSessionManager_HandlePlayerStateChanged(self, player);
-    if (player->get_isConnectionOwner()) {
-        customSongsEnabled = player->HasState(getCustomSongsStateStr());
-    }
-}
-
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
     sessionManager = self;
     SessionManagerStart(sessionManager);
     packetManager = new MultiQuestensions::PacketManager(sessionManager);
 
-    customSongsEnabled = getConfig().config["customsongs"].GetBool();
-
-    getLogger().debug("customsongs: %d", customSongsEnabled);
-    
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(moddedState), true);
-    self->SetLocalPlayerState(il2cpp_utils::newcsstr(questState), true);
-    self->SetLocalPlayerState(getCustomSongsStateStr(), customSongsEnabled);
-    self->SetLocalPlayerState(getFreeModStateStr(), false);
-    self->SetLocalPlayerState(getHostPickStateStr(), true);
-    //self->SetLocalPlayerState(il2cpp_utils::newcsstr(customSongsState), true);
-
-    //self->add_playerStateChangedEvent(il2cpp_utils::MakeAction<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(HandlePlayerStateChanged));
     packetManager->RegisterCallback<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>("MultiplayerExtensions.Beatmaps.PreviewBeatmapPacket", HandlePreviewBeatmapPacket);
 }
 
@@ -271,18 +210,6 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigat
     LevelSelectionNavigationController_Setup(self, songPackMask, allowedBeatmapDifficultyMask, notAllowedCharacteristics, hidePacksIfOneOrNone, hidePracticeButton, showPlayerStatsInDetailView,
         actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, customSongsEnabled);
 }
-
-
-//// Prevent the button becoming shown when we're force disabling it, as pressing it would crash
-//MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewController::SetStartGameEnabled, void, LobbySetupViewController* self, bool startGameEnabled, LobbySetupViewController::CannotStartGameReason cannotStartGameReason) {
-//    getLogger().info("LobbySetupViewController_SetStartGameEnabled. Enabled: %d. Reason: %d", startGameEnabled, (int)cannotStartGameReason);
-//    if (isMissingLevel && cannotStartGameReason == LobbySetupViewController::CannotStartGameReason::None) {
-//        getLogger().info("Game attempted to enable the play button when the level was missing, stopping it!");
-//        startGameEnabled = false;
-//        cannotStartGameReason = LobbySetupViewController::CannotStartGameReason::DoNotOwnSong;
-//    }
-//    LobbySetupViewController_SetStartGameEnabled(self, startGameEnabled, cannotStartGameReason);
-//}
 
 static bool isMissingLevel = false;
 
@@ -406,21 +333,6 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPl
     }
 }
 
-//MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync, &NetworkPlayerEntitlementChecker::GetPlayerLevelEntitlementsAsync, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, IConnectedPlayer* player, Il2CppString* levelId, System::Threading::CancellationToken token) {
-//    auto task = Task_1<EntitlementsStatus>::New_ctor();
-//    HMTask::New_ctor(il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
-//        (std::function<void()>)[self, player, levelId, token, task] {
-//            auto returnTask = NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync(self, player, levelId, token);
-//            auto result = returnTask->get_Result();
-//            if (result == EntitlementsStatus::NotDownloaded) {
-//                result = EntitlementsStatus::Ok;
-//            }
-//            task->TrySetResult(result);
-//        }
-//    ), nullptr)->Run();
-//    return task;
-//}
-
 System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
 
 MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
@@ -506,7 +418,6 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_DidActivate);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
-    INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerStateChanged);
 
     getLogger().info("Installed all hooks!");
 }
