@@ -91,11 +91,8 @@ bool customSongsEnabled = true;
 
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
-        getLogger().debug(__FILE__ " Line: %d", __LINE__);
         ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
-        getLogger().debug(__FILE__ " Line: %d", __LINE__);
         if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
-            getLogger().debug(__FILE__ " Line: %d", __LINE__);
             if (il2cpp_functions::class_is_assignable_from(classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())))) {
                 getLogger().debug(__FILE__ " Line: %d", __LINE__);
                 return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());

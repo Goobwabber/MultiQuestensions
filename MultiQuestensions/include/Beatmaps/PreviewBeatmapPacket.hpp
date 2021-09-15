@@ -42,7 +42,7 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps,
 
 	// Selection Info
 	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
-	DECLARE_INSTANCE_FIELD(unsigned int, difficulty);
+	DECLARE_INSTANCE_FIELD(uint, difficulty);
 
 	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Serialize", 1), LiteNetLib::Utils::NetDataWriter* writer);
 	DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Deserialize", 1), LiteNetLib::Utils::NetDataReader* reader);
