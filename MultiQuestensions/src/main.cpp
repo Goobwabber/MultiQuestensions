@@ -93,7 +93,8 @@ MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
         ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
         if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
-            if (il2cpp_functions::class_is_assignable_from(classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())))) {
+            //if (il2cpp_utils::AssignableFrom<il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel()))>(classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
+            if (il2cpp_functions::class_is_assignable_from(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
                 getLogger().debug(__FILE__ " Line: %d", __LINE__);
                 return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
             }
@@ -194,6 +195,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuR
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = GetExistingPreview(beatmapId->get_levelID());
     BeatmapCharacteristicSO* characteristic = self->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(beatmapId->get_beatmapCharacteristicSerializedName());
     if (preview != nullptr) {
+        getLogger().debug("preview exits, SetPlayerBeatmapLevel");
         self->SetPlayerBeatmapLevel(userId, reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapId->get_difficulty(), characteristic);
     }
     else {
