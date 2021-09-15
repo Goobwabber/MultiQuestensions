@@ -51,9 +51,9 @@ namespace MultiQuestensions {
 			catch (...) {
 				getLogger().warning("An Unknown exception was thrown while processing custom packet");
 			}
-			int processedBytes = reader->get_Position() - prevPosition;
-			reader->SkipBytes(length - processedBytes);
 		}
+		int processedBytes = reader->get_Position() - prevPosition;
+		reader->SkipBytes(length - processedBytes);
 	}
 
 	bool PacketSerializer::HandlesType(Il2CppReflectionType* type) {
