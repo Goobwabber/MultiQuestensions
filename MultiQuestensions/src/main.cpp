@@ -25,6 +25,10 @@
 #include "GlobalNamespace/CannotStartGameReason.hpp"
 #include "GlobalNamespace/LobbyGameStateController.hpp"
 #include "GlobalNamespace/ILobbyPlayerData.hpp"
+
+#include "GlobalNamespace/MenuRpcManager.hpp"
+#include "GlobalNamespace/ConnectedPlayerManager.hpp"
+#include "GlobalNamespace/ConnectedPlayerManager_SyncTimePacket.hpp"
 //#include "GlobalNamespace/LobbySetupViewController.hpp"
 //#include "GlobalNamespace/LobbySetupViewController_CannotStartGameReason.hpp"
 using namespace GlobalNamespace;
@@ -266,6 +270,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
         if (HasSong(levelId)) {
             getLogger().debug("MultiplayerLevelLoader_LoadLevel, HasSong, calling original");
             MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
+            return;
         }
         else {
             BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelId),
@@ -288,6 +293,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                                     self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
                                                     //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
                                                     MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
+                                                    return;
                                                 }
                                             );
                                         }
@@ -337,22 +343,22 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPl
     }
 }
 
-System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
-
-MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
-    entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
-        playerEntitlements.emplace_back(status);
-        });
-    self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
-    NetworkPlayerEntitlementChecker_Start(self);
-}
-
-MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
-    if (entitlementAction)
-        playerEntitlements.clear();
-        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
-    NetworkPlayerEntitlementChecker_OnDestroy(self);
-}
+//System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
+//
+//MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
+//    entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
+//        playerEntitlements.emplace_back(status);
+//        });
+//    self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
+//    NetworkPlayerEntitlementChecker_Start(self);
+//}
+//
+//MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
+//    if (entitlementAction)
+//        playerEntitlements.clear();
+//        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
+//    NetworkPlayerEntitlementChecker_OnDestroy(self);
+//}
 
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     // TODO: I honestly forgot what I had to add in here
@@ -368,7 +374,7 @@ void saveDefaultConfig() {
     if (config.HasMember("customsongs") && config.HasMember("freemod")) {
         getLogger().info("Config file already exists.");
         return;
-    }
+    }  
 
     config.RemoveAllMembers();
     config.SetObject();
@@ -396,6 +402,28 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
+MAKE_HOOK_MATCH(MenuRpcManager_InvokeSetCountdownEndTime, &MenuRpcManager::InvokeSetCountdownEndTime, void, MenuRpcManager* self, ::Il2CppString* userId, float newTime) {
+    getLogger().debug("InvokeSetCountdownEndTime: newTime: %f", newTime);
+    MenuRpcManager_InvokeSetCountdownEndTime(self, userId, newTime);
+}
+
+MAKE_HOOK_MATCH(MenuRpcManager_InvokeStartLevel, &MenuRpcManager::InvokeStartLevel, void, MenuRpcManager* self, ::Il2CppString* userId, GlobalNamespace::BeatmapIdentifierNetSerializable* beatmapId, GlobalNamespace::GameplayModifiers* gameplayModifiers, float startTime) {
+    getLogger().debug("StartLevel: startTime: %f", startTime);
+    MenuRpcManager_InvokeStartLevel(self, userId, beatmapId, gameplayModifiers, startTime);
+}
+
+MAKE_HOOK_MATCH(LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime, &LobbyGameStateController::HandleMenuRpcManagerSetCountdownEndTime, void, LobbyGameStateController* self, ::Il2CppString* userId, float countdownTime) {
+    getLogger().debug("SetCountdownEndTime: raw=%f, synctime=%f, r-s=%f", countdownTime, self->multiplayerSessionManager->get_syncTime(), countdownTime - self->multiplayerSessionManager->get_syncTime());
+    LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime(self, userId, countdownTime);
+}
+
+MAKE_HOOK_MATCH(ConnectedPlayerManager_HandleSyncTimePacket, &ConnectedPlayerManager::HandleSyncTimePacket, void, ConnectedPlayerManager* self, GlobalNamespace::ConnectedPlayerManager::SyncTimePacket* packet, GlobalNamespace::IConnectedPlayer* player) {
+    //getLogger().debug("SetCountdownEndTime: raw=%f, synctime=%f, r-s=%f", countdownTime, self->multiplayerSessionManager->get_syncTime(), countdownTime - self->multiplayerSessionManager->get_syncTime());
+    getLogger().debug("HandleSyncTimePacket: syncTime=%f", packet->syncTime);
+
+    ConnectedPlayerManager_HandleSyncTimePacket(self, packet, player);
+}
+
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
@@ -410,8 +438,8 @@ extern "C" void load() {
 
     INSTALL_HOOK(getLogger(), MultiplayerLevelLoader_LoadLevel);
     INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
-    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
-    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
+    //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
+    //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
     //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
     if (Modloader::getMods().find("BeatTogether") != Modloader::getMods().end()) {
         getLogger().info("Hello BeatTogether!");
@@ -424,5 +452,20 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbySetupViewController_DidActivate);
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
 
+    INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeSetCountdownEndTime);
+    INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeStartLevel);
+
+    INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime);
+    INSTALL_HOOK(getLogger(), ConnectedPlayerManager_HandleSyncTimePacket);
+
     getLogger().info("Installed all hooks!");
+
+    getLogger().debug("il2cpp_functions::Class_Init: %p"
+        "il2cpp_functions::type_equals: %p"
+        "il2cpp_functions::value_box: %p"
+        "il2cpp_functions::object_unbox: %p", 
+        &il2cpp_functions::Class_Init,
+        &il2cpp_functions::type_equals,
+        &il2cpp_functions::value_box,
+        &il2cpp_functions::object_unbox);
 }
