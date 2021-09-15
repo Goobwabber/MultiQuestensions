@@ -92,15 +92,15 @@ bool customSongsEnabled = true;
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
         ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
-        if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID() == levelId) {
-            //if (il2cpp_utils::AssignableFrom<il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel()))>(classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
-            if (il2cpp_functions::class_is_assignable_from(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())), classof(MultiQuestensions::Beatmaps::PreviewBeatmapStub*))) {
+        if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID()->Equals(levelId)) {
+            getLogger().debug("GetExistingPreview type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())->klass).c_str());
+            if (il2cpp_utils::AssignableFrom<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())->klass)) {
                 getLogger().debug(__FILE__ " Line: %d", __LINE__);
                 return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
             }
         }
     }
-    getLogger().debug("Return nullptr " __FILE__ " Line: %d", __LINE__);
+    getLogger().debug("GetExistingPreview return nullptr " __FILE__ " Line: %d", __LINE__);
     return nullptr;
 }
 
