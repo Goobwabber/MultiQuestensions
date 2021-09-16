@@ -85,6 +85,7 @@ Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 GlobalNamespace::MultiplayerSessionManager* sessionManager;
 GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
 MultiQuestensions::PacketManager* packetManager;
+GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 
 std::string moddedState = "modded";
 
@@ -401,6 +402,8 @@ static std::map<std::string, std::map<std::string, int>> entitlementDictionary;
 
 //static std::multimap<std::string, std::string, int> entitlementDictionary;
 
+static void HandleEntitlement(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement);
+
 // Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
 static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
     std::string cUserId = to_utf8(csstrtostr(userId)).c_str();
@@ -410,30 +413,64 @@ static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelI
     //    entitlementDictionary[cUserId] = std::map<std::string, int>;
     //}
     entitlementDictionary[cUserId][cLevelId] = entitlement.value;
+    HandleEntitlement(userId, levelId, entitlement);
 }
 
-//System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
-//
-//MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
-//    entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
-//        playerEntitlements.emplace_back(status);
-//        });
-//    self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
-//    NetworkPlayerEntitlementChecker_Start(self);
-//}
-//
-//MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
-//    if (entitlementAction)
-//        playerEntitlements.clear();
-//        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
-//    NetworkPlayerEntitlementChecker_OnDestroy(self);
-//}
+System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
+
+MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
+    entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
+        HandleEntitlementReceived(userId, beatmapId, status);
+        });
+    self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
+    NetworkPlayerEntitlementChecker_Start(self);
+}
+
+MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
+    if (entitlementAction)
+        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
+    NetworkPlayerEntitlementChecker_OnDestroy(self);
+}
+
+GlobalNamespace::IPreviewBeatmapLevel* loadingPreviewBeatmapLevel;
+GlobalNamespace::BeatmapDifficulty loadingBeatmapDifficulty;
+GlobalNamespace::BeatmapCharacteristicSO* loadingBeatmapCharacteristic;
+GlobalNamespace::IDifficultyBeatmap* loadingDifficultyBeatmap;
+GlobalNamespace::GameplayModifiers* loadingGameplayModifiers;
+
+static void HandleEntitlement(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
+    if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
+        lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(loadingPreviewBeatmapLevel, loadingBeatmapDifficulty, loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
+    }
+}
 
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     // TODO: I honestly forgot what I had to add in here
     getLogger().debug("LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished");
     self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
-    LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
+    lobbyGameStateController = self;
+    loadingPreviewBeatmapLevel = previewBeatmapLevel;
+    loadingBeatmapDifficulty = beatmapDifficulty;
+    loadingBeatmapCharacteristic = beatmapCharacteristic;
+    loadingDifficultyBeatmap = difficultyBeatmap;
+    loadingGameplayModifiers = gameplayModifiers;
+    bool entitlementStatusOK = true;
+    std::string LevelID = to_utf8(csstrtostr(self->startedBeatmapId->get_levelID()));
+    for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
+        std::string UserID =  to_utf8(csstrtostr(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
+        if (entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
+    }
+    if (entitlementStatusOK) {
+        lobbyGameStateController = nullptr;
+        loadingPreviewBeatmapLevel = nullptr;
+        //loadingBeatmapDifficulty = beatmapDifficulty;
+        loadingBeatmapCharacteristic = nullptr;
+        loadingDifficultyBeatmap = nullptr;
+        loadingGameplayModifiers = nullptr;
+
+        // call original method
+        LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
+    }
 }
 
 void saveDefaultConfig() {
@@ -512,8 +549,8 @@ extern "C" void load() {
 
     INSTALL_HOOK(getLogger(), MultiplayerLevelLoader_LoadLevel);
     INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
-    //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
-    //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
+    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
+    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
     //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
     if (Modloader::getMods().find("BeatTogether") != Modloader::getMods().end()) {
         getLogger().info("Hello BeatTogether!");
