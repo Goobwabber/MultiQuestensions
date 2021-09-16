@@ -25,6 +25,7 @@
 #include "GlobalNamespace/CannotStartGameReason.hpp"
 #include "GlobalNamespace/LobbyGameStateController.hpp"
 #include "GlobalNamespace/ILobbyPlayerData.hpp"
+#include "GlobalNamespace/GameServerPlayerTableCell.hpp"
 
 #include "GlobalNamespace/MenuRpcManager.hpp"
 #include "GlobalNamespace/ConnectedPlayerManager.hpp"
@@ -90,14 +91,24 @@ bool customSongsEnabled = true;
 //using PD_ValueCollection = System::Collections::Generic::Dictionary_2<Il2CppString*, ILobbyPlayerDataModel*>::ValueCollection;
 
 MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString* levelId) {
+    getLogger().debug("GetExistingPreview PlayerCount: %d", sessionManager->connectedPlayers->get_Count());
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
-        ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
+        ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->
+            get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
         if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID()->Equals(levelId)) {
             getLogger().debug("GetExistingPreview type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())->klass).c_str());
             if (il2cpp_utils::AssignableFrom<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())->klass)) {
                 getLogger().debug(__FILE__ " Line: %d", __LINE__);
                 return reinterpret_cast<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(playerData->get_beatmapLevel());
             }
+        }
+        else {
+            if (playerData->get_beatmapLevel() != nullptr)
+                getLogger().debug("Check expected levelId: %s, \r\nactual levelId: %s, \r\nlevelIDs match? %s", 
+                    to_utf8(csstrtostr(levelId)).c_str(), 
+                    to_utf8(csstrtostr(playerData->get_beatmapLevel()->get_levelID())).c_str(), 
+                    playerData->get_beatmapLevel()->get_levelID()->Equals(levelId) ? "true" : "false");
+            else getLogger().debug("beatmapLevel is null");
         }
     }
     getLogger().debug("GetExistingPreview return nullptr " __FILE__ " Line: %d", __LINE__);
@@ -161,7 +172,6 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
     if (hash != nullptr) {
         getLogger().info("Local user selected song '%s'.", to_utf8(csstrtostr(hash)).c_str());
         MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = GetExistingPreview(levelId);
-                                                                // ^ Also crash here
         if (preview != nullptr) {
             self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
             self->menuRpcManager->RecommendBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
@@ -171,12 +181,12 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
             IPreviewBeatmapLevel* localIPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(levelId);
             if (localIPreview != nullptr) {
                 try {
-                    MultiQuestensions::Beatmaps::PreviewBeatmapPacket* nullPacket = nullptr;
-                    MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview, nullPacket));
+                    using namespace MultiQuestensions::Beatmaps;
+                    PreviewBeatmapStub* previewStub = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview, static_cast<PreviewBeatmapPacket*>(nullptr)));
                     //MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = MultiQuestensions::Beatmaps::PreviewBeatmapStub::New_ctor(hash, localIPreview);
                     getLogger().debug("Check 'LobbyPlayersSetLocalBeatmap' levelID: %s", to_utf8(csstrtostr(reinterpret_cast<IPreviewBeatmapLevel*>(previewStub)->get_levelID())).c_str());
                     self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(previewStub), beatmapDifficulty, characteristic);
-                    MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
+                    PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
                     packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(packet));
                     self->menuRpcManager->RecommendBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
                     return;
@@ -190,21 +200,46 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
     LobbyPlayersSetLocalBeatmap(self, levelId, beatmapDifficulty, characteristic);
 }
 
+std::string GetHash(const std::string& levelId) {
+    return levelId.substr(RuntimeSongLoader::API::GetCustomLevelsPrefix().length(), levelId.length() - RuntimeSongLoader::API::GetCustomLevelsPrefix().length());
+}
+
 // LobbyPlayersDataModel HandleMenuRpcManagerSelectedBeatmap (DONT REMOVE THIS, without it a player's selected map will be cleared)
 MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuRpcManagerRecommendBeatmap, void, LobbyPlayersDataModel* self, Il2CppString* userId, BeatmapIdentifierNetSerializable* beatmapId) {
+    getLogger().debug("HandleMenuRpcManagerRecommendBeatmap: LevelID: %s", to_utf8(csstrtostr(beatmapId->get_levelID())).c_str());
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = GetExistingPreview(beatmapId->get_levelID());
-    BeatmapCharacteristicSO* characteristic = self->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(beatmapId->get_beatmapCharacteristicSerializedName());
     if (preview != nullptr) {
-        getLogger().debug("preview exits, SetPlayerBeatmapLevel");
+        getLogger().debug("HandleMenuRpcManagerRecommendBeatmap: Preview exists, SetPlayerBeatmapLevel");
+        BeatmapCharacteristicSO* characteristic = self->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(beatmapId->get_beatmapCharacteristicSerializedName());
         self->SetPlayerBeatmapLevel(userId, reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapId->get_difficulty(), characteristic);
+        return;
     }
     else {
+        getLogger().debug("HandleMenuRpcManagerRecommendBeatmap: Preview doesn't exist use localPreview, SetPlayerBeatmapLevel");
         IPreviewBeatmapLevel* localPreview = self->beatmapLevelsModel->GetLevelPreviewForLevelId(beatmapId->levelID);
         if (localPreview != nullptr) {
+            BeatmapCharacteristicSO* characteristic = self->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(beatmapId->get_beatmapCharacteristicSerializedName());
+            //self->SetPlayerBeatmapLevel(userId, localPreview, beatmapId->get_difficulty(), characteristic);
             LobbyPlayersSelectedBeatmap(self, userId, beatmapId);
         }
         else {
             // TODO: fetch beatmap data from beatsaver
+            getLogger().debug("No Info found, need to fetch from BeatSaver");
+            //BeatSaver::API::GetBeatmapByHashAsync(GetHash((beatmapId->levelID),
+            //    [](std::optional<BeatSaver::Beatmap> beatmap) {
+            //        QuestUI::MainThreadScheduler::Schedule(
+            //            [beatmap] {
+            //                if (beatmap.has_value()) {
+            //                    self->SetPlayerBeatmapLevel(userId, bmPreview, beatmapId);
+            //                // Create our own Preview or something?
+            //                }
+            //                else {
+            //                // Well doesn't exist on BeatSaver then
+            //                }
+            //            }
+            //        );
+            //    }
+            //);
         }
     }
 }
@@ -266,10 +301,6 @@ bool HasSong(std::string levelId) {
         }
     }
     return false;
-}
-
-std::string GetHash(const std::string& levelId) {
-    return levelId.substr(RuntimeSongLoader::API::GetCustomLevelsPrefix().length(), levelId.length() - RuntimeSongLoader::API::GetCustomLevelsPrefix().length());
 }
 
 MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadLevel, void, MultiplayerLevelLoader* self, BeatmapIdentifierNetSerializable* beatmapId, GameplayModifiers* gameplayModifiers, float initialStartTime) {
@@ -433,6 +464,11 @@ MAKE_HOOK_MATCH(ConnectedPlayerManager_HandleSyncTimePacket, &ConnectedPlayerMan
     ConnectedPlayerManager_HandleSyncTimePacket(self, packet, player);
 }
 
+MAKE_HOOK_MATCH(GameServerPlayerTableCell_SetData, &GameServerPlayerTableCell::SetData, void, GameServerPlayerTableCell* self, IConnectedPlayer* connectedPlayer, ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<AdditionalContentModel::EntitlementStatus>* getLevelEntitlementTask) {
+    getLevelEntitlementTask = Task_1<AdditionalContentModel::EntitlementStatus>::New_ctor(AdditionalContentModel::EntitlementStatus::Owned);
+    GameServerPlayerTableCell_SetData(self, connectedPlayer, playerData, hasKickPermissions, allowSelection, getLevelEntitlementTask);
+}
+
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
@@ -463,6 +499,8 @@ extern "C" void load() {
 
     INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeSetCountdownEndTime);
     INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeStartLevel);
+
+    INSTALL_HOOK(getLogger(), GameServerPlayerTableCell_SetData);
 
     INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime);
     INSTALL_HOOK(getLogger(), ConnectedPlayerManager_HandleSyncTimePacket);
