@@ -26,6 +26,8 @@
 #include "GlobalNamespace/LobbyGameStateController.hpp"
 #include "GlobalNamespace/ILobbyPlayerData.hpp"
 #include "GlobalNamespace/GameServerPlayerTableCell.hpp"
+#include "GlobalNamespace/MultiplayerLobbyConnectionController.hpp"
+#include "GlobalNamespace/CreateServerFormData.hpp"
 
 #include "GlobalNamespace/MenuRpcManager.hpp"
 #include "GlobalNamespace/ConnectedPlayerManager.hpp"
@@ -40,7 +42,7 @@ using namespace System::Threading::Tasks;
 
 #include "songdownloader/shared/BeatSaverAPI.hpp"
 
-std::vector<EntitlementsStatus> playerEntitlements;
+//std::vector<EntitlementsStatus> playerEntitlements;
 
 #ifndef VERSION
 #warning No Version set
@@ -250,6 +252,18 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
         MultiQuestensions::UI::LobbySetupPanel::AddSetupPanel(self->get_rectTransform(), sessionManager);
 }
 
+MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_CreateParty, &MultiplayerLobbyConnectionController::CreateParty, void, MultiplayerLobbyConnectionController* self, CreateServerFormData data) {
+    static auto maskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
+    data.songPacks = SongPackMask::get_all() | SongPackMask(maskStr);
+    MultiplayerLobbyConnectionController_CreateParty(self, data);
+}
+
+MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_ConnectToMatchmaking, &MultiplayerLobbyConnectionController::ConnectToMatchmaking, void, MultiplayerLobbyConnectionController* self, BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask, bool allowSongSelection) {
+    static auto maskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
+    songPackMask = songPackMask | SongPackMask(maskStr);
+    MultiplayerLobbyConnectionController_ConnectToMatchmaking(self, beatmapDifficultyMask, songPackMask, allowSongSelection);
+}
+
 // Show the custom levels tab in multiplayer
 MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigationController::Setup, void, LevelSelectionNavigationController* self,
     SongPackMask songPackMask, BeatmapDifficultyMask allowedBeatmapDifficultyMask, Array<GlobalNamespace::BeatmapCharacteristicSO*>* notAllowedCharacteristics,
@@ -257,7 +271,7 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigat
     SelectLevelCategoryViewController::LevelCategory startLevelCategory, IPreviewBeatmapLevel* beatmapLevelToBeSelectedAfterPresent, bool enableCustomLevels) {
     getLogger().info("LevelSelectionNavigationController_Setup setting custom songs . . .");
     LevelSelectionNavigationController_Setup(self, songPackMask, allowedBeatmapDifficultyMask, notAllowedCharacteristics, hidePacksIfOneOrNone, hidePracticeButton, showPlayerStatsInDetailView,
-        actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, customSongsEnabled);
+        actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, songPackMask.Contains(il2cpp_utils::newcsstr("custom_levelpack_CustomLevels")));
 }
 
 static bool isMissingLevel = false;
@@ -495,6 +509,10 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetPlayersMissingLevelText);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_DidActivate);
+
+    INSTALL_HOOK(getLogger(), MultiplayerLobbyConnectionController_CreateParty);
+    INSTALL_HOOK(getLogger(), MultiplayerLobbyConnectionController_ConnectToMatchmaking);
+
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
 
     INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeSetCountdownEndTime);

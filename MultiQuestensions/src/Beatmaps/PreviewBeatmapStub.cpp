@@ -3,6 +3,10 @@
 #include "System/Threading/Tasks/TaskStatus.hpp"
 #include "UnityEngine/ImageConversion.hpp"
 #include "GlobalNamespace/MediaAsyncLoader.hpp"
+#include "songdownloader/shared/BeatSaverAPI.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
+#include <vector>
 
 DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
@@ -124,7 +128,21 @@ namespace MultiQuestensions::Beatmaps {
 			return _preview->GetCoverImageAsync(cancellationToken);
 		}
 		else {
-			return nullptr;
+			using namespace QuestUI;
+			auto task = System::Threading::Tasks::Task_1<UnityEngine::Sprite*>::New_ctor(nullptr);
+			std::string levelid = to_utf8(csstrtostr(levelID));
+			BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelid), [task](std::optional<BeatSaver::Beatmap> beatmap) {
+				if (beatmap.has_value()) {
+					BeatSaver::API::GetCoverImageAsync(*beatmap, [task](std::vector<uint8_t> bytes) {
+						MainThreadScheduler::Schedule([bytes, task] {
+							std::vector<uint8_t> data = bytes;
+								task->TrySetResult(BeatSaberUI::VectorToSprite(data));
+							});
+						});
+				}
+				}
+			);
+			return task;
 		}
 	}
 

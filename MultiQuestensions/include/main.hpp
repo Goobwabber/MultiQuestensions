@@ -44,18 +44,4 @@ Il2CppString* LevelIdToHash(Il2CppString*);
 
 extern bool customSongsEnabled;
 
-// Fix DECLARE_CTOR
-
-#ifdef DECLARE_CTOR_FIX
-#error "DECLARE_CTOR_FIX is already defined! Undefine it before including macros.hpp!"
-#endif
-// Declare a method with name that will be called on construction.
-#define DECLARE_CTOR_FIX(name, ...) \
-public: \
-void name(__VA_ARGS__); \
-template<::il2cpp_utils::CreationType creationType = ::il2cpp_utils::CreationType::Temporary, class... TArgs> \
-static ___TargetType* New_ctor(TArgs&&... args) { \
-    static_assert(::custom_types::Decomposer<decltype(&___TargetType::name)>::equal<TArgs...>(), "Arguments provided to New_ctor must match the constructor!"); \
-    return THROW_UNLESS(il2cpp_utils::New<___TargetType*, creationType>(___TypeRegistration::klass_ptr, std::forward<TArgs>(args)...)); \
-} \
-___CREATE_INSTANCE_METHOD(name, ".ctor", METHOD_ATTRIBUTE_PUBLIC | METHOD_ATTRIBUTE_HIDE_BY_SIG | METHOD_ATTRIBUTE_SPECIAL_NAME | METHOD_ATTRIBUTE_RT_SPECIAL_NAME, nullptr)
+extern std::string GetHash(const std::string& levelId);
