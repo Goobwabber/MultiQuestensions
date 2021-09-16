@@ -399,13 +399,16 @@ MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPl
 
 static std::map<std::string, std::map<std::string, int>> entitlementDictionary;
 
+//static std::multimap<std::string, std::string, int> entitlementDictionary;
+
 // Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
 static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
     std::string cUserId = to_utf8(csstrtostr(userId)).c_str();
     std::string cLevelId = to_utf8(csstrtostr(levelId)).c_str();
-    if (!entitlementDictionary.count(cUserId)) {
-        entitlementDictionary[cUserId] = std::map<std::string, int>();
-    }
+    //entitlementDictionary.emplace(std::make_pair(cUserId,  cLevelId), entitlement.value);
+    //if (!entitlementDictionary.count(cUserId)) {
+    //    entitlementDictionary[cUserId] = std::map<std::string, int>;
+    //}
     entitlementDictionary[cUserId][cLevelId] = entitlement.value;
 }
 
