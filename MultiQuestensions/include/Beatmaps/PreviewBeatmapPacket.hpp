@@ -11,26 +11,15 @@
 #include "GlobalNamespace/IPoolablePacket.hpp"
 #include "System/Object.hpp"
 
-namespace MultiQuestensions::Beatmaps {
-	//constexpr std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*)};
-	//static std::initializer_list<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
-	//static std::vector<Il2CppClass*> PBPinterfaces{ classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
-	static std::vector<Il2CppClass*> GetPBPInterfaces() {
-		return { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) };
-	}
-}
+#define PBPInterfaces { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }
 
-//___DECLARE_TYPE_WRAPPER(MultiQuestensions::Beatmaps, PreviewBeatmapPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, "System", "Object", sizeof(Il2CppObject), "MultiQuestensions::Beatmaps", { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }, 0,
-//___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject*, "MultiQuestensions::Beatmaps", ::il2cpp_utils::ExtractTypes<std::vector<const Il2CppType*>{ LiteNetLib::Utils::INetSerializable*, GlobalNamespace::IPoolablePacket* }>(), 0, nullptr,
-DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, 
-	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
-	MultiQuestensions::Beatmaps::GetPBPInterfaces(),
-
+___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, 
+	Il2CppObject, "MultiQuestensions::Beatmaps", 
+	PBPInterfaces, 0, nullptr,
 	//DECLARE_DEFAULT_CTOR();
 	//PreviewBeatmapPacket();
 	//DECLARE_CTOR(New_ctor);
 	DECLARE_CTOR(New);
-
 
 	// Basic Song Info/Metadata
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
@@ -76,3 +65,4 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps,
 	//	REGISTER_METHOD(Deserialize);
 	//)
 )
+#undef PBPInterfaces

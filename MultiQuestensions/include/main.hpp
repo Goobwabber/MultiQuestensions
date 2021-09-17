@@ -43,3 +43,5 @@ Logger& getLogger();
 Il2CppString* LevelIdToHash(Il2CppString*);
 
 extern std::string GetHash(const std::string& levelId);
+
+extern ModInfo modInfo;

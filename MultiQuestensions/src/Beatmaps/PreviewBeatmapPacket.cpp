@@ -35,15 +35,6 @@ namespace MultiQuestensions::Beatmaps {
 	void PreviewBeatmapPacket::Deserialize(LiteNetLib::Utils::NetDataReader* reader) {
 		getLogger().debug("PreviewBeatmapPacket::Deserialize");
 
-		getLogger().debug("il2cpp_functions::Class_Init: %p"
-			"il2cpp_functions::type_equals: %p"
-			"il2cpp_functions::value_box: %p"
-			"il2cpp_functions::object_unbox: %p",
-			&il2cpp_functions::Class_Init,
-			&il2cpp_functions::type_equals,
-			&il2cpp_functions::value_box,
-			&il2cpp_functions::object_unbox);
-
 		levelId = reader->GetString();
 		getLogger().debug("levelID: %s", to_utf8(csstrtostr(levelId)).c_str());
 		levelHash = reader->GetString();

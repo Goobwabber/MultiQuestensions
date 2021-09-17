@@ -21,7 +21,7 @@ using namespace MultiQuestensions;
 #define VERSION "0.1.0"
 #endif
 
-static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
 // Loads the config from disk using our modInfo, then returns it for use
 Configuration& getConfig() {
