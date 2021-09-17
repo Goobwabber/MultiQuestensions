@@ -13,6 +13,7 @@ namespace MultiQuestensions::Extensions {
 
 #pragma region ExtendedPlayer
 	void ExtendedPlayer::ExtendedPlayer_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, int platform, UnityEngine::Color playerColor, Il2CppString* mpexVersion) {
+		getLogger().debug("Creating ExtendedPlayer");
 		_connectedPlayer = player;
 		if (mpexVersion) this->mpexVersion = mpexVersion;
 		else this->mpexVersion = MQE_version();
@@ -21,6 +22,7 @@ namespace MultiQuestensions::Extensions {
 			this->platform = (Platform)platform;
 			this->playerColor = playerColor;
 		}
+		getLogger().debug("Finished Creating ExtendedPlayer");
 	}
 #pragma endregion
 
@@ -57,12 +59,10 @@ namespace MultiQuestensions::Extensions {
 	void ExtendedPlayerPacket::Deserialize(LiteNetLib::Utils::NetDataReader* reader) {
 		getLogger().debug("ExtendedPlayerPacket::Deserialize");
 
-		this->platformID = reader->GetString();
-		this->mpexVersion = reader->GetString();
-		UnityEngine::Color new_playerColor;
-		if (!UnityEngine::ColorUtility::TryParseHtmlString(reader->GetString(), new_playerColor))
+		platformID = reader->GetString();
+		mpexVersion = reader->GetString();
+		if (!UnityEngine::ColorUtility::TryParseHtmlString(reader->GetString(), ByRef(playerColor)))
 			this->playerColor = ExtendedPlayer::DefaultColor;
-
 		if (reader->get_AvailableBytes() >= 4) // Verify this works when the platform int exists.
 			this->platform = (Platform)reader->GetInt();
 		else

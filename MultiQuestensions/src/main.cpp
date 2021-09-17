@@ -2,6 +2,7 @@
 #include "Hooks/Hooks.hpp"
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "Beatmaps/PreviewBeatmapStub.hpp"
+#include "Extensions/ExtendedPlayer.hpp"
 #include "Packets/PacketManager.hpp"
 #include "UI/LobbySetupPanel.hpp"
 
@@ -122,16 +123,60 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
     catch (...) {
         getLogger().debug("Unknown exception in HandlePreviewBeatmapPacket");
     }
+}
 
+std::map<std::string, Extensions::ExtendedPlayer*> _extendedPlayers;
+
+static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPlayerPacket* packet, IConnectedPlayer* player) {
+    const std::string userId = to_utf8(csstrtostr(player->get_userId()));
+    if (_extendedPlayers.contains(userId)) {
+        Extensions::ExtendedPlayer* extendedPlayer = _extendedPlayers[userId];
+        extendedPlayer->platformID = packet->platformID;
+        extendedPlayer->platform = packet->platform;
+        extendedPlayer->playerColor = packet->playerColor;
+        extendedPlayer->mpexVersion = packet->mpexVersion;
+    }
+    else {
+        getLogger().info("Received 'ExtendedPlayerPacket' from '%s' with platformID: '%s'  mpexVersion: '%s'", 
+            to_utf8(csstrtostr(player->get_userId())).c_str(),
+            to_utf8(csstrtostr(packet->platformID)).c_str(),
+            to_utf8(csstrtostr(packet->mpexVersion)).c_str()
+        );
+        Extensions::ExtendedPlayer* extendedPlayer;
+        try {
+            extendedPlayer = THROW_UNLESS(il2cpp_utils::New<Extensions::ExtendedPlayer*>(player, packet->platformID, (int)packet->platform, packet->playerColor, packet->mpexVersion));
+            if (modInfo.version != to_utf8(csstrtostr(extendedPlayer->mpexVersion)))
+            {
+                getLogger().warning(
+                    "###################################################################\r\n"
+                    "Different MultiplayerExtensions version detected!\r\n"
+                    "The player '%s' is using MultiplayerExtensions %s while you are using MultiplayerExtensions %s\r\n"
+                    "For best compatibility all players should use the same version of MultiplayerExtensions.\r\n"
+                    "###################################################################",
+                    to_utf8(csstrtostr(player->get_userName())).c_str(),
+                    to_utf8(csstrtostr(extendedPlayer->mpexVersion)).c_str(),
+                    modInfo.version.c_str()
+                );
+            }
+        }
+        catch (const std::runtime_error& e) {
+            getLogger().error("Exception while trying to create ExtendedPlayer: %s", e.what());
+        }
+        if (extendedPlayer) {
+            _extendedPlayers[userId] = extendedPlayer;
+            //extendedPlayerConnectedEvent::Invoke(extendedPlayer);
+        }
+    }
 }
 
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
     sessionManager = self;
     SessionManagerStart(sessionManager);
-    packetManager = new MultiQuestensions::PacketManager(sessionManager);
+    packetManager = new PacketManager(sessionManager);
 
-    packetManager->RegisterCallback<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>("MultiplayerExtensions.Beatmaps.PreviewBeatmapPacket", HandlePreviewBeatmapPacket);
+    packetManager->RegisterCallback<Beatmaps::PreviewBeatmapPacket*>("MultiplayerExtensions.Beatmaps.PreviewBeatmapPacket", HandlePreviewBeatmapPacket);
+    packetManager->RegisterCallback<Extensions::ExtendedPlayerPacket*>("MultiplayerExtensions.Extensions.ExtendedPlayerPacket", HandleExtendedPlayerPacket);
 }
 
 // LobbyPlayersDataModel Activate

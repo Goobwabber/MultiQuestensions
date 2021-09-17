@@ -26,8 +26,6 @@ namespace MultiQuestensions {
 		getLogger().debug("Writer Put");
 		getLogger().debug("Nullptr checking: packet: %p, writer: %p", packet, writer);
 		packet->Serialize(writer);
-		//reinterpret_cast<GlobalNamespace::BeatmapIdentifierNetSerializable*>(packet)->LiteNetLib_Utils_INetSerializable_Serialize(writer);
-																			//		  ^ nullptr
 		getLogger().debug("Serialize Finished");
 	}
 

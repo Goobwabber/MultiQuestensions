@@ -40,6 +40,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
     /// <summary>
     /// Platform
     /// </summary>
+    public:
     Platform platform;
     Platform get_platform();
 
@@ -112,7 +113,6 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
     const bool HasState(Il2CppString* state) const {
         return _connectedPlayer->HasState(state);
     }
-
 )
 
 #define EBPInterfaces { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }
