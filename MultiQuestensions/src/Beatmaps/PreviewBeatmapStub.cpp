@@ -137,12 +137,12 @@ namespace MultiQuestensions::Beatmaps {
 						MainThreadScheduler::Schedule([bytes, task] {
 							std::vector<uint8_t> data = bytes;
 								task->TrySetResult(BeatSaberUI::VectorToSprite(data));
+								return task;
 							});
 						});
 				}
 				}
 			);
-			return task;
 		}
 	}
 

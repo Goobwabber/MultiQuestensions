@@ -42,6 +42,4 @@ Logger& getLogger();
 // Utilities
 Il2CppString* LevelIdToHash(Il2CppString*);
 
-extern bool customSongsEnabled;
-
 extern std::string GetHash(const std::string& levelId);

@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "Hooks/Hooks.hpp"
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "Beatmaps/PreviewBeatmapStub.hpp"
 #include "Packets/PacketManager.hpp"
@@ -6,43 +7,14 @@
 
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
-#include "beatsaber-hook/shared/utils/hooking.hpp"
 
-#include "System/Collections/Generic/Dictionary_2.hpp"
-#include "System/Collections/Hashtable.hpp"
-#include "System/Collections/Hashtable_ValueCollection.hpp"
-#include "System/Threading/Tasks/Task_1.hpp"
-#include "System/Action_1.hpp"
-#include "System/Action.hpp"
-
-#include "GlobalNamespace/BeatmapIdentifierNetSerializable.hpp"
-#include "GlobalNamespace/MultiplayerLevelLoader.hpp"
-#include "GlobalNamespace/HMTask.hpp"
-#include "GlobalNamespace/StandardScoreSyncStateNetSerializable.hpp"
-#include "GlobalNamespace/NetworkPlayerEntitlementChecker.hpp"
-#include "GlobalNamespace/LevelSelectionNavigationController.hpp"
-#include "GlobalNamespace/LobbySetupViewController.hpp"
-#include "GlobalNamespace/CannotStartGameReason.hpp"
-#include "GlobalNamespace/LobbyGameStateController.hpp"
-#include "GlobalNamespace/ILobbyPlayerData.hpp"
-#include "GlobalNamespace/GameServerPlayerTableCell.hpp"
-#include "GlobalNamespace/MultiplayerLobbyConnectionController.hpp"
-#include "GlobalNamespace/CreateServerFormData.hpp"
-
-#include "GlobalNamespace/MenuRpcManager.hpp"
-#include "GlobalNamespace/ConnectedPlayerManager.hpp"
-#include "GlobalNamespace/ConnectedPlayerManager_SyncTimePacket.hpp"
 //#include "GlobalNamespace/LobbySetupViewController.hpp"
 //#include "GlobalNamespace/LobbySetupViewController_CannotStartGameReason.hpp"
 using namespace GlobalNamespace;
 using namespace System::Threading::Tasks;
+using namespace MultiQuestensions;
 
 #include "songloader/shared/API.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
-
-#include "songdownloader/shared/BeatSaverAPI.hpp"
-
-//std::vector<EntitlementsStatus> playerEntitlements;
 
 #ifndef VERSION
 #warning No Version set
@@ -81,15 +53,15 @@ Il2CppString* LevelIdToHash(Il2CppString* levelId) {
 
 
 
-// Plugin setup stuff
-GlobalNamespace::MultiplayerSessionManager* sessionManager;
-GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
-MultiQuestensions::PacketManager* packetManager;
-GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
+namespace MultiQuestensions {
+    // Plugin setup stuff
+    GlobalNamespace::MultiplayerSessionManager* sessionManager;
+    GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
+    MultiQuestensions::PacketManager* packetManager;
+    GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 
-std::string moddedState = "modded";
-
-bool customSongsEnabled = true;
+    std::string moddedState = "modded";
+}
 
 //using PD_ValueCollection = System::Collections::Generic::Dictionary_2<Il2CppString*, ILobbyPlayerDataModel*>::ValueCollection;
 
@@ -305,17 +277,19 @@ MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewCon
     LobbySetupViewController_SetStartGameEnabled(self, cannotStartGameReason);
 }
 
-bool IsCustomLevel(const std::string& levelId) {
-    return levelId.starts_with(RuntimeSongLoader::API::GetCustomLevelsPrefix());
-}
-
-bool HasSong(std::string levelId) {
-    for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
-        if (to_utf8(csstrtostr(song->levelID)) == levelId) {
-            return true;
-        }
+namespace MultiQuestensions {
+    bool IsCustomLevel(const std::string& levelId) {
+        return levelId.starts_with(RuntimeSongLoader::API::GetCustomLevelsPrefix());
     }
-    return false;
+
+    bool HasSong(std::string levelId) {
+        for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
+            if (to_utf8(csstrtostr(song->levelID)) == levelId) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadLevel, void, MultiplayerLevelLoader* self, BeatmapIdentifierNetSerializable* beatmapId, GameplayModifiers* gameplayModifiers, float initialStartTime) {
@@ -367,82 +341,6 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
     }
 }
 
-MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPlayerEntitlementChecker::GetEntitlementStatus, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, Il2CppString* levelIdCS) {
-    std::string levelId = to_utf8(csstrtostr(levelIdCS));
-    getLogger().info("NetworkPlayerEntitlementChecker_GetEntitlementStatus: %s", levelId.c_str());
-    if (IsCustomLevel(levelId)) {
-        if (HasSong(levelId)) {
-            return Task_1<EntitlementsStatus>::New_ctor(EntitlementsStatus::Ok);
-        }
-        else {
-            auto task = Task_1<EntitlementsStatus>::New_ctor();
-            BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelId),
-                [task](std::optional<BeatSaver::Beatmap> beatmap) {
-                    QuestUI::MainThreadScheduler::Schedule(
-                        [task, beatmap] {
-                            if (beatmap.has_value()) {
-                                task->TrySetResult(EntitlementsStatus::NotDownloaded);
-                            }
-                            else {
-                                task->TrySetResult(EntitlementsStatus::NotOwned);
-                            }
-                        }
-                    );
-                }
-            );
-            return task;
-        }
-    }
-    else {
-        return NetworkPlayerEntitlementChecker_GetEntitlementStatus(self, levelIdCS);
-    }
-}
-
-static std::map<std::string, std::map<std::string, int>> entitlementDictionary;
-
-//static std::multimap<std::string, std::string, int> entitlementDictionary;
-
-static void HandleEntitlement(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement);
-
-// Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
-static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
-    std::string cUserId = to_utf8(csstrtostr(userId)).c_str();
-    std::string cLevelId = to_utf8(csstrtostr(levelId)).c_str();
-    //entitlementDictionary.emplace(std::make_pair(cUserId,  cLevelId), entitlement.value);
-    //if (!entitlementDictionary.count(cUserId)) {
-    //    entitlementDictionary[cUserId] = std::map<std::string, int>;
-    //}
-    entitlementDictionary[cUserId][cLevelId] = entitlement.value;
-    HandleEntitlement(userId, levelId, entitlement);
-}
-
-System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
-
-MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
-    entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
-        HandleEntitlementReceived(userId, beatmapId, status);
-        });
-    self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
-    NetworkPlayerEntitlementChecker_Start(self);
-}
-
-MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
-    if (entitlementAction)
-        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
-    NetworkPlayerEntitlementChecker_OnDestroy(self);
-}
-
-GlobalNamespace::IPreviewBeatmapLevel* loadingPreviewBeatmapLevel;
-GlobalNamespace::BeatmapDifficulty loadingBeatmapDifficulty;
-GlobalNamespace::BeatmapCharacteristicSO* loadingBeatmapCharacteristic;
-GlobalNamespace::IDifficultyBeatmap* loadingDifficultyBeatmap;
-GlobalNamespace::GameplayModifiers* loadingGameplayModifiers;
-
-static void HandleEntitlement(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
-    if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
-        lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(loadingPreviewBeatmapLevel, loadingBeatmapDifficulty, loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
-    }
-}
 
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     // TODO: I honestly forgot what I had to add in here
@@ -473,41 +371,6 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
     }
 }
 
-void saveDefaultConfig() {
-    getLogger().info("Creating config file...");
-    ConfigDocument& config = getConfig().config;
-
-    if (config.HasMember("customsongs") && config.HasMember("freemod")) {
-        getLogger().info("Config file already exists.");
-        return;
-    }  
-
-    config.RemoveAllMembers();
-    config.SetObject();
-    auto& allocator = config.GetAllocator();
-
-    config.AddMember("customsongs", true, allocator);
-    config.AddMember("freemod", false, allocator);
-    config.AddMember("hostpick", true, allocator);
-    //config["customsongs"].SetBool(true);
-    //config["enforcemods"].SetBool(true);
-
-    getConfig().Write();
-    getLogger().info("Config file created.");
-}
-
-// Called at the early stages of game loading
-extern "C" void setup(ModInfo& info) {
-    info.id = ID;
-    info.version = VERSION;
-    modInfo = info;
-
-    getConfig().Load();
-    saveDefaultConfig();
-
-    getLogger().info("Completed setup!");
-}
-
 MAKE_HOOK_MATCH(MenuRpcManager_InvokeSetCountdownEndTime, &MenuRpcManager::InvokeSetCountdownEndTime, void, MenuRpcManager* self, ::Il2CppString* userId, float newTime) {
     getLogger().debug("InvokeSetCountdownEndTime: newTime: %f", newTime);
     MenuRpcManager_InvokeSetCountdownEndTime(self, userId, newTime);
@@ -535,6 +398,44 @@ MAKE_HOOK_MATCH(GameServerPlayerTableCell_SetData, &GameServerPlayerTableCell::S
     GameServerPlayerTableCell_SetData(self, connectedPlayer, playerData, hasKickPermissions, allowSelection, getLevelEntitlementTask);
 }
 
+
+void saveDefaultConfig() {
+    getLogger().info("Creating config file...");
+    ConfigDocument& config = getConfig().config;
+
+    if (config.HasMember("lagreducer")) {
+        getLogger().info("Config file already exists.");
+        return;
+    }  
+
+    config.RemoveAllMembers();
+    config.SetObject();
+    auto& allocator = config.GetAllocator();
+
+    config.AddMember("customsongs", true, allocator);
+    config.AddMember("lagreducer", false, allocator);
+
+    //config.AddMember("freemod", false, allocator);
+    //config.AddMember("hostpick", true, allocator);
+    //config["customsongs"].SetBool(true);
+    //config["enforcemods"].SetBool(true);
+
+    getConfig().Write();
+    getLogger().info("Config file created.");
+}
+
+// Called at the early stages of game loading
+extern "C" void setup(ModInfo& info) {
+    info.id = ID;
+    info.version = VERSION;
+    modInfo = info;
+
+    getConfig().Load();
+    saveDefaultConfig();
+
+    getLogger().info("Completed setup!");
+}
+
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
@@ -542,15 +443,13 @@ extern "C" void load() {
     custom_types::Register::AutoRegister();
 
     getLogger().info("Installing hooks...");
+    Hooks::Install_Hooks();
     INSTALL_HOOK(getLogger(), SessionManagerStart);
     INSTALL_HOOK(getLogger(), LobbyPlayersActivate);
     INSTALL_HOOK(getLogger(), LobbyPlayersSetLocalBeatmap);
     INSTALL_HOOK(getLogger(), LobbyPlayersSelectedBeatmap);
 
     INSTALL_HOOK(getLogger(), MultiplayerLevelLoader_LoadLevel);
-    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
-    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
-    INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
     //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
     if (Modloader::getMods().find("BeatTogether") != Modloader::getMods().end()) {
         getLogger().info("Hello BeatTogether!");

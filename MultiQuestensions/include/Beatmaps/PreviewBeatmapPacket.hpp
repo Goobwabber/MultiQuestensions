@@ -20,6 +20,8 @@ namespace MultiQuestensions::Beatmaps {
 	}
 }
 
+//___DECLARE_TYPE_WRAPPER(MultiQuestensions::Beatmaps, PreviewBeatmapPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, "System", "Object", sizeof(Il2CppObject), "MultiQuestensions::Beatmaps", { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }, 0,
+//___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject*, "MultiQuestensions::Beatmaps", ::il2cpp_utils::ExtractTypes<std::vector<const Il2CppType*>{ LiteNetLib::Utils::INetSerializable*, GlobalNamespace::IPoolablePacket* }>(), 0, nullptr,
 DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, 
 	PreviewBeatmapPacket, "System", "Object", sizeof(Il2CppObject),
 	MultiQuestensions::Beatmaps::GetPBPInterfaces(),

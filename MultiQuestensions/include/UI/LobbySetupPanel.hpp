@@ -9,6 +9,7 @@ namespace MultiQuestensions::UI {
 	private:
 		//static GlobalNamespace::IMultiplayerSessionManager* sessionManager;
 		//HMUI::CurvedTextMeshPro* modifierText;
+		static UnityEngine::UI::Toggle* lagReducerToggle;
 		static UnityEngine::UI::Toggle* customSongsToggle;
 
 	public:

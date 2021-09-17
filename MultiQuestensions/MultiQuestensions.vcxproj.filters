@@ -49,6 +49,7 @@
       <Filter>src\Beatmaps</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\LobbySetupPanel.cpp" />
+    <ClCompile Include="src\Extensions\ExtendedPlayer.cpp.dis" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -136,5 +137,8 @@
       <Filter>extern</Filter>
     </ClInclude>
     <ClInclude Include="include\UI\LobbySetupPanel.hpp" />
+    <ClInclude Include="include\Hooks\Hooks.hpp" />
+    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementChecker.cpp" />
+    <ClInclude Include="include\Extensions\ExtendedPlayer.hpp.dis" />
   </ItemGroup>
 </Project>

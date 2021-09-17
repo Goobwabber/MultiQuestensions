@@ -8,11 +8,15 @@ using namespace UnityEngine::UI;
 
 namespace MultiQuestensions::UI {
 
+	UnityEngine::UI::Toggle* LobbySetupPanel::lagReducerToggle;
 	UnityEngine::UI::Toggle* LobbySetupPanel::customSongsToggle;
 
 	void SetCustomSongs(bool value) {
 		getConfig().config["customsongs"].SetBool(value);
-		customSongsEnabled = value;
+	}
+
+	void SetLagReducer(bool value) {
+		getConfig().config["lagreducer"].SetBool(value);
 	}
 
 	void LobbySetupPanel::AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager) {
@@ -40,6 +44,11 @@ namespace MultiQuestensions::UI {
 		//layout2->set_minWidth(45);
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>
+
+		QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
+
+		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Lag Reducer", getConfig().config["lagreducer"].GetBool(), SetLagReducer);
+		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
 
 		customSongsToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Custom Songs", getConfig().config["customsongs"].GetBool(), SetCustomSongs);
 		QuestUI::BeatSaberUI::AddHoverHint(customSongsToggle->get_gameObject(), "Toggles custom songs for all players");
