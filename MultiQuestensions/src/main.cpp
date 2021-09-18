@@ -6,8 +6,16 @@
 #include "Packets/PacketManager.hpp"
 #include "UI/LobbySetupPanel.hpp"
 
+#include "GlobalNamespace/ConnectedPlayerManager.hpp"
+#include "GlobalNamespace/LocalNetworkPlayerModel.hpp"
+#include "GlobalNamespace/IPlatformUserModel.hpp"
+#include "GlobalNamespace/UserInfo.hpp"
+#include "UnityEngine/Resources.hpp"
+
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
+
+#include "CodegenExtensions/ColorUtility.hpp"
 
 //#include "GlobalNamespace/LobbySetupViewController.hpp"
 //#include "GlobalNamespace/LobbySetupViewController_CannotStartGameReason.hpp"
@@ -126,6 +134,8 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
 }
 
 std::map<std::string, Extensions::ExtendedPlayer*> _extendedPlayers;
+Extensions::ExtendedPlayer* localExtendedPlayer;
+IPlatformUserModel* platformUserModel;
 
 static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPlayerPacket* packet, IConnectedPlayer* player) {
     const std::string userId = to_utf8(csstrtostr(player->get_userId()));
@@ -144,13 +154,13 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
         );
         Extensions::ExtendedPlayer* extendedPlayer;
         try {
-            extendedPlayer = THROW_UNLESS(il2cpp_utils::New<Extensions::ExtendedPlayer*>(player, packet->platformID, (int)packet->platform, packet->playerColor, packet->mpexVersion));
+            extendedPlayer = Extensions::ExtendedPlayer::CS_ctor(player, packet->platformID, packet->platform, packet->mpexVersion, packet->playerColor);
             if (modInfo.version != to_utf8(csstrtostr(extendedPlayer->mpexVersion)))
             {
                 getLogger().warning(
                     "###################################################################\r\n"
                     "Different MultiplayerExtensions version detected!\r\n"
-                    "The player '%s' is using MultiplayerExtensions %s while you are using MultiplayerExtensions %s\r\n"
+                    "The player '%s' is using MultiplayerExtensions %s while you are using MultiQuestensions %s\r\n"
                     "For best compatibility all players should use the same version of MultiplayerExtensions.\r\n"
                     "###################################################################",
                     to_utf8(csstrtostr(player->get_userName())).c_str(),
@@ -169,14 +179,63 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
     }
 }
 
+void HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player) {
+    getLogger().info("Player '%s' joined", to_utf8(csstrtostr(player->get_userId())).c_str());
+    getLogger().debug("Sending ExtendedPlayerPacket");
+    if (localExtendedPlayer->get_platformID() != nullptr)
+    {
+        try {
+            Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+        }
+        catch (const std::runtime_error& e) {
+            getLogger().error("%s", e.what());
+        }
+    }
+    getLogger().debug("ExtendedPlayerPacket sent");
+}
+
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
     sessionManager = self;
     SessionManagerStart(sessionManager);
     packetManager = new PacketManager(sessionManager);
 
+
     packetManager->RegisterCallback<Beatmaps::PreviewBeatmapPacket*>("MultiplayerExtensions.Beatmaps.PreviewBeatmapPacket", HandlePreviewBeatmapPacket);
     packetManager->RegisterCallback<Extensions::ExtendedPlayerPacket*>("MultiplayerExtensions.Extensions.ExtendedPlayerPacket", HandleExtendedPlayerPacket);
+}
+
+MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "StartSession", 1), void, MultiplayerSessionManager* self, ConnectedPlayerManager* connectedPlayerManager) {
+    SessionManager_StartSession(self, connectedPlayerManager);
+    getLogger().debug("MultiplayerSessionManager.StartSession, creating localExtendedPlayerPacket");
+    try {
+        localExtendedPlayer = Extensions::ExtendedPlayer::CS_ctor(self->get_localPlayer());
+
+        if (!UnityEngine::ColorUtility::TryParseHtmlString(il2cpp_utils::newcsstr(getConfig().config["color"].GetString()), ByRef(localExtendedPlayer->playerColor)))
+            localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
+
+        static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>()->get(0);
+
+        static auto UserInfoTask = localNetworkPlayerModel->platformUserModel->GetUserInfo();
+
+        static auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
+            auto userInfo = userInfoTask->get_Result();
+            if (userInfo) {
+                localExtendedPlayer->platformID = userInfo->platformUserId;
+                localExtendedPlayer->platform = (Extensions::Platform)userInfo->platform.value;
+            }
+            else getLogger().error("Failed to get local network player!");
+            }
+        );
+
+        reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+    }
+    catch (const std::runtime_error& e) {
+        getLogger().error("%s", e.what());
+    }
+    // System::Action_1<GlobalNamespace::IConnectedPlayer*>*
+    self->add_playerConnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(classof(System::Action_1<GlobalNamespace::IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerConnected));
 }
 
 // LobbyPlayersDataModel Activate
@@ -448,7 +507,7 @@ void saveDefaultConfig() {
     getLogger().info("Creating config file...");
     ConfigDocument& config = getConfig().config;
 
-    if (config.HasMember("lagreducer")) {
+    if (config.HasMember("color")) {
         getLogger().info("Config file already exists.");
         return;
     }  
@@ -459,6 +518,7 @@ void saveDefaultConfig() {
 
     config.AddMember("customsongs", true, allocator);
     config.AddMember("lagreducer", false, allocator);
+    config.AddMember("color", "#08C0FF", allocator);
 
     //config.AddMember("freemod", false, allocator);
     //config.AddMember("hostpick", true, allocator);
@@ -490,6 +550,7 @@ extern "C" void load() {
     getLogger().info("Installing hooks...");
     Hooks::Install_Hooks();
     INSTALL_HOOK(getLogger(), SessionManagerStart);
+    INSTALL_HOOK(getLogger(), SessionManager_StartSession);
     INSTALL_HOOK(getLogger(), LobbyPlayersActivate);
     INSTALL_HOOK(getLogger(), LobbyPlayersSetLocalBeatmap);
     INSTALL_HOOK(getLogger(), LobbyPlayersSelectedBeatmap);
@@ -511,13 +572,15 @@ extern "C" void load() {
 
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
 
+#pragma region Debug Hooks
     INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeSetCountdownEndTime);
     INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeStartLevel);
-
-    INSTALL_HOOK(getLogger(), GameServerPlayerTableCell_SetData);
-
     INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime);
     INSTALL_HOOK(getLogger(), ConnectedPlayerManager_HandleSyncTimePacket);
+#pragma endregion
+
+
+    INSTALL_HOOK(getLogger(), GameServerPlayerTableCell_SetData);
 
     getLogger().info("Installed all hooks!");
 

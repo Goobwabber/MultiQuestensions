@@ -16,7 +16,7 @@ namespace MultiQuestensions {
     GlobalNamespace::IDifficultyBeatmap* loadingDifficultyBeatmap;
     GlobalNamespace::GameplayModifiers* loadingGameplayModifiers;
 
-    System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
+    //System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
 #pragma endregion
 
     // Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
@@ -66,23 +66,28 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_Start, &NetworkPlayerEntitlementChecker::Start, void, NetworkPlayerEntitlementChecker* self) {
-        entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
+        //entitlementAction = il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
+        //    HandleEntitlementReceived(userId, beatmapId, status);
+        //    });
+        //self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
+        self->rpcManager->add_setIsEntitledToLevelEvent(
+        il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
             HandleEntitlementReceived(userId, beatmapId, status);
-            });
-        self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
+            }));
         NetworkPlayerEntitlementChecker_Start(self);
     }
 
-    MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
-        if (entitlementAction)
-            self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
-        NetworkPlayerEntitlementChecker_OnDestroy(self);
-    }
+    // Causes crash when being called
+    //MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_OnDestroy, &NetworkPlayerEntitlementChecker::OnDestroy, void, NetworkPlayerEntitlementChecker* self) {
+    //    if (entitlementAction)
+    //        self->rpcManager->remove_setIsEntitledToLevelEvent(entitlementAction);
+    //    NetworkPlayerEntitlementChecker_OnDestroy(self);
+    //}
 #pragma endregion
 
     void Hooks::NetworkplayerEntitlementChecker() {
         INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
         INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
-        INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
+        //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
     }
 }

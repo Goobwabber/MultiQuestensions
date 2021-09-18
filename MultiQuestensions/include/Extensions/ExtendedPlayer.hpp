@@ -41,7 +41,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
     /// Platform
     /// </summary>
     public:
-    Platform platform;
+    Platform platform = Platform::OculusQuest;
     Platform get_platform();
 
     /// <summary>
@@ -55,6 +55,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
     /// </summary>
     DECLARE_INSTANCE_FIELD(UnityEngine::Color, playerColor);
 
+
     DECLARE_INSTANCE_FIELD(Il2CppString*, isPartyOwner);
     DECLARE_INSTANCE_FIELD(Il2CppString*, hasRecommendBeatmapPermission);
     DECLARE_INSTANCE_FIELD(Il2CppString*, hasRecommendModifiersPermission);
@@ -62,47 +63,56 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
 
     DECLARE_CTOR(ExtendedPlayer_ctor, GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, int platform, UnityEngine::Color playerColor, Il2CppString* mpexVersion);
 
-    const bool isMe() const {
+public:
+    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player);
+    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
+    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, Il2CppString* mpexVersion, UnityEngine::Color playerColor);
+
+    const UnityEngine::Color get_playerColor() const {
+        return playerColor;
+    }
+
+    const bool get_isMe() const {
         return _connectedPlayer->get_isMe();
     }
 
-    const Il2CppString* const userId() const {
+    const Il2CppString* const get_userId() const {
         return _connectedPlayer->get_userId();
     }
 
-    const Il2CppString* const userName() const {
+    const Il2CppString* const get_userName() const {
         return _connectedPlayer->get_userName();
     }
 
-    const float currentLatency() const {
+    const float get_currentLatency() const {
         return _connectedPlayer->get_currentLatency();
     }
 
-    const bool isConnected() const {
+    const bool get_isConnected() const {
         return _connectedPlayer->get_isConnected();
     }
 
-    const bool isConnectionOwner() const {
+    const bool get_isConnectionOwner() const {
         return _connectedPlayer->get_isConnectionOwner();
     }
 
-    const float offsetSyncTime() const {
+    const float get_offsetSyncTime() const {
         return _connectedPlayer->get_offsetSyncTime();
     }
 
-    const int sortIndex() const {
+    const int get_sortIndex() const {
         return _connectedPlayer->get_sortIndex();
     }
     
-    const bool isKicked() const {
+    const bool get_isKicked() const {
         return _connectedPlayer->get_isKicked();
     }
 
-    const GlobalNamespace::MultiplayerAvatarData multiplayerAvatarData() const {
+    const GlobalNamespace::MultiplayerAvatarData get_multiplayerAvatarData() const {
         return _connectedPlayer->get_multiplayerAvatarData();
     }
 
-    const GlobalNamespace::DisconnectedReason disconnectedReason() const {
+    const GlobalNamespace::DisconnectedReason get_disconnectedReason() const {
         return _connectedPlayer->get_disconnectedReason();
     }
 
@@ -117,11 +127,11 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
 
 #define EBPInterfaces { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlayerPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS,
-    Il2CppObject, "MultiQuestensions::Extensions",
+    Il2CppObject, "MultiplayerExtensions.Extensions",
     EBPInterfaces, 0, nullptr,
     DECLARE_CTOR(New);
-
-    ExtendedPlayerPacket* Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
+public:
+    static ExtendedPlayerPacket* Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
 
     // Player and platform information
     DECLARE_INSTANCE_FIELD(Il2CppString*, platformID);

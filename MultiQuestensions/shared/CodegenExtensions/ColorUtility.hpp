@@ -32,12 +32,13 @@ namespace UnityEngine {
 
         static Il2CppString* ToHtmlStringRGB(Color color) {
             Color32 color2 = Color32((uint8_t)std::clamp((int)round(color.r * 255.0f), 0, 255), (uint8_t)std::clamp((int)round(color.g * 255.0f), 0, 255), (uint8_t)std::clamp((int)round(color.b * 255.0f), 0, 255), 1);
-            return UnityString::Format(il2cpp_utils::newcsstr("{0:X2}{1:X2}{2:X2}"), Array<uint8_t>::New(
-                {
-                    color2.r,
-                    color2.g,
-                    color2.b
-                }));
+            return il2cpp_utils::newcsstr(string_format("#%02x%02x%02x", color2.r, color2.g, color2.b));
+            //return UnityString::Format(il2cpp_utils::newcsstr("{0:X2}{1:X2}{2:X2}"), Array<uint8_t>::New(
+            //    {
+            //        color2.r,
+            //        color2.g,
+            //        color2.b
+            //    }));
         }
     };
 }
