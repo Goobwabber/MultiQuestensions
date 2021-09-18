@@ -85,14 +85,16 @@ namespace MultiQuestensions::UI {
 				//getModConfig().ClockColor.SetValue(lastChangedColor);
 			},
 			[](UnityEngine::Color value) {
-				try {
-					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), value);
-					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
-					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
-				}
-				catch (const std::runtime_error& e) {
-					getLogger().error("%s", e.what());
-				}
+				// TODO: Uncomment when MpEx supports it
+				
+				//try {
+				//	Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), value);
+				//	getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+				//	packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				//}
+				//catch (const std::runtime_error& e) {
+				//	getLogger().error("%s", e.what());
+				//}
 			}
 		);
 
