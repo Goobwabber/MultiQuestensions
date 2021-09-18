@@ -61,6 +61,7 @@ namespace MultiQuestensions::UI {
 			[&playerColor](UnityEngine::Color value) {
 				playerColor = value;
 				getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
+				getConfig().Write();
 				try {
 					localExtendedPlayer->playerColor = value;
 					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
