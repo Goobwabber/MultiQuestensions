@@ -12,9 +12,9 @@ namespace MultiQuestensions {
 
 	int targetIterations = 0;
 
-	MAKE_HOOK_MATCH(MultiplayerResultsPyramidPatch, &MultiplayerResultsPyramidView::SetupResults, void, MultiplayerResultsPyramidView* self, IReadOnlyList_1<MultiplayerPlayerResultsData>* resultsData, UnityEngine::Transform* badgeStartTransform, UnityEngine::Transform* badgeMidTransform) {
-		IEnumerable_1<MultiplayerPlayerResultsData>* newResultsData = System::Linq::Enumerable::Take(reinterpret_cast<IEnumerable_1<MultiplayerPlayerResultsData>*>(resultsData), 5);
-		MultiplayerResultsPyramidPatch(self, newResultsData, badgeStartTransform, badgeMidTransform);
+	MAKE_HOOK_MATCH(MultiplayerResultsPyramidPatch, &MultiplayerResultsPyramidView::SetupResults, void, MultiplayerResultsPyramidView* self, IReadOnlyList_1<MultiplayerPlayerResultsData*>* resultsData, UnityEngine::Transform* badgeStartTransform, UnityEngine::Transform* badgeMidTransform) {
+		List<MultiplayerPlayerResultsData*>* newResultsData = Enumerable::ToList(Enumerable::Take(reinterpret_cast<IEnumerable_1<MultiplayerPlayerResultsData*>*>(resultsData), 5));
+		MultiplayerResultsPyramidPatch(self, (IReadOnlyList_1<MultiplayerPlayerResultsData*>*)newResultsData, badgeStartTransform, badgeMidTransform);
 	}
 
 	MAKE_HOOK_MATCH(IntroAnimationPatch, &MultiplayerIntroAnimationController::PlayIntroAnimation, void, MultiplayerIntroAnimationController* self, float maxDesiredIntroAnimationDuration, Action* onCompleted) {
@@ -52,7 +52,7 @@ namespace MultiQuestensions {
 		self->introPlayableDirector = realDirector;
 	}
 
-	MAKE_HOOK_MATCH(CalculatePlayerIndexSequencePatch, &MultiplayerIntroAnimationController::CalculatePlayerIndexSequence, Queue_1<int>, MultiplayerIntroAnimationController* self, IReadOnlyList_1<IConnectedPlayer*>* allActivePlayer) {
+	MAKE_HOOK_MATCH(CalculatePlayerIndexSequencePatch, &MultiplayerIntroAnimationController::CalculatePlayerIndexSequence, Queue_1<int>*, MultiplayerIntroAnimationController* self, IReadOnlyList_1<IConnectedPlayer*>* allActivePlayer) {
 		List<IConnectedPlayer*>* listActivePlayers = Enumerable::ToList(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(allActivePlayer));
 		IConnectedPlayer* localPlayer = nullptr;
 

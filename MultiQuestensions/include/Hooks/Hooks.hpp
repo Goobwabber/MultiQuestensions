@@ -33,6 +33,7 @@
 #include "GlobalNamespace/ConnectedPlayerManager.hpp"
 #include "GlobalNamespace/ConnectedPlayerManager_SyncTimePacket.hpp"
 
+#include "GlobalNamespace/MultiplayerPlayerResultsData.hpp"
 #include "GlobalNamespace/MultiplayerResultsPyramidView.hpp"
 #include "GlobalNamespace/MultiplayerIntroAnimationController.hpp"
 
