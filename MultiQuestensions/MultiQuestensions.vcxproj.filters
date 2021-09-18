@@ -31,6 +31,30 @@
     <Filter Include="extern">
       <UniqueIdentifier>{fcee4a01-7013-456d-844d-3ee6263d7ddd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Hooks">
+      <UniqueIdentifier>{aa3ea131-982c-4dac-9adf-86347ed8e599}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI">
+      <UniqueIdentifier>{45320952-85bc-4fe1-ba82-ebb2601bfda8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Extensions">
+      <UniqueIdentifier>{c25852c5-f35c-425e-9641-6468d5e4b8f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Extensions">
+      <UniqueIdentifier>{53f23e9d-f202-4d68-9b7b-8ebdb04ea12e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Hooks">
+      <UniqueIdentifier>{ae4c12ec-ab3a-4fe5-a1c6-cff5786bf5ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\UI">
+      <UniqueIdentifier>{583a75e7-93f8-4eea-aade-02f6c090f090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared">
+      <UniqueIdentifier>{9db08377-28e4-461d-bcc4-5ebb645b167c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\CodegenExtensions">
+      <UniqueIdentifier>{31772450-96cd-49b8-8cd9-8e78b2fab9c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -48,8 +72,12 @@
     <ClCompile Include="src\Beatmaps\PreviewBeatmapStub.cpp">
       <Filter>src\Beatmaps</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\LobbySetupPanel.cpp" />
-    <ClCompile Include="src\Extensions\ExtendedPlayer.cpp" />
+    <ClCompile Include="src\Extensions\ExtendedPlayer.cpp">
+      <Filter>src\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\LobbySetupPanel.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -136,10 +164,20 @@
     <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp">
       <Filter>extern</Filter>
     </ClInclude>
-    <ClInclude Include="include\UI\LobbySetupPanel.hpp" />
-    <ClInclude Include="include\Hooks\Hooks.hpp" />
-    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementChecker.cpp" />
-    <ClInclude Include="include\Extensions\ExtendedPlayer.hpp" />
-    <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp" />
+    <ClInclude Include="include\Extensions\ExtendedPlayer.hpp">
+      <Filter>include\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Hooks\Hooks.hpp">
+      <Filter>include\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\LobbySetupPanel.hpp">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementChecker.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp">
+      <Filter>shared\CodegenExtensions</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
