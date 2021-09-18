@@ -4,6 +4,8 @@
 #include "UnityEngine/UI/ContentSizeFitter.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/RectOffset.hpp"
+
+#include "CodegenExtensions/ColorUtility.hpp"
 using namespace UnityEngine::UI;
 
 namespace MultiQuestensions::UI {
@@ -50,7 +52,56 @@ namespace MultiQuestensions::UI {
 		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Lag Reducer", getConfig().config["lagreducer"].GetBool(), SetLagReducer);
 		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
 
-		customSongsToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Custom Songs", getConfig().config["customsongs"].GetBool(), SetCustomSongs);
-		QuestUI::BeatSaberUI::AddHoverHint(customSongsToggle->get_gameObject(), "Toggles custom songs for all players");
+		UnityEngine::Color playerColor;
+		UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
+
+		//QuestUI::BeatSaberUI::CreateColorPickerModal(parent->get_transform(), "Player Color Selection", playerColor);
+
+		auto colorPicker = QuestUI::BeatSaberUI::CreateColorPickerModal(parent, "Player Color Selection", playerColor,
+			[&playerColor](UnityEngine::Color value) {
+				playerColor = value;
+				getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
+				try {
+					localExtendedPlayer->playerColor = value;
+					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				}
+				catch (const std::runtime_error& e) {
+					getLogger().error("%s", e.what());
+				}
+			},
+			[] {
+				try {
+					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				}
+				catch (const std::runtime_error& e) {
+					getLogger().error("%s", e.what());
+				}
+
+				//instance->SetColor(getModConfig().ClockColor.GetValue());
+				//getModConfig().ClockColor.SetValue(lastChangedColor);
+			},
+			[](UnityEngine::Color value) {
+				try {
+					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), value);
+					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				}
+				catch (const std::runtime_error& e) {
+					getLogger().error("%s", e.what());
+				}
+			}
+		);
+
+		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
+			colorPicker->Show();
+			}
+		);
+
+		//customSongsToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Custom Songs", getConfig().config["customsongs"].GetBool(), SetCustomSongs);
+		//QuestUI::BeatSaberUI::AddHoverHint(customSongsToggle->get_gameObject(), "Toggles custom songs for all players");
 	}
 }

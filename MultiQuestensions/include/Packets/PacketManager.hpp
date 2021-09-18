@@ -57,4 +57,6 @@ namespace MultiQuestensions {
 
 		void UnregisterCallback(std::string identifier);
 	};
+
+	extern PacketManager* packetManager;
 }

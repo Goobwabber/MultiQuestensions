@@ -2,8 +2,6 @@
 #include "Hooks/Hooks.hpp"
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "Beatmaps/PreviewBeatmapStub.hpp"
-#include "Extensions/ExtendedPlayer.hpp"
-#include "Packets/PacketManager.hpp"
 #include "UI/LobbySetupPanel.hpp"
 
 #include "GlobalNamespace/ConnectedPlayerManager.hpp"
@@ -186,6 +184,7 @@ void HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player) {
     {
         try {
             Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+            getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
             packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
         }
         catch (const std::runtime_error& e) {
@@ -212,7 +211,7 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
     try {
         localExtendedPlayer = Extensions::ExtendedPlayer::CS_ctor(self->get_localPlayer());
 
-        if (!UnityEngine::ColorUtility::TryParseHtmlString(il2cpp_utils::newcsstr(getConfig().config["color"].GetString()), ByRef(localExtendedPlayer->playerColor)))
+        if (!UnityEngine::ColorUtility::TryParseHtmlString(il2cpp_utils::newcsstr(getConfig().config["color"].GetString()), localExtendedPlayer->playerColor))
             localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
 
         static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>()->get(0);

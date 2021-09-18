@@ -72,7 +72,7 @@ namespace MultiQuestensions::Extensions {
 
         platformID = reader->GetString();
         mpexVersion = reader->GetString();
-        if (!UnityEngine::ColorUtility::TryParseHtmlString(reader->GetString(), ByRef(playerColor)))
+        if (!UnityEngine::ColorUtility::TryParseHtmlString(reader->GetString(), playerColor))
             this->playerColor = ExtendedPlayer::DefaultColor;
         if (reader->get_AvailableBytes() >= 4) // Verify this works when the platform int exists.
             this->platform = (Platform)reader->GetInt();
