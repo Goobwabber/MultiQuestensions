@@ -23,7 +23,7 @@ if ((Test-Path "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp", ".
         Write-Host "./extern/beatsaber-hook/src/inline-hook/relocate.c"
     }
     Write-Host "Task Failed"
-    break;
+    exit 1;
 }
 
 echo "Building MultiQuestensions Version: $Version"

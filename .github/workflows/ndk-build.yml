@@ -70,7 +70,7 @@ jobs:
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
       run: |
-        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux.zip
         unzip -q ndk.zip
         mv ${ndkname} ndk
       

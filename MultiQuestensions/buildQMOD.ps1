@@ -38,7 +38,7 @@ if ($?) {
             Write-Host ".\mod.json"
         }
         Write-Host "Task Failed"
-        break;
+        exit 1;
     }
     else {
     # If we have all files needed, go ahead and packe into qmod
