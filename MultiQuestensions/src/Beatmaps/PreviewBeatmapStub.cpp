@@ -125,24 +125,31 @@ namespace MultiQuestensions::Beatmaps {
 
 	System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* PreviewBeatmapStub::GetCoverImageAsync(System::Threading::CancellationToken cancellationToken) {
 		if (_preview) {
+			getLogger().debug("Use localPreview");
 			return _preview->GetCoverImageAsync(cancellationToken);
 		}
+		if (coverImage)
+			return System::Threading::Tasks::Task_1<UnityEngine::Sprite*>::New_ctor(coverImage);
 		else {
 			using namespace QuestUI;
-			auto task = System::Threading::Tasks::Task_1<UnityEngine::Sprite*>::New_ctor(nullptr);
+			getLogger().debug("Try getting CoverImage from BeatSaver");
+			auto task = System::Threading::Tasks::Task_1<UnityEngine::Sprite*>::New_ctor();
 			std::string levelid = to_utf8(csstrtostr(levelID));
-			BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelid), [task](std::optional<BeatSaver::Beatmap> beatmap) {
-				if (beatmap.has_value()) {
-					BeatSaver::API::GetCoverImageAsync(*beatmap, [task](std::vector<uint8_t> bytes) {
-						MainThreadScheduler::Schedule([bytes, task] {
-							std::vector<uint8_t> data = bytes;
-								task->TrySetResult(BeatSaberUI::VectorToSprite(data));
-								return task;
-							});
-						});
+			auto beatmap = BeatSaver::API::GetBeatmapByHash(GetHash(levelid));
+			if (beatmap.has_value()) {
+				std::vector<uint8_t> bytes = BeatSaver::API::GetCoverImage(*beatmap);
+				if (task->TrySetResult(BeatSaberUI::VectorToSprite(bytes))) {
+					getLogger().debug("Set coverImage from BeatSaver");
 				}
+				else {
+					task->TrySetResult(static_cast<UnityEngine::Sprite*>(nullptr));
 				}
-			);
+			}
+			else {
+				getLogger().debug("Failed to get beatmap information from BeatSaver");
+			}
+			coverImage = task->get_ResultOnSuccess();
+			return task;
 		}
 	}
 

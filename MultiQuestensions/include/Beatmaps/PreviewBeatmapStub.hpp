@@ -32,6 +32,7 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	DECLARE_INSTANCE_METHOD(MultiQuestensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
 
 	DECLARE_INSTANCE_FIELD(GlobalNamespace::IPreviewBeatmapLevel*, _preview);
+	DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, coverImage);
 	DECLARE_INSTANCE_FIELD(bool, isDownloaded);
 	DECLARE_INSTANCE_FIELD(bool, isDownloadable);
 

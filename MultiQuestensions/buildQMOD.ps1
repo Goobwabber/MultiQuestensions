@@ -50,8 +50,9 @@ if ($?) {
             $json | ConvertTo-Json -depth 32| Set-Content $PSScriptRoot/mod.json
 
             Write-Host "Packaging QMod with ModID: $ModID Version: $VERSION and BS-Hook version: $BSHook"
-            Compress-Archive -Path "./libs/arm64-v8a/lib$ModID.so", "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so", ".\mod.json" -DestinationPath "./Temp$ModID_v$VERSION.zip" -Update
-            Move-Item "./Temp$ModID_v$VERSION.zip" "./$ModID_v$VERSION.qmod" -Force
+            $packagename = $ModID + "_v" + $VERSION
+            Compress-Archive -Path "./libs/arm64-v8a/lib$ModID.so", "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so", ".\mod.json" -DestinationPath "./Temp$packagename.zip" -Update
+            Move-Item "./Temp$packagename.zip" "./$packagename.qmod" -Force
         }
         Write-Host "Task Completed"
     }
