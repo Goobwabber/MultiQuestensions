@@ -14,7 +14,6 @@
     <None Include=".gitignore" />
     <None Include="Android.mk" />
     <None Include="Application.mk" />
-    <None Include="bmbfmod.json" />
     <None Include="cpp.hint" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
     <None Include="qpm.json" />

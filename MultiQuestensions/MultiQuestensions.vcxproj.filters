@@ -3,7 +3,6 @@
   <ItemGroup>
     <None Include="Android.mk" />
     <None Include="Application.mk" />
-    <None Include="bmbfmod.json" />
     <None Include="qpm.json" />
     <None Include=".gitignore" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
@@ -78,6 +77,7 @@
     <ClCompile Include="src\UI\LobbySetupPanel.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
