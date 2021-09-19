@@ -35,8 +35,6 @@
 #include <set>
 #include <string>
 
-
-
 // Define these functions here so that we can easily read configuration and log information from other files
 Configuration& getConfig();
 Logger& getLogger();
@@ -47,17 +45,3 @@ Il2CppString* LevelIdToHash(Il2CppString*);
 extern std::string GetHash(const std::string& levelId);
 
 extern ModInfo modInfo;
-
-// MQE Includes
-#include "Extensions/ExtendedPlayer.hpp"
-#include "Packets/PacketManager.hpp"
-
-namespace MultiQuestensions {
-    // Plugin setup stuff
-    extern GlobalNamespace::MultiplayerSessionManager* sessionManager;
-    extern GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
-    extern GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
-}
-
-extern MultiQuestensions::Extensions::ExtendedPlayer* localExtendedPlayer;
-

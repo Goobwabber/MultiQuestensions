@@ -54,6 +54,7 @@
     <ClInclude Include="include\Beatmaps\PreviewBeatmapPacket.hpp" />
     <ClInclude Include="include\Beatmaps\PreviewBeatmapStub.hpp" />
     <ClInclude Include="include\Extensions\ExtendedPlayer.hpp" />
+    <ClInclude Include="include\GlobalFieldsTemp.hpp" />
     <ClInclude Include="include\Hooks\Hooks.hpp" />
     <ClInclude Include="include\main.hpp" />
     <ClInclude Include="include\Packets\Callback.hpp" />

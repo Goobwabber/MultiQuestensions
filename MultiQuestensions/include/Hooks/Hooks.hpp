@@ -1,4 +1,5 @@
 #pragma once
+#include "GlobalFieldsTemp.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "GlobalNamespace/NetworkPlayerEntitlementChecker.hpp"
 

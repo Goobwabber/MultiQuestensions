@@ -179,5 +179,6 @@
     <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp">
       <Filter>shared\CodegenExtensions</Filter>
     </ClInclude>
+    <ClInclude Include="include\GlobalFieldsTemp.hpp" />
   </ItemGroup>
 </Project>

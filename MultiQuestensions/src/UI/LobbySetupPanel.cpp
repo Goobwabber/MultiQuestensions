@@ -6,6 +6,7 @@
 #include "UnityEngine/RectOffset.hpp"
 
 #include "CodegenExtensions/ColorUtility.hpp"
+#include "GlobalFieldsTemp.hpp"
 using namespace UnityEngine::UI;
 
 namespace MultiQuestensions::UI {
