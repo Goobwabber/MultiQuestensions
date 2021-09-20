@@ -41,7 +41,7 @@ on:
 env:
      module_id: multiquestensions
      version: 0.1.0-Dev-${{ github.run_number }}
-     bs_hook: 2_3_1
+     bs_hook: 2_3_0
      BS_Version: 1.17.1
      ndkname: android-ndk-r23
 
