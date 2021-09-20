@@ -78,6 +78,9 @@
       <Filter>src\UI</Filter>
     </ClCompile>
     <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp" />
+    <ClCompile Include="src\Environments\LobbyAvatarPlaceLighting.cpp" />
+    <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp" />
+    <ClCompile Include="src\Assets\Sprites.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -180,5 +183,8 @@
       <Filter>shared\CodegenExtensions</Filter>
     </ClInclude>
     <ClInclude Include="include\GlobalFieldsTemp.hpp" />
+    <ClInclude Include="include\Environments\LobbyAvatarPlaceLighting.hpp" />
+    <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp" />
+    <ClInclude Include="include\Assets\Sprites.hpp" />
   </ItemGroup>
 </Project>

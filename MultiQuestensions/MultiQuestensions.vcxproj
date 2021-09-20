@@ -19,8 +19,11 @@
     <None Include="qpm.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Assets\Sprites.cpp" />
     <ClCompile Include="src\Beatmaps\PreviewBeatmapPacket.cpp" />
     <ClCompile Include="src\Beatmaps\PreviewBeatmapStub.cpp" />
+    <ClCompile Include="src\Environments\LobbyAvatarPlaceLighting.cpp" />
+    <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp" />
     <ClCompile Include="src\Extensions\ExtendedPlayer.cpp" />
     <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -51,8 +54,11 @@
     <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp" />
     <ClInclude Include="extern\songdownloader\shared\Types\TypeMacros.hpp" />
     <ClInclude Include="extern\songloader\shared\API.hpp" />
+    <ClInclude Include="include\Assets\Sprites.hpp" />
     <ClInclude Include="include\Beatmaps\PreviewBeatmapPacket.hpp" />
     <ClInclude Include="include\Beatmaps\PreviewBeatmapStub.hpp" />
+    <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp" />
+    <ClInclude Include="include\Environments\LobbyAvatarPlaceLighting.hpp" />
     <ClInclude Include="include\Extensions\ExtendedPlayer.hpp" />
     <ClInclude Include="include\GlobalFieldsTemp.hpp" />
     <ClInclude Include="include\Hooks\Hooks.hpp" />

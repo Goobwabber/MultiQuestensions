@@ -76,11 +76,11 @@ public:
         return _connectedPlayer->get_isMe();
     }
 
-    const Il2CppString* const get_userId() const {
+    Il2CppString* const get_userId() const {
         return _connectedPlayer->get_userId();
     }
 
-    const Il2CppString* const get_userName() const {
+    Il2CppString* const get_userName() const {
         return _connectedPlayer->get_userName();
     }
 
