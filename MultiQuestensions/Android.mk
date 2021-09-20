@@ -60,18 +60,6 @@ LOCAL_MODULE := codegen
 LOCAL_EXPORT_C_INCLUDES := extern/codegen
 LOCAL_SRC_FILES := extern/libcodegen.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: libcryptopp - version: 8.5.0
-include $(CLEAR_VARS)
-LOCAL_MODULE := cryptopp
-LOCAL_EXPORT_C_INCLUDES := extern/libcryptopp
-LOCAL_SRC_FILES := extern/libcryptopp.a
-include $(PREBUILT_STATIC_LIBRARY)
-# Creating prebuilt for dependency: libcurl - version: 7.78.0
-include $(CLEAR_VARS)
-LOCAL_MODULE := curl
-LOCAL_EXPORT_C_INCLUDES := extern/libcurl
-LOCAL_SRC_FILES := extern/libcurl.a
-include $(PREBUILT_STATIC_LIBRARY)
 
 
 include $(CLEAR_VARS)
@@ -86,8 +74,6 @@ LOCAL_SHARED_LIBRARIES += songloader
 LOCAL_SHARED_LIBRARIES += questui
 LOCAL_SHARED_LIBRARIES += songdownloader
 LOCAL_SHARED_LIBRARIES += codegen
-LOCAL_STATIC_LIBRARIES += cryptopp
-LOCAL_STATIC_LIBRARIES += curl
 LOCAL_LDLIBS += -llog
 LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"multiquestensions"' -DVERSION='"$(VERSION)"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a
