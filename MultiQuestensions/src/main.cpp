@@ -395,9 +395,12 @@ namespace MultiQuestensions {
     }
 }
 
+std::vector<std::string> DownloadedSongIds;
+
 MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadLevel, void, MultiplayerLevelLoader* self, BeatmapIdentifierNetSerializable* beatmapId, GameplayModifiers* gameplayModifiers, float initialStartTime) {
     std::string levelId = to_utf8(csstrtostr(beatmapId->levelID));
     getLogger().info("MultiplayerLevelLoader_LoadLevel: %s", levelId.c_str());
+    std::string hash = GetHash(levelId);
     if (IsCustomLevel(levelId)) {
         if (HasSong(levelId)) {
             getLogger().debug("MultiplayerLevelLoader_LoadLevel, HasSong, calling original");
@@ -405,19 +408,20 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
             return;
         }
         else {
-            BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelId),
-                [self, beatmapId, gameplayModifiers, initialStartTime](std::optional<BeatSaver::Beatmap> beatmapOpt) {
+            BeatSaver::API::GetBeatmapByHashAsync(hash,
+                [self, beatmapId, gameplayModifiers, initialStartTime, hash](std::optional<BeatSaver::Beatmap> beatmapOpt) {
                     if (beatmapOpt.has_value()) {
                         auto beatmap = beatmapOpt.value();
                         auto beatmapName = beatmap.GetName();
-                        getLogger().info("Downloading map: %s", beatmapName.c_str());
+                        getLogger().info("Downloading map: %s", beatmap.GetName().c_str());
                         BeatSaver::API::DownloadBeatmapAsync(beatmap,
-                            [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName](bool error) {
+                            [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName, hash](bool error) {
                                 if (error) {
                                     getLogger().info("Failed downloading map: %s", beatmapName.c_str());
                                 }
                                 else {
                                     getLogger().info("Downloaded map: %s", beatmapName.c_str());
+                                    DownloadedSongIds.emplace_back(hash);
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [self, beatmapId, gameplayModifiers, initialStartTime] {
                                             RuntimeSongLoader::API::RefreshSongs(false,

@@ -18,7 +18,7 @@ namespace MultiQuestensions {
 			MultiplayerResultsPyramidPatch(self, (IReadOnlyList_1<MultiplayerPlayerResultsData*>*)newResultsData, badgeStartTransform, badgeMidTransform);
 		}
 		catch (const std::runtime_error& e) {
-			getLogger().critical("%s", e.what());
+			getLogger().critical("Hook MultiplayerResultsPyramidPatch File " __FILE__ " at Line %d: %s", __LINE__, e.what());
 			MultiplayerResultsPyramidPatch(self, resultsData, badgeStartTransform, badgeMidTransform);
 		}
 	}
@@ -59,14 +59,20 @@ namespace MultiQuestensions {
 			self->introPlayableDirector = realDirector;
 		}
 		catch (const std::runtime_error& e) {
-			getLogger().critical("%s", e.what());
+			getLogger().critical("Hook IntroAnimationPatch" __FILE__ " at Line %d: %s", __LINE__, e.what());
 			IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
 		}
 	}
 
 	MAKE_HOOK_MATCH(CalculatePlayerIndexSequencePatch, &MultiplayerIntroAnimationController::CalculatePlayerIndexSequence, Queue_1<int>*, MultiplayerIntroAnimationController* self, IReadOnlyList_1<IConnectedPlayer*>* allActivePlayer) {
 		try {
-			List<IConnectedPlayer*>* listActivePlayers = Enumerable::ToList<IConnectedPlayer*>(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(allActivePlayer));
+			// 09-21 14:30:26.025  4647  4672 D QuestHook[UtilsLogger|v2.3.0]: (il2cpp_utils::FindMethod) Method 27:
+			// 09-21 14:30:26.026  4647  4672 D QuestHook[UtilsLogger|v2.3.0]: (il2cpp_utils::FindMethod) static
+			// System.Collections.Generic.List<TSource> ToList(System.Collections.Generic.IEnumerable<TSource> source);
+			static auto* Enumerable_ToList_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "ToList", 1));
+			static auto* Enumerable_ToList = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_ToList_Generic, { classof(IConnectedPlayer*) }));
+			List<IConnectedPlayer*>* listActivePlayers = il2cpp_utils::RunMethodThrow<System::Collections::Generic::List_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr), Enumerable_ToList, reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(allActivePlayer));
+			//List<IConnectedPlayer*>* listActivePlayers = Enumerable::ToList<IConnectedPlayer*>(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(allActivePlayer));
 			IConnectedPlayer* localPlayer = nullptr;
 
 			// Check if active players contains local player and remove local player
@@ -79,7 +85,20 @@ namespace MultiQuestensions {
 			}
 
 			// Skip x amount of players and then take 4
-			List<IConnectedPlayer*>* selectedActivePlayers = Enumerable::ToList<IConnectedPlayer*>(Enumerable::Take<IConnectedPlayer*>(Enumerable::Skip<IConnectedPlayer*>(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(listActivePlayers), (targetIterations - 1) * 4), 4));
+			static auto* Enumerable_Skip_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "Skip", 2));
+			static auto* Enumerable_Skip = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_Skip_Generic, { classof(IConnectedPlayer*) }));
+			auto* skipResult = il2cpp_utils::RunMethodThrow<System::Collections::Generic::IEnumerable_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr), 
+				Enumerable_Skip, reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(listActivePlayers), (targetIterations - 1) * 4);
+
+			static auto* Enumerable_Take_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "Take", 2));
+			static auto* Enumerable_Take = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_Take_Generic, { classof(IConnectedPlayer*) }));
+			auto* takeResult = il2cpp_utils::RunMethodThrow<System::Collections::Generic::IEnumerable_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr),
+				Enumerable_Take, skipResult, 4);
+
+			List<IConnectedPlayer*>* selectedActivePlayers = il2cpp_utils::RunMethodThrow<System::Collections::Generic::List_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr), Enumerable_ToList, takeResult);
+
+			//List<IConnectedPlayer*>* selectedActivePlayers = Enumerable::ToList<IConnectedPlayer*>(Enumerable::Take<IConnectedPlayer*>(Enumerable::Skip<IConnectedPlayer*>(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(listActivePlayers), (targetIterations - 1) * 4), 4));
+			//List<IConnectedPlayer*>* selectedActivePlayers = Enumerable::ToList<IConnectedPlayer*>(Enumerable::Take<IConnectedPlayer*>(skipResult, 4));
 
 			// Add back local player if not null
 			if (targetIterations == 1 && localPlayer != nullptr) {
@@ -87,11 +106,11 @@ namespace MultiQuestensions {
 			}
 
 			// Call method with new list of players
-			CalculatePlayerIndexSequencePatch(self, (IReadOnlyList_1<IConnectedPlayer*>*)selectedActivePlayers);
+			return CalculatePlayerIndexSequencePatch(self, (IReadOnlyList_1<IConnectedPlayer*>*)selectedActivePlayers);
 		}
 		catch (const std::runtime_error& e) {
-			getLogger().critical("%s", e.what());
-			CalculatePlayerIndexSequencePatch(self, allActivePlayer);
+			getLogger().critical("Hook CalculatePlayerIndexSequencePatch" __FILE__ " at Line %d: %s", __LINE__, e.what());
+			return CalculatePlayerIndexSequencePatch(self, allActivePlayer);
 		}
 	}
 

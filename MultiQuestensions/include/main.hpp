@@ -45,3 +45,5 @@ Il2CppString* LevelIdToHash(Il2CppString*);
 extern std::string GetHash(const std::string& levelId);
 
 extern ModInfo modInfo;
+
+extern std::vector<std::string> DownloadedSongIds;
