@@ -54,6 +54,18 @@
     <Filter Include="shared\CodegenExtensions">
       <UniqueIdentifier>{31772450-96cd-49b8-8cd9-8e78b2fab9c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Assets">
+      <UniqueIdentifier>{a60f556f-4e31-4d7a-b66b-59c6ac2d00bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Environments">
+      <UniqueIdentifier>{1af0c26d-b1f0-45a1-bc3c-6e1b1f566a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Assets">
+      <UniqueIdentifier>{f3c2764b-bfdc-4b78-8d5f-592db4f23328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Environments">
+      <UniqueIdentifier>{2b4e6880-d0be-4434-97d1-214454d8e290}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -77,10 +89,18 @@
     <ClCompile Include="src\UI\LobbySetupPanel.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp" />
-    <ClCompile Include="src\Environments\LobbyAvatarPlaceLighting.cpp" />
-    <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp" />
-    <ClCompile Include="src\Assets\Sprites.cpp" />
+    <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Sprites.cpp">
+      <Filter>src\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Environments\LobbyAvatarPlaceLighting.cpp">
+      <Filter>src\Environments</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp">
+      <Filter>src\Environments</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -182,9 +202,17 @@
     <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp">
       <Filter>shared\CodegenExtensions</Filter>
     </ClInclude>
-    <ClInclude Include="include\GlobalFieldsTemp.hpp" />
-    <ClInclude Include="include\Environments\LobbyAvatarPlaceLighting.hpp" />
-    <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp" />
-    <ClInclude Include="include\Assets\Sprites.hpp" />
+    <ClInclude Include="include\Assets\Sprites.hpp">
+      <Filter>include\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Environments\LobbyAvatarPlaceLighting.hpp">
+      <Filter>include\Environments</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp">
+      <Filter>include\Environments</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlobalFieldsTemp.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
