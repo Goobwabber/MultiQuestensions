@@ -14,7 +14,7 @@ namespace MultiQuestensions {
 
 	MAKE_HOOK_MATCH(MultiplayerResultsPyramidPatch, &MultiplayerResultsPyramidView::SetupResults, void, MultiplayerResultsPyramidView* self, IReadOnlyList_1<MultiplayerPlayerResultsData*>* resultsData, UnityEngine::Transform* badgeStartTransform, UnityEngine::Transform* badgeMidTransform) {
 		try {
-			List<MultiplayerPlayerResultsData*>* newResultsData = Enumerable::ToList(Enumerable::Take(reinterpret_cast<IEnumerable_1<MultiplayerPlayerResultsData*>*>(resultsData), 5));
+			List<MultiplayerPlayerResultsData*>* newResultsData = Enumerable::ToList<MultiplayerPlayerResultsData*>(Enumerable::Take<MultiplayerPlayerResultsData*>(reinterpret_cast<IEnumerable_1<MultiplayerPlayerResultsData*>*>(resultsData), 5));
 			MultiplayerResultsPyramidPatch(self, (IReadOnlyList_1<MultiplayerPlayerResultsData*>*)newResultsData, badgeStartTransform, badgeMidTransform);
 		}
 		catch (const std::runtime_error& e) {
@@ -41,7 +41,7 @@ namespace MultiQuestensions {
 
 					// Mute duplicated animations except one (otherwise audio is very loud)
 					TimelineAsset* animationTimeline = reinterpret_cast<TimelineAsset*>(self->introPlayableDirector->get_playableAsset());
-					List<TrackAsset*>* outputTracks = Enumerable::ToList(animationTimeline->GetOutputTracks());
+					List<TrackAsset*>* outputTracks = Enumerable::ToList<TrackAsset*>(animationTimeline->GetOutputTracks());
 					for (int i = 0; i < outputTracks->get_Count(); i++) {
 						TrackAsset* currentTrack = outputTracks->get_Item(i);
 						bool isAudio = il2cpp_utils::AssignableFrom<AudioTrack*>(reinterpret_cast<Il2CppObject*>(currentTrack)->klass);
@@ -66,7 +66,7 @@ namespace MultiQuestensions {
 
 	MAKE_HOOK_MATCH(CalculatePlayerIndexSequencePatch, &MultiplayerIntroAnimationController::CalculatePlayerIndexSequence, Queue_1<int>*, MultiplayerIntroAnimationController* self, IReadOnlyList_1<IConnectedPlayer*>* allActivePlayer) {
 		try {
-			List<IConnectedPlayer*>* listActivePlayers = Enumerable::ToList(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(allActivePlayer));
+			List<IConnectedPlayer*>* listActivePlayers = Enumerable::ToList<IConnectedPlayer*>(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(allActivePlayer));
 			IConnectedPlayer* localPlayer = nullptr;
 
 			// Check if active players contains local player and remove local player
@@ -79,7 +79,7 @@ namespace MultiQuestensions {
 			}
 
 			// Skip x amount of players and then take 4
-			List<IConnectedPlayer*>* selectedActivePlayers = Enumerable::ToList(Enumerable::Take(Enumerable::Skip(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(listActivePlayers), (targetIterations - 1) * 4), 4));
+			List<IConnectedPlayer*>* selectedActivePlayers = Enumerable::ToList<IConnectedPlayer*>(Enumerable::Take<IConnectedPlayer*>(Enumerable::Skip<IConnectedPlayer*>(reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(listActivePlayers), (targetIterations - 1) * 4), 4));
 
 			// Add back local player if not null
 			if (targetIterations == 1 && localPlayer != nullptr) {
