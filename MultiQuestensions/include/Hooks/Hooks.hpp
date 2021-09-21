@@ -49,9 +49,13 @@
 
 #include "songdownloader/shared/BeatSaverAPI.hpp"
 
+#include "songloader/shared/API.hpp"
+
 namespace MultiQuestensions {
 
-    extern bool IsCustomLevel(const std::string& levelId);
+    constexpr bool IsCustomLevel(const std::string& levelId) {
+        return levelId.starts_with(RuntimeSongLoader::API::GetCustomLevelsPrefix());
+    }
 
     extern bool HasSong(std::string levelId);
 

@@ -21,11 +21,13 @@ using namespace GlobalNamespace;
 using namespace System::Threading::Tasks;
 using namespace MultiQuestensions;
 
-#include "songloader/shared/API.hpp"
-
 #ifndef VERSION
 #warning No Version set
 #define VERSION "0.1.0"
+#endif
+#ifndef MPEX_PROTOCOL
+#warning No MPEX_PROTOCOL set
+#define MPEX_PROTOCOL "0.6.1"
 #endif
 
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -153,17 +155,16 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
         Extensions::ExtendedPlayer* extendedPlayer;
         try {
             extendedPlayer = Extensions::ExtendedPlayer::CS_ctor(player, packet->platformID, packet->platform, packet->mpexVersion, packet->playerColor);
-            if (modInfo.version != to_utf8(csstrtostr(extendedPlayer->mpexVersion)))
+            if (to_utf8(csstrtostr(extendedPlayer->mpexVersion)) != MPEX_PROTOCOL)
             {
                 getLogger().warning(
                     "###################################################################\r\n"
                     "Different MultiplayerExtensions version detected!\r\n"
-                    "The player '%s' is using MultiplayerExtensions %s while you are using MultiQuestensions %s\r\n"
+                    "The player '%s' is using MultiplayerExtensions %s while you are using MultiQuestensions " MPEX_PROTOCOL "\r\n"
                     "For best compatibility all players should use the same version of MultiplayerExtensions.\r\n"
                     "###################################################################",
                     to_utf8(csstrtostr(player->get_userName())).c_str(),
-                    to_utf8(csstrtostr(extendedPlayer->mpexVersion)).c_str(),
-                    modInfo.version.c_str()
+                    to_utf8(csstrtostr(extendedPlayer->mpexVersion)).c_str()
                 );
             }
         }
@@ -215,9 +216,7 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
             localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
 
         static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>()->get(0);
-
         static auto UserInfoTask = localNetworkPlayerModel->platformUserModel->GetUserInfo();
-
         static auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
             auto userInfo = userInfoTask->get_Result();
             if (userInfo) {
@@ -381,10 +380,6 @@ MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewCon
 }
 
 namespace MultiQuestensions {
-    bool IsCustomLevel(const std::string& levelId) {
-        return levelId.starts_with(RuntimeSongLoader::API::GetCustomLevelsPrefix());
-    }
-
     bool HasSong(std::string levelId) {
         for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
             if (to_utf8(csstrtostr(song->levelID)) == levelId) {
@@ -519,7 +514,6 @@ void saveDefaultConfig() {
     config.SetObject();
     auto& allocator = config.GetAllocator();
 
-    config.AddMember("customsongs", true, allocator);
     config.AddMember("lagreducer", false, allocator);
     config.AddMember("color", "#08C0FF", allocator);
 
@@ -586,13 +580,4 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), GameServerPlayerTableCell_SetData);
 
     getLogger().info("Installed all hooks!");
-
-    getLogger().debug("il2cpp_functions::Class_Init: %p"
-        "il2cpp_functions::type_equals: %p"
-        "il2cpp_functions::value_box: %p"
-        "il2cpp_functions::object_unbox: %p", 
-        &il2cpp_functions::Class_Init,
-        &il2cpp_functions::type_equals,
-        &il2cpp_functions::value_box,
-        &il2cpp_functions::object_unbox);
 }

@@ -68,59 +68,59 @@ public:
     static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
     static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, Il2CppString* mpexVersion, UnityEngine::Color playerColor);
 
-    const UnityEngine::Color get_playerColor() const {
+    constexpr const UnityEngine::Color& get_playerColor() const {
         return playerColor;
     }
 
-    const bool get_isMe() const {
+    constexpr bool get_isMe() const {
         return _connectedPlayer->get_isMe();
     }
 
-    Il2CppString* const get_userId() const {
+    constexpr Il2CppString* const get_userId() const {
         return _connectedPlayer->get_userId();
     }
 
-    Il2CppString* const get_userName() const {
+    constexpr Il2CppString* const get_userName() const {
         return _connectedPlayer->get_userName();
     }
 
-    const float get_currentLatency() const {
+    constexpr float get_currentLatency() const {
         return _connectedPlayer->get_currentLatency();
     }
 
-    const bool get_isConnected() const {
+    constexpr bool get_isConnected() const {
         return _connectedPlayer->get_isConnected();
     }
 
-    const bool get_isConnectionOwner() const {
+    constexpr bool get_isConnectionOwner() const {
         return _connectedPlayer->get_isConnectionOwner();
     }
 
-    const float get_offsetSyncTime() const {
+    constexpr float get_offsetSyncTime() const {
         return _connectedPlayer->get_offsetSyncTime();
     }
 
-    const int get_sortIndex() const {
+    constexpr int get_sortIndex() const {
         return _connectedPlayer->get_sortIndex();
     }
     
-    const bool get_isKicked() const {
+    constexpr bool get_isKicked() const {
         return _connectedPlayer->get_isKicked();
     }
 
-    const GlobalNamespace::MultiplayerAvatarData get_multiplayerAvatarData() const {
+    constexpr GlobalNamespace::MultiplayerAvatarData get_multiplayerAvatarData() const {
         return _connectedPlayer->get_multiplayerAvatarData();
     }
 
-    const GlobalNamespace::DisconnectedReason get_disconnectedReason() const {
+    constexpr GlobalNamespace::DisconnectedReason get_disconnectedReason() const {
         return _connectedPlayer->get_disconnectedReason();
     }
 
-    const bool HasState(std::string state) const {
+    constexpr bool HasState(std::string& state) const {
         return _connectedPlayer->HasState(il2cpp_utils::newcsstr(state));
     }
 
-    const bool HasState(Il2CppString* state) const {
+    constexpr bool HasState(Il2CppString* state) const {
         return _connectedPlayer->HasState(state);
     }
 )

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MPEX_PROTOCOL ?= 0.6.1
 LOCAL_PATH := $(call my-dir)
 TARGET_ARCH_ABI := $(APP_ABI)
 
@@ -75,7 +76,7 @@ LOCAL_SHARED_LIBRARIES += questui
 LOCAL_SHARED_LIBRARIES += songdownloader
 LOCAL_SHARED_LIBRARIES += codegen
 LOCAL_LDLIBS += -llog
-LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"multiquestensions"' -DVERSION='"$(VERSION)"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
+LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"multiquestensions"' -DVERSION='"$(VERSION)"' -DMPEX_PROTOCOL='"$(MPEX_PROTOCOL)"' -I'./shared' -I'./extern' -isystem'extern/codegen/include' -Ofast
 LOCAL_CPPFLAGS += -std=c++2a
 LOCAL_C_INCLUDES += ./include ./src
 include $(BUILD_SHARED_LIBRARY)

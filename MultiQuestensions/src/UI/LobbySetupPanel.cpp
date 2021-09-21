@@ -12,11 +12,6 @@ using namespace UnityEngine::UI;
 namespace MultiQuestensions::UI {
 
 	UnityEngine::UI::Toggle* LobbySetupPanel::lagReducerToggle;
-	UnityEngine::UI::Toggle* LobbySetupPanel::customSongsToggle;
-
-	void SetCustomSongs(bool value) {
-		getConfig().config["customsongs"].SetBool(value);
-	}
 
 	void SetLagReducer(bool value) {
 		getConfig().config["lagreducer"].SetBool(value);
@@ -29,28 +24,27 @@ namespace MultiQuestensions::UI {
 		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(0, 0, 18, 0)); // 100, 0, 18, 0
 
 		auto vertical2 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
-		auto sizeFitter = vertical2->get_gameObject()->AddComponent<ContentSizeFitter*>();
-		sizeFitter->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
-		auto layout = vertical2->get_gameObject()->AddComponent<LayoutElement*>();
-		layout->set_minWidth(45);
+		vertical2->get_gameObject()->AddComponent<ContentSizeFitter*>()
+			->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
+		vertical2->get_gameObject()->AddComponent<LayoutElement*>()
+			->set_minWidth(45);
 
-		auto vertical3 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(vertical2->get_transform());
-		auto sizeFitter1 = vertical3->get_gameObject()->AddComponent<ContentSizeFitter*>();
-		sizeFitter1->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
-		auto layout1 = vertical3->get_gameObject()->AddComponent<LayoutElement*>();
-		layout1->set_minWidth(45);
+		auto vertical3 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
+		vertical3->get_gameObject()->AddComponent<ContentSizeFitter*>()
+			->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
+		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(45);
 
 		auto vertical4 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
-		auto sizeFitter2 = vertical4->get_gameObject()->AddComponent<ContentSizeFitter*>();
-		sizeFitter2->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
-		auto layout2 = vertical4->get_gameObject()->AddComponent<LayoutElement*>();
-		layout2->set_minWidth(45);
+		vertical4->get_gameObject()->AddComponent<ContentSizeFitter*>()
+			->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
+		vertical4->get_gameObject()->AddComponent<LayoutElement*>()
+			->set_minWidth(45);
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>
 
-		QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
+		QuestUI::BeatSaberUI::CreateText(vertical4->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
 
-		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Lag Reducer", getConfig().config["lagreducer"].GetBool(), SetLagReducer);
+		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", getConfig().config["lagreducer"].GetBool(), SetLagReducer);
 		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
 
 		UnityEngine::Color playerColor;
@@ -100,7 +94,7 @@ namespace MultiQuestensions::UI {
 			}
 		);
 
-		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
+		QuestUI::BeatSaberUI::CreateUIButton(vertical4->get_transform(), "Color", [colorPicker] {
 			colorPicker->Show();
 			}
 		);

@@ -7,8 +7,8 @@ DEFINE_TYPE(MultiQuestensions::Extensions, ExtendedPlayerPacket)
 
 namespace MultiQuestensions::Extensions {
 
-    static Il2CppString* const MQE_version() {
-        return il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>(modInfo.version);
+    static constexpr Il2CppString* const MQE_Protocol() {
+        return il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>(MPEX_PROTOCOL);
     }
 
 #pragma region ExtendedPlayer
@@ -16,7 +16,7 @@ namespace MultiQuestensions::Extensions {
         getLogger().debug("Creating ExtendedPlayer");
         _connectedPlayer = player;
         if (mpexVersion) this->mpexVersion = mpexVersion;
-        else this->mpexVersion = MQE_version();
+        else this->mpexVersion = MQE_Protocol();
         if (platformID) {
             this->platformID = platformID;
             this->platform = (Platform)platform;
@@ -88,7 +88,7 @@ namespace MultiQuestensions::Extensions {
         extendedPlayer->platformID = platformID;
         extendedPlayer->platform = (Platform)platform;
         extendedPlayer->playerColor = playerColor;
-        extendedPlayer->mpexVersion = il2cpp_utils::newcsstr(modInfo.version);
+        extendedPlayer->mpexVersion = MQE_Protocol();
         return extendedPlayer;
     }
 #pragma endregion

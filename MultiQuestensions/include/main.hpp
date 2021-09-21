@@ -9,9 +9,9 @@
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
-#include "codegen/include/LiteNetLib/Utils/INetSerializable.hpp"
 
 // Codegen includes
+#include "LiteNetLib/Utils/INetSerializable.hpp"
 #include "GlobalNamespace/MultiplayerSessionManager.hpp"
 #include "GlobalNamespace/IMenuRpcManager.hpp"
 #include "GlobalNamespace/LobbyPlayersDataModel.hpp"

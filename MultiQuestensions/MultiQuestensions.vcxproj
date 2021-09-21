@@ -100,7 +100,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeIncludeSearchPath>
-    <NMakePreprocessorDefinitions>ID='"Mod ID"';VERSION='"Mod Version"'</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>ID='"Mod ID"';VERSION='"Mod Version"';MPEX_PROTOCOL='"0.6.1"'</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" NDK_PROJECT_PATH=$(ProjectDir) APP_BUILD_SCRIPT=$(ProjectDir)Android.mk NDK_APPLICATION_MK=$(ProjectDir)Application.mk</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" -B</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(NdkPath)\build\ndk-build.cmd" clean</NMakeCleanCommandLine>
