@@ -82,7 +82,7 @@ namespace MultiQuestensions::UI {
 				//getModConfig().ClockColor.SetValue(lastChangedColor);
 			},
 			[](UnityEngine::Color value) {
-				// TODO: Uncomment when MpEx supports it
+				// TODO: Uncomment when MpEx supports live platform color updates
 				
 				//try {
 				//	Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), value);
@@ -113,7 +113,7 @@ namespace MultiQuestensions::UI {
 			DownloadedSongIds.clear();
 			}
 		);
-		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes all songs downloaded by MQE during this game session.");
+		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes all automatically downloaded songs during multiplayer sessions since game launch.");
 
 
 		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
