@@ -7,6 +7,7 @@
 
 #include "CodegenExtensions/ColorUtility.hpp"
 #include "GlobalFieldsTemp.hpp"
+#include "songloader/shared/API.hpp"
 using namespace UnityEngine::UI;
 
 namespace MultiQuestensions::UI {
@@ -21,7 +22,7 @@ namespace MultiQuestensions::UI {
 		auto vertical = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
 
 		auto horizontal = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
-		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(0, 0, 18, 0)); // 100, 0, 18, 0
+		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(20, 0, 18, 0)); // 100, 0, 18, 0
 
 		auto vertical2 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical2->get_gameObject()->AddComponent<ContentSizeFitter*>()
@@ -32,7 +33,7 @@ namespace MultiQuestensions::UI {
 		auto vertical3 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical3->get_gameObject()->AddComponent<ContentSizeFitter*>()
 			->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
-		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(45);
+		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(30);
 
 		auto vertical4 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical4->get_gameObject()->AddComponent<ContentSizeFitter*>()
@@ -94,7 +95,28 @@ namespace MultiQuestensions::UI {
 			}
 		);
 
-		QuestUI::BeatSaberUI::CreateUIButton(vertical4->get_transform(), "Color", [colorPicker] {
+		auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
+			using namespace RuntimeSongLoader::API;
+			bool needRefresh = false;
+			for (auto hash : DownloadedSongIds) {
+				auto level = GetLevelByHash(hash);
+				if (level.has_value()) {
+					std::string songPath = to_utf8(csstrtostr(level.value()->customLevelPath));
+					getLogger().debug("Deleting Song: %s", songPath.c_str());
+					DeleteSong(songPath, [&needRefresh] {
+						if (needRefresh) RefreshSongs(false);
+						}
+					);
+				}
+			}
+			needRefresh = true;
+			DownloadedSongIds.clear();
+			}
+		);
+		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes all songs downloaded by MQE during this game session.");
+
+
+		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
 			colorPicker->Show();
 			}
 		);
