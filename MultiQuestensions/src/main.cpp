@@ -140,7 +140,7 @@ IPlatformUserModel* platformUserModel;
 static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPlayerPacket* packet, IConnectedPlayer* player) {
     const std::string userId = to_utf8(csstrtostr(player->get_userId()));
     if (_extendedPlayers.contains(userId)) {
-        Extensions::ExtendedPlayer* extendedPlayer = _extendedPlayers[userId];
+        Extensions::ExtendedPlayer* extendedPlayer = _extendedPlayers.at(userId);
         extendedPlayer->platformID = packet->platformID;
         extendedPlayer->platform = packet->platform;
         extendedPlayer->playerColor = packet->playerColor;
@@ -172,28 +172,46 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
             getLogger().error("Exception while trying to create ExtendedPlayer: %s", e.what());
         }
         if (extendedPlayer) {
-            _extendedPlayers[userId] = extendedPlayer;
+            _extendedPlayers.emplace(userId, extendedPlayer);
+
+            getLogger().debug("SetPlayerPlaceColor");
+            SetPlayerPlaceColor(extendedPlayer->get_sortIndex()/*player*/, extendedPlayer->get_playerColor(), true);
             //extendedPlayerConnectedEvent::Invoke(extendedPlayer);
         }
     }
 }
 
-void HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player) {
-    getLogger().info("Player '%s' joined", to_utf8(csstrtostr(player->get_userId())).c_str());
-    getLogger().debug("Sending ExtendedPlayerPacket");
-    if (localExtendedPlayer->get_platformID() != nullptr)
-    {
-        try {
-            Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
-            getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
-            packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
-        }
-        catch (const std::runtime_error& e) {
-            getLogger().error("%s", e.what());
+void HandlePlayerConnected(IConnectedPlayer* player) {
+    try {
+        getLogger().debug("HandlePlayerConnected");
+        if (player) {
+            const std::string userId = to_utf8(csstrtostr(player->get_userId()));
+            getLogger().info("Player '%s' joined", userId.c_str());
+            getLogger().debug("Sending ExtendedPlayerPacket");
+            if (localExtendedPlayer->get_platformID() != nullptr)
+            {
+                Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+                getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+                packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+            }
+            getLogger().debug("ExtendedPlayerPacket sent");
+
+            SetPlayerPlaceColor(player->get_sortIndex()/*player*/, Extensions::ExtendedPlayer::DefaultColor, true);
         }
     }
-    getLogger().debug("ExtendedPlayerPacket sent");
+    catch (const std::runtime_error& e) {
+        getLogger().error("%s", e.what());
+    }
 }
+
+void HandlePlayerDisconnected(IConnectedPlayer* player) {
+    getLogger().info("Player '%s' left", to_utf8(csstrtostr(player->get_userId())).c_str());
+    getLogger().debug("Reseting platform lights");
+    SetPlayerPlaceColor(player->get_sortIndex()/*player*/, UnityEngine::Color::get_black(), true);
+}
+
+//void HandleDisconnect(DisconnectedReason* reason) {
+//}
 
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
@@ -234,6 +252,8 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
     }
     // System::Action_1<GlobalNamespace::IConnectedPlayer*>*
     self->add_playerConnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(classof(System::Action_1<GlobalNamespace::IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerConnected));
+    self->add_playerDisconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::IConnectedPlayer*>*>(classof(System::Action_1<GlobalNamespace::IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerDisconnected));
+    //self->add_disconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>*>(classof(System::Action_1<GlobalNamespace::DisconnectedReason>*>*), static_cast<Il2CppObject*>(nullptr), HandleDisconnect));
 }
 
 // LobbyPlayersDataModel Activate
@@ -395,7 +415,6 @@ std::vector<std::string> DownloadedSongIds;
 MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadLevel, void, MultiplayerLevelLoader* self, BeatmapIdentifierNetSerializable* beatmapId, GameplayModifiers* gameplayModifiers, float initialStartTime) {
     std::string levelId = to_utf8(csstrtostr(beatmapId->levelID));
     getLogger().info("MultiplayerLevelLoader_LoadLevel: %s", levelId.c_str());
-    std::string hash = GetHash(levelId);
     if (IsCustomLevel(levelId)) {
         if (HasSong(levelId)) {
             getLogger().debug("MultiplayerLevelLoader_LoadLevel, HasSong, calling original");
@@ -403,6 +422,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
             return;
         }
         else {
+            std::string hash = GetHash(levelId);
             BeatSaver::API::GetBeatmapByHashAsync(hash,
                 [self, beatmapId, gameplayModifiers, initialStartTime, hash](std::optional<BeatSaver::Beatmap> beatmapOpt) {
                     if (beatmapOpt.has_value()) {

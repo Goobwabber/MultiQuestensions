@@ -113,7 +113,7 @@ namespace MultiQuestensions::UI {
 			DownloadedSongIds.clear();
 			}
 		);
-		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes all automatically downloaded songs during multiplayer sessions since game launch.");
+		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes automatically downloaded songs from all multiplayer sessions since you launched the game.");
 
 
 		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {

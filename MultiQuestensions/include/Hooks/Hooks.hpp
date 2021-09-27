@@ -73,11 +73,13 @@ namespace MultiQuestensions {
     class Hooks {
         static void NetworkplayerEntitlementChecker();
         static void MaxPlayerHooks();
+        static void EnvironmentHooks();
 
     public:
         static const void Install_Hooks() {
             NetworkplayerEntitlementChecker();
             MaxPlayerHooks();
+            EnvironmentHooks();
         }
     };
 }

@@ -26,6 +26,7 @@
     <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp" />
     <ClCompile Include="src\Extensions\ExtendedPlayer.cpp" />
     <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp" />
+    <ClCompile Include="src\Hooks\EnvironmentHooks.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Packets\PacketManager.cpp" />
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />

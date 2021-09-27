@@ -101,6 +101,7 @@
     <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp">
       <Filter>src\Environments</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hooks\EnvironmentHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
