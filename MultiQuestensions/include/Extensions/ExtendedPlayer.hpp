@@ -25,7 +25,10 @@ namespace MultiQuestensions::Extensions {
     };
 }
 
-DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNamespace::IConnectedPlayer,
+#define EPInterfaces { classof(GlobalNamespace::IConnectedPlayer*) }
+___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlayer, Il2CppTypeEnum::IL2CPP_TYPE_CLASS,
+    Il2CppObject, "MultiplayerExtensions.Extensions",
+    EPInterfaces, 0, nullptr,
 
     static const constexpr UnityEngine::Color DefaultColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
 
@@ -55,7 +58,6 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Extensions, ExtendedPlayer, GlobalNames
     /// </summary>
     DECLARE_INSTANCE_FIELD(UnityEngine::Color, playerColor);
 
-
     DECLARE_INSTANCE_FIELD(Il2CppString*, isPartyOwner);
     DECLARE_INSTANCE_FIELD(Il2CppString*, hasRecommendBeatmapPermission);
     DECLARE_INSTANCE_FIELD(Il2CppString*, hasRecommendModifiersPermission);
@@ -72,63 +74,30 @@ public:
         return playerColor;
     }
 
-    constexpr bool get_isMe() const {
-        return _connectedPlayer->get_isMe();
-    }
-
-    constexpr Il2CppString* const get_userId() const {
-        return _connectedPlayer->get_userId();
-    }
-
-    constexpr Il2CppString* const get_userName() const {
-        return _connectedPlayer->get_userName();
-    }
-
-    constexpr float get_currentLatency() const {
-        return _connectedPlayer->get_currentLatency();
-    }
-
-    constexpr bool get_isConnected() const {
-        return _connectedPlayer->get_isConnected();
-    }
-
-    constexpr bool get_isConnectionOwner() const {
-        return _connectedPlayer->get_isConnectionOwner();
-    }
-
-    constexpr float get_offsetSyncTime() const {
-        return _connectedPlayer->get_offsetSyncTime();
-    }
-
-    constexpr int get_sortIndex() const {
-        return _connectedPlayer->get_sortIndex();
-    }
-    
-    constexpr bool get_isKicked() const {
-        return _connectedPlayer->get_isKicked();
-    }
-
-    constexpr GlobalNamespace::MultiplayerAvatarData get_multiplayerAvatarData() const {
-        return _connectedPlayer->get_multiplayerAvatarData();
-    }
-
-    constexpr GlobalNamespace::DisconnectedReason get_disconnectedReason() const {
-        return _connectedPlayer->get_disconnectedReason();
-    }
-
-    constexpr bool HasState(std::string& state) const {
+    constexpr bool HasState_CPP(std::string& state) const {
         return _connectedPlayer->HasState(il2cpp_utils::newcsstr(state));
     }
 
-    constexpr bool HasState(Il2CppString* state) const {
-        return _connectedPlayer->HasState(state);
-    }
-)
+    DECLARE_INSTANCE_METHOD(bool, get_isMe);
+    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userId);
+    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userName);
+    DECLARE_INSTANCE_METHOD(float, get_currentLatency);
+    DECLARE_INSTANCE_METHOD(bool, get_isConnected);
+    DECLARE_INSTANCE_METHOD(bool, get_isConnectionOwner);
+    DECLARE_INSTANCE_METHOD(float, get_offsetSyncTime);
+    DECLARE_INSTANCE_METHOD(int, get_sortIndex);
+    DECLARE_INSTANCE_METHOD(bool, get_isKicked);
+    DECLARE_INSTANCE_METHOD(GlobalNamespace::MultiplayerAvatarData, get_multiplayerAvatarData);
+    DECLARE_INSTANCE_METHOD(GlobalNamespace::DisconnectedReason, get_disconnectedReason);
+    DECLARE_INSTANCE_METHOD(bool, HasState, Il2CppString* state);
 
-#define EBPInterfaces { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }
+)
+#undef EPInterfaces
+
+#define EPPInterfaces { classof(LiteNetLib::Utils::INetSerializable*), classof(GlobalNamespace::IPoolablePacket*) }
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlayerPacket, Il2CppTypeEnum::IL2CPP_TYPE_CLASS,
     Il2CppObject, "MultiplayerExtensions.Extensions",
-    EBPInterfaces, 0, nullptr,
+    EPPInterfaces, 0, nullptr,
     DECLARE_CTOR(New);
 public:
     static ExtendedPlayerPacket* Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
@@ -144,4 +113,4 @@ public:
     DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPoolablePacket*), "Release", 0));
 
 )
-#undef EBPInterfaces
+#undef EPPInterfaces

@@ -141,6 +141,7 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
     const std::string userId = to_utf8(csstrtostr(player->get_userId()));
     if (_extendedPlayers.contains(userId)) {
         Extensions::ExtendedPlayer* extendedPlayer = _extendedPlayers.at(userId);
+        extendedPlayer->_connectedPlayer = player;
         extendedPlayer->platformID = packet->platformID;
         extendedPlayer->platform = packet->platform;
         extendedPlayer->playerColor = packet->playerColor;
@@ -175,7 +176,12 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
             _extendedPlayers.emplace(userId, extendedPlayer);
 
             getLogger().debug("SetPlayerPlaceColor");
-            SetPlayerPlaceColor(player->get_sortIndex()/*player*/, extendedPlayer->get_playerColor(), true);
+            SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer), extendedPlayer->get_playerColor(), true);
+            getLogger().debug("CreateOrUpdateNameTag");
+            // This packet is usually received before the avatar is actually created
+            CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer));
+            getLogger().debug("ExtendedPlayerPacket done");
+
             //extendedPlayerConnectedEvent::Invoke(extendedPlayer);
         }
     }
@@ -196,7 +202,7 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
             }
             getLogger().debug("ExtendedPlayerPacket sent");
 
-            SetPlayerPlaceColor(player->get_sortIndex()/*player*/, Extensions::ExtendedPlayer::DefaultColor, false);
+            SetPlayerPlaceColor(player, Extensions::ExtendedPlayer::DefaultColor, false);
         }
     }
     catch (const std::runtime_error& e) {
@@ -207,7 +213,8 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
 void HandlePlayerDisconnected(IConnectedPlayer* player) {
     getLogger().info("Player '%s' left", to_utf8(csstrtostr(player->get_userId())).c_str());
     getLogger().debug("Reseting platform lights");
-    SetPlayerPlaceColor(player->get_sortIndex()/*player*/, UnityEngine::Color::get_black(), true);
+    SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
+    _extendedPlayers.erase(to_utf8(csstrtostr(player->get_userId())).c_str());
 }
 
 //void HandleDisconnect(DisconnectedReason* reason) {

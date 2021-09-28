@@ -1,10 +1,11 @@
+#include "main.hpp"
 #include "Environments/LobbyAvatarNameTag.hpp"
 #include "Assets/Sprites.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/RectTransform.hpp"
 #include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
 #include "GlobalNamespace/ConnectedPlayerName.hpp"
-#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Object.hpp"
 using MultiQuestensions::Extensions::ExtendedPlayer;
 using namespace GlobalNamespace;
 using namespace UnityEngine::UI;
@@ -20,7 +21,7 @@ namespace MultiQuestensions::Environments {
     }
 
     static Il2CppString* Name() {
-        static auto* name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
+        static auto* name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Name");
         return name;
     }
 
@@ -60,7 +61,7 @@ namespace MultiQuestensions::Environments {
         // Take control of name tag
         ConnectedPlayerName* nativeNameScript;
         if (_nameText->TryGetComponent<ConnectedPlayerName*>(ByRef(nativeNameScript)))
-            GameObject::Destroy(nativeNameScript);
+            Object::Destroy(nativeNameScript);
         _nameText->set_text(Player());
     }
 
@@ -83,13 +84,15 @@ namespace MultiQuestensions::Environments {
 
     void LobbyAvatarNameTag::SetExtendedPlayerInfo(ExtendedPlayer* extendedPlayer)
     {
-        _playerInfo = extendedPlayer;
+        _playerInfo = reinterpret_cast<IConnectedPlayer*>(extendedPlayer);
 
         if (!_enabled)
             return;
 
         _nameText->set_text(extendedPlayer->get_userName());
         _nameText->set_color(extendedPlayer->get_playerColor());
+
+        getLogger().debug("SetExtendedPlayerInfo platform: %d", (int)extendedPlayer->get_platform());
 
         switch (extendedPlayer->get_platform())
         {
@@ -123,13 +126,16 @@ namespace MultiQuestensions::Environments {
     #pragma region Set Icons
     void LobbyAvatarNameTag::SetIcon(PlayerIconSlot slot, Sprite* sprite)
     {
+        getLogger().debug("SetIcon Sprite %p", sprite);
+
         if (!_enabled)
             return;
 
         HMUI::ImageView* imageView;
-        if (!_playerIcons[slot])
+        if (!_playerIcons.contains(slot))
         {
-            auto iconObj = GameObject::New_ctor(il2cpp_utils::newcsstr(string_format("MpExPlayerIcon(%d)", (int)slot)));
+            getLogger().debug("SetIcon, create new Icon");
+            auto iconObj = GameObject::New_ctor(il2cpp_utils::newcsstr(string_format("MQEPlayerIcon(%d)", (int)slot)));
             iconObj->get_transform()->SetParent(_bg->get_transform(), false);
             iconObj->get_transform()->SetSiblingIndex((int)slot);
             iconObj->set_layer(5);
@@ -155,6 +161,8 @@ namespace MultiQuestensions::Environments {
 
     void LobbyAvatarNameTag::RemoveIcon(PlayerIconSlot slot)
     {
+        getLogger().debug("RemoveIcon");
+
         if (!_enabled)
             return;
         if (_playerIcons.contains(slot))

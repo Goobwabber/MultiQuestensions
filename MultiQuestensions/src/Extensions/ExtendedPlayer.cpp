@@ -46,6 +46,54 @@ namespace MultiQuestensions::Extensions {
     Il2CppString* ExtendedPlayer::get_mpexVersion() {
         return mpexVersion;
     }
+
+    bool ExtendedPlayer::get_isMe() {
+        return _connectedPlayer->get_isMe();
+    }
+
+    Il2CppString* ExtendedPlayer::get_userId() {
+        return _connectedPlayer->get_userId();
+    }
+
+    Il2CppString* ExtendedPlayer::get_userName() {
+        return _connectedPlayer->get_userName();
+    }
+
+    float ExtendedPlayer::get_currentLatency() {
+        return _connectedPlayer->get_currentLatency();
+    }
+
+    bool ExtendedPlayer::get_isConnected() {
+        return _connectedPlayer->get_isConnected();
+    }
+
+    bool ExtendedPlayer::get_isConnectionOwner() {
+        return _connectedPlayer->get_isConnectionOwner();
+    }
+
+    float ExtendedPlayer::get_offsetSyncTime() {
+        return _connectedPlayer->get_offsetSyncTime();
+    }
+
+    int ExtendedPlayer::get_sortIndex() {
+        return _connectedPlayer->get_sortIndex();
+    }
+
+    bool ExtendedPlayer::get_isKicked() {
+        return _connectedPlayer->get_isKicked();
+    }
+
+    GlobalNamespace::MultiplayerAvatarData ExtendedPlayer::get_multiplayerAvatarData() {
+        return _connectedPlayer->get_multiplayerAvatarData();
+    }
+
+    GlobalNamespace::DisconnectedReason ExtendedPlayer::get_disconnectedReason() {
+        return _connectedPlayer->get_disconnectedReason();
+    }
+
+    bool ExtendedPlayer::HasState(Il2CppString* state) {
+        return _connectedPlayer->HasState(state);
+    }
 #pragma endregion
 
 #pragma region ExtendedPlayerPacket
