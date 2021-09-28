@@ -3,7 +3,7 @@ name: NDK Build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, rewrite ]
+    branches: [ main, rewrite, 1.17.1-Update ]
     paths:
       - 'MultiQuestensions/**'
       - '.github/workflows/ndk-build.yml'
@@ -41,9 +41,9 @@ on:
 env:
      module_id: multiquestensions
      version: 0.1.0-Dev-${{ github.run_number }}
-     bs_hook: 2_0_3
-     BS_Version: 1.16.2
-     ndkname: android-ndk-r22
+     bs_hook: 2_3_0
+     BS_Version: 1.17.1
+     ndkname: android-ndk-r23
 
 jobs:
   build:
@@ -70,7 +70,7 @@ jobs:
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
       run: |
-        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux.zip
         unzip -q ndk.zip
         mv ${ndkname} ndk
       
@@ -78,6 +78,11 @@ jobs:
       run: |
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+
+    #- name: Create ndkpath.txt
+    #  run: |
+    #    echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+    #    cat ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
         
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
@@ -107,18 +112,18 @@ jobs:
         cd ./MultiQuestensions
         ../QPM/QPM restore
         
-    - name: Get SongDownloader
-      shell: bash
-      env:
-        URL: ${{ secrets.SONGDOWNLOADER }}
-      run: |
-        cd ${GITHUB_WORKSPACE}/MultiQuestensions/extern
-        wget -q -O songdownloader.zip "$URL"
-        unzip -q songdownloader.zip
-        echo 
-        echo Listing Folder
-        echo 
-        ls
+    #- name: Get SongDownloader
+    #  shell: bash
+    #  env:
+    #    URL: ${{ secrets.SONGDOWNLOADER }}
+    #  run: |
+    #    cd ${GITHUB_WORKSPACE}/MultiQuestensions/extern
+    #    wget -q -O songdownloader.zip "$URL"
+    #    unzip -q songdownloader.zip
+    #    echo 
+    #    echo Listing Folder
+    #    echo 
+    #    ls
 
 
     - name: Check dependency Folders
@@ -157,4 +162,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: multiquestensions.qmod
-        path: ./MultiQuestensions/${(multiquestensions*.qmod)[0]}
+        path: ./MultiQuestensions/multiquestensions.qmod

@@ -25,15 +25,16 @@ namespace MultiQuestensions::Beatmaps {
 DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "System", "Object", sizeof(Il2CppObject),
 	{ classof(GlobalNamespace::IPreviewBeatmapLevel*) },
 
-	DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
-	DECLARE_CTOR(FromPacket, MultiQuestensions::Beatmaps::PreviewBeatmapPacket*);
+	DECLARE_CTOR(FromPreviewPacket, Il2CppString* levelhash, GlobalNamespace::IPreviewBeatmapLevel* level, PreviewBeatmapPacket* lvl = nullptr);
+	//DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
+	//DECLARE_CTOR(FromPacket, MultiQuestensions::Beatmaps::PreviewBeatmapPacket*);
 
 	DECLARE_INSTANCE_METHOD(MultiQuestensions::Beatmaps::PreviewBeatmapPacket*, GetPacket, Il2CppString*, GlobalNamespace::BeatmapDifficulty);
 
 	DECLARE_INSTANCE_FIELD(GlobalNamespace::IPreviewBeatmapLevel*, _preview);
+	DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, coverImage);
 	DECLARE_INSTANCE_FIELD(bool, isDownloaded);
 	DECLARE_INSTANCE_FIELD(bool, isDownloadable);
-
 
 
 	DECLARE_INSTANCE_FIELD(Il2CppString*, levelID);

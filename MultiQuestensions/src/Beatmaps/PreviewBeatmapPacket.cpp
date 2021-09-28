@@ -1,11 +1,14 @@
 #include "Beatmaps/PreviewBeatmapPacket.hpp"
 #include "custom-types/shared/register.hpp"
+#include "GlobalNamespace/VarIntExtensions.hpp"
 
 DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapPacket);
 
 namespace MultiQuestensions::Beatmaps {
 
-	void PreviewBeatmapPacket::New_ctor() {}
+	//void PreviewBeatmapPacket::New_ctor() {}
+	//PreviewBeatmapPacket::PreviewBeatmapPacket() {}
+	void PreviewBeatmapPacket::New() {}
 
 	void PreviewBeatmapPacket::Release() {
 		getLogger().debug("PreviewBeatmapPacket::Release");
@@ -25,7 +28,8 @@ namespace MultiQuestensions::Beatmaps {
 		writer->Put(songDuration);
 
 		writer->Put(characteristic);
-		writer->Put(difficulty);
+		GlobalNamespace::VarIntExtensions::PutVarUInt(writer, difficulty);
+		//writer->Put(difficulty);
 	}
 
 	void PreviewBeatmapPacket::Deserialize(LiteNetLib::Utils::NetDataReader* reader) {
@@ -48,6 +52,7 @@ namespace MultiQuestensions::Beatmaps {
 		songDuration = reader->GetFloat();
 
 		characteristic = reader->GetString();
-		difficulty = reader->GetUInt();
+		difficulty = GlobalNamespace::VarIntExtensions::GetVarUInt(reader);
+		getLogger().debug("Deserialize PreviewBeatmapPacket done");
 	}
 }
