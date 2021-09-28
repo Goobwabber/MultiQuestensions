@@ -92,7 +92,7 @@ namespace MultiQuestensions {
 		}
 
 		for (auto& [key, extendedPlayer] : _extendedPlayers) {
-			SetPlayerPlaceColor(extendedPlayer->get_sortIndex()/*extendedPlayer*/, extendedPlayer->get_playerColor(), false);
+			SetPlayerPlaceColor(extendedPlayer->get_sortIndex()/*extendedPlayer*/, extendedPlayer->get_playerColor(), true);
 		}
 		
 		//for (int i = 0; i < sessionManager->get_connectedPlayers()->Length())
@@ -157,8 +157,8 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(LightWithIdMonoBehaviour_RegisterLight, &LightWithIdMonoBehaviour::RegisterLight, void, LightWithIdMonoBehaviour* self) {
-        if (!(self->get_transform()->get_parent() != nullptr && self->get_transform()->get_parent()->get_name()->Contains(il2cpp_utils::newcsstr("LobbyAvatarPlace")))) LightWithIdMonoBehaviour_RegisterLight(self);
-    }
+		if (!(self->get_transform()->get_parent() != nullptr && self->get_transform()->get_parent()->get_name()->Contains(il2cpp_utils::newcsstr("LobbyAvatarPlace")))) LightWithIdMonoBehaviour_RegisterLight(self);
+	}
 
     MAKE_HOOK_MATCH(MultiplayerLobbyAvatarManager_AddPlayer, &MultiplayerLobbyAvatarManager::AddPlayer, void, MultiplayerLobbyAvatarManager* self, IConnectedPlayer* connectedPlayer) {
         MultiplayerLobbyAvatarManager_AddPlayer(self, connectedPlayer);

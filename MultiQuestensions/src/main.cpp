@@ -175,7 +175,7 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
             _extendedPlayers.emplace(userId, extendedPlayer);
 
             getLogger().debug("SetPlayerPlaceColor");
-            SetPlayerPlaceColor(extendedPlayer->get_sortIndex()/*player*/, extendedPlayer->get_playerColor(), true);
+            SetPlayerPlaceColor(player->get_sortIndex()/*player*/, extendedPlayer->get_playerColor(), true);
             //extendedPlayerConnectedEvent::Invoke(extendedPlayer);
         }
     }
@@ -196,7 +196,7 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
             }
             getLogger().debug("ExtendedPlayerPacket sent");
 
-            SetPlayerPlaceColor(player->get_sortIndex()/*player*/, Extensions::ExtendedPlayer::DefaultColor, true);
+            SetPlayerPlaceColor(player->get_sortIndex()/*player*/, Extensions::ExtendedPlayer::DefaultColor, false);
         }
     }
     catch (const std::runtime_error& e) {
