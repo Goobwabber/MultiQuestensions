@@ -1,5 +1,12 @@
+#include "main.hpp"
 #include "Assets/Sprites.hpp"
-using UnityEngine::Sprite;
+#include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/Texture2D.hpp"
+#include "UnityEngine/Texture.hpp"
+#include "UnityEngine/ImageConversion.hpp"
+#include "UnityEngine/SpriteMeshType.hpp"
+#include "System/Convert.hpp"
+using namespace UnityEngine;
 using namespace QuestUI::BeatSaberUI;
 
 namespace MultiQuestensions {
@@ -10,13 +17,22 @@ namespace MultiQuestensions {
     Sprite* Sprites::Oculus64Icon;
     Sprite* Sprites::Steam64Icon;
 
+    Sprite* CreateSpriteFromBase64(std::string& base64) {
+        Array<uint8_t>* bytes = System::Convert::FromBase64String(il2cpp_utils::newcsstr(base64));
+        Texture2D* texture = Texture2D::New_ctor(2, 2);
+        if (ImageConversion::LoadImage(texture, bytes, false)) {
+            return Sprite::Create(texture, UnityEngine::Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), UnityEngine::Vector2(0, 0), 10.0f, 0u, SpriteMeshType::Tight, UnityEngine::Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        }
+        return nullptr;
+    }
+
     Sprite* Sprites::IconOculus64() {
-        if (!Oculus64Icon) Oculus64Icon = Base64ToSprite(Oculus64);
+        if (!Oculus64Icon) Oculus64Icon = CreateSpriteFromBase64(Oculus64);
         return Oculus64Icon;
     }
 
     Sprite* Sprites::IconSteam64() {
-        if (!Steam64Icon) Steam64Icon = Base64ToSprite(Steam64);
+        if (!Steam64Icon) Steam64Icon = CreateSpriteFromBase64(Steam64);
         return Steam64Icon;
     }
 }

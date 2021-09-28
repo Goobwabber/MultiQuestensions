@@ -197,7 +197,13 @@ namespace MultiQuestensions {
 	void CreateOrUpdateNameTag(IConnectedPlayer* player)
 	{
 		getLogger().debug("Start CreateOrUpdateNameTag: GetAvatarCaptionObject");
-		auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
+		if (il2cpp_utils::AssignableFrom<MultiQuestensions::Extensions::ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) 
+			getLogger().debug("CreateOrUpdateNameTag ExtendedPlayer");
+		else getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
+		//static auto* IConnectedPlayer_get_userId = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(IConnectedPlayer*), "get_userId", 0));
+		//auto* userIdResult = il2cpp_utils::RunMethodThrow<Il2CppString*, false>(player, IConnectedPlayer_get_userId);
+
+		auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId()/*userIdResult*/);
 		if (objAvatarCaption == nullptr)
 			return;
 
