@@ -3,10 +3,10 @@
   <ItemGroup>
     <None Include="Android.mk" />
     <None Include="Application.mk" />
-    <None Include="bmbfmod.json" />
     <None Include="qpm.json" />
     <None Include=".gitignore" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -27,6 +27,45 @@
     <Filter Include="include\Packets">
       <UniqueIdentifier>{887c95fa-1cf7-4668-bea7-e022d31b7a98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extern">
+      <UniqueIdentifier>{fcee4a01-7013-456d-844d-3ee6263d7ddd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Hooks">
+      <UniqueIdentifier>{aa3ea131-982c-4dac-9adf-86347ed8e599}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI">
+      <UniqueIdentifier>{45320952-85bc-4fe1-ba82-ebb2601bfda8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Extensions">
+      <UniqueIdentifier>{c25852c5-f35c-425e-9641-6468d5e4b8f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Extensions">
+      <UniqueIdentifier>{53f23e9d-f202-4d68-9b7b-8ebdb04ea12e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Hooks">
+      <UniqueIdentifier>{ae4c12ec-ab3a-4fe5-a1c6-cff5786bf5ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\UI">
+      <UniqueIdentifier>{583a75e7-93f8-4eea-aade-02f6c090f090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared">
+      <UniqueIdentifier>{9db08377-28e4-461d-bcc4-5ebb645b167c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared\CodegenExtensions">
+      <UniqueIdentifier>{31772450-96cd-49b8-8cd9-8e78b2fab9c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Assets">
+      <UniqueIdentifier>{a60f556f-4e31-4d7a-b66b-59c6ac2d00bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Environments">
+      <UniqueIdentifier>{1af0c26d-b1f0-45a1-bc3c-6e1b1f566a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Assets">
+      <UniqueIdentifier>{f3c2764b-bfdc-4b78-8d5f-592db4f23328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Environments">
+      <UniqueIdentifier>{2b4e6880-d0be-4434-97d1-214454d8e290}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -44,6 +83,25 @@
     <ClCompile Include="src\Beatmaps\PreviewBeatmapStub.cpp">
       <Filter>src\Beatmaps</Filter>
     </ClCompile>
+    <ClCompile Include="src\Extensions\ExtendedPlayer.cpp">
+      <Filter>src\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\LobbySetupPanel.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Sprites.cpp">
+      <Filter>src\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Environments\LobbyAvatarPlaceLighting.cpp">
+      <Filter>src\Environments</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp">
+      <Filter>src\Environments</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\EnvironmentAndAvatarHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -63,6 +121,99 @@
     </ClInclude>
     <ClInclude Include="include\Packets\Callback.hpp">
       <Filter>include\Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songloader\shared\API.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\ArrayUtil.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Beatmap.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristic.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristicDifficulty.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Data\CustomDataType.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Difficulties.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\eventmacros.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\ExternalComponents.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreen.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenManager.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenMoverPointer.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Settings\IncrementSetting.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\MainThreadScheduler.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Metadata.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Page.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\questui\shared\QuestUI.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Stats.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\TypeMacros.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp">
+      <Filter>extern</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Extensions\ExtendedPlayer.hpp">
+      <Filter>include\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Hooks\Hooks.hpp">
+      <Filter>include\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\LobbySetupPanel.hpp">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementChecker.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp">
+      <Filter>shared\CodegenExtensions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Assets\Sprites.hpp">
+      <Filter>include\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Environments\LobbyAvatarPlaceLighting.hpp">
+      <Filter>include\Environments</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp">
+      <Filter>include\Environments</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlobalFieldsTemp.hpp">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

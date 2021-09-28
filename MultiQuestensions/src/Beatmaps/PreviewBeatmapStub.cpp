@@ -1,83 +1,173 @@
 #include "Beatmaps/PreviewBeatmapStub.hpp"
-#include "extern/beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "System/Threading/Tasks/TaskStatus.hpp"
+#include "UnityEngine/ImageConversion.hpp"
+#include "GlobalNamespace/MediaAsyncLoader.hpp"
+#include "songdownloader/shared/BeatSaverAPI.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
+#include <vector>
 
-DEFINE_CLASS(MultiQuestensions::Beatmaps::PreviewBeatmapStub);
-
-Il2CppString* LevelIdToHash(Il2CppString* levelId) {
-	if (Il2CppString::IsNullOrWhiteSpace(levelId)) {
-		return nullptr;
-	}
-	Array<Il2CppString*>* ary = levelId->Split('_', ' ');
-	Il2CppString* hash = nullptr;
-	if (ary->Length() > 2) {
-		hash = ary->values[2];
-	}
-	return (hash != nullptr && hash->get_Length() == 40) ? hash : nullptr;
-}
+DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
 namespace MultiQuestensions::Beatmaps {
-	void PreviewBeatmapStub::fromPreview(GlobalNamespace::IPreviewBeatmapLevel* preview) {
-		levelID = preview->get_levelID();
-		levelHash = LevelIdToHash(levelID);
-		isDownloaded = true;
+	//void PreviewBeatmapStub::FromPreview(Il2CppString* levelHashStr, GlobalNamespace::IPreviewBeatmapLevel* preview) {
+	//	getLogger().debug("PreviewBeatmapStub::FromPreview");
 
-		songName = preview->get_songName();
-		songSubName = preview->get_songSubName();
-		songAuthorName = preview->get_songAuthorName();
-		levelAuthorName = preview->get_levelAuthorName();
+	//	_preview = preview;
+	//	isDownloaded = true;
+	//	_downloadable = DownloadableState::Unchecked;
 
-		beatsPerMinute = preview->get_beatsPerMinute();
-		songDuration = preview->get_songDuration();
-		
-		// Need this declared before getter to prevent early freeing
-		static Unity::Collections::NativeArray_1<uint8_t> rawCover;
+	//	levelID = preview->get_levelID();
+	//	levelHash = levelHashStr;
+	//	getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
 
-		_audioGetter = preview->GetPreviewAudioClipAsync(System::Threading::CancellationToken::get_None());
-		_coverGetter = preview->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
-		/*_rawCoverGetter = _coverGetter->ContinueWith<Array<uint8_t>*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, Array<uint8_t>*>*>(
-			*[](System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* spriteTask)->Array<uint8_t>*{
-				UnityEngine::Sprite* sprite = spriteTask->get_Result();
-				rawCover = sprite->get_texture()->GetRawTextureData<uint8_t>();
-				return reinterpret_cast<Array<uint8_t>*>(&rawCover);
-			}
-		));*/
+	//	songName = preview->get_songName();
+	//	songSubName = preview->get_songSubName();
+	//	songAuthorName = preview->get_songAuthorName();
+	//	levelAuthorName = preview->get_levelAuthorName();
+	//	getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).c_str(), to_utf8(csstrtostr(songSubName)).c_str(), to_utf8(csstrtostr(songAuthorName)).c_str(), to_utf8(csstrtostr(levelAuthorName)).c_str());
+	//	
+	//	beatsPerMinute = preview->get_beatsPerMinute();
+	//	songDuration = preview->get_songDuration();
+	//	getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
+	//}
+
+	//void PreviewBeatmapStub::FromPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet) {
+	//	getLogger().debug("PreviewBeatmapStub::FromPacket");
+
+	//	getLogger().debug("Set downloadstates");
+	//	isDownloaded = false;
+	//	_downloadable = DownloadableState::Unchecked;
+	//	
+	//	getLogger().debug("Get levelId and Hash");
+	//	levelID = packet->levelId;
+	//	levelHash = packet->levelHash;
+	//	//levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
+	//	getLogger().debug("levelID: %s\n Hash: %s", 
+	//		to_utf8(csstrtostr(levelID)).c_str(),
+	//		to_utf8(csstrtostr(levelHash)).c_str());
+	//	getLogger().debug("SongInfo strings");
+	//	songName = packet->songName;
+	//	songSubName = packet->songSubName;
+	//	songAuthorName = packet->songAuthorName;
+	//	levelAuthorName = packet->levelAuthorName;
+	//	getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
+	//		to_utf8(csstrtostr(songName)).c_str(),
+	//		to_utf8(csstrtostr(songSubName)).c_str(),
+	//		to_utf8(csstrtostr(songAuthorName)).c_str(),
+	//		to_utf8(csstrtostr(levelAuthorName)).c_str());
+
+	//	getLogger().debug("SongInfo floats");
+	//	beatsPerMinute = packet->beatsPerMinute;
+	//	songDuration = packet->songDuration;
+	//	getLogger().debug("beatsPerMinute: %f\n songDuration: %f",
+	//		beatsPerMinute,
+	//		songDuration);
+	//}
+
+	void PreviewBeatmapStub::FromPreviewPacket(Il2CppString* levelhash, GlobalNamespace::IPreviewBeatmapLevel* level, PreviewBeatmapPacket* lvl) {
+		if (levelhash && level) {
+			getLogger().debug("PreviewBeatmapStub::FromPreview");
+
+			_preview = level;
+			isDownloaded = true;
+			_downloadable = DownloadableState::Unchecked;
+
+			levelID = level->get_levelID();
+			levelHash = levelhash;
+			getLogger().debug("levelID: %s, levelHash: %s", to_utf8(csstrtostr(levelID)).c_str(), to_utf8(csstrtostr(levelHash)).c_str());
+
+			songName = level->get_songName();
+			songSubName = level->get_songSubName();
+			songAuthorName = level->get_songAuthorName();
+			levelAuthorName = level->get_levelAuthorName();
+			getLogger().debug("songName: %s, songSubName: %s, songAuthorName: %s, levelAuthorName: %s", to_utf8(csstrtostr(songName)).c_str(), to_utf8(csstrtostr(songSubName)).c_str(), to_utf8(csstrtostr(songAuthorName)).c_str(), to_utf8(csstrtostr(levelAuthorName)).c_str());
+
+			beatsPerMinute = level->get_beatsPerMinute();
+			songDuration = level->get_songDuration();
+			getLogger().debug("beatsPerMinute: %f, songDuration: %f", beatsPerMinute, songDuration);
+		}
+		else {
+			getLogger().debug("PreviewBeatmapStub::FromPacket");
+
+			getLogger().debug("Set downloadstates");
+			isDownloaded = false;
+			_downloadable = DownloadableState::Unchecked;
+
+			getLogger().debug("Get levelId and Hash");
+			levelID = lvl->levelId;
+			levelHash = lvl->levelHash;
+			//levelHash = LevelIdToHash(levelID)/*packet->levelHash*/;
+			getLogger().debug("levelID: %s\n Hash: %s",
+				to_utf8(csstrtostr(levelID)).c_str(),
+				to_utf8(csstrtostr(levelHash)).c_str());
+			getLogger().debug("SongInfo strings");
+			songName = lvl->songName;
+			songSubName = lvl->songSubName;
+			songAuthorName = lvl->songAuthorName;
+			levelAuthorName = lvl->levelAuthorName;
+			getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
+				to_utf8(csstrtostr(songName)).c_str(),
+				to_utf8(csstrtostr(songSubName)).c_str(),
+				to_utf8(csstrtostr(songAuthorName)).c_str(),
+				to_utf8(csstrtostr(levelAuthorName)).c_str());
+
+			getLogger().debug("SongInfo floats");
+			beatsPerMinute = lvl->beatsPerMinute;
+			songDuration = lvl->songDuration;
+			getLogger().debug("beatsPerMinute: %f\n songDuration: %f",
+				beatsPerMinute,
+				songDuration);
+		}
+
 	}
 
-	void PreviewBeatmapStub::fromPacket(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet) {
-		levelID = packet->levelId;
-		levelHash = LevelIdToHash(levelID);
-		isDownloaded = false;
-
-		songName = packet->songName;
-		songSubName = packet->songSubName;
-		songAuthorName = packet->songAuthorName;
-		levelAuthorName = packet->levelAuthorName;
-
-		beatsPerMinute = packet->beatsPerMinute;
-		songDuration = packet->songDuration;
-
-		_rawCoverGetter = System::Threading::Tasks::Task_1<Array<uint8_t>*>::New_ctor(packet->coverImage);
-		/*_coverGetter = _rawCoverGetter->ContinueWith<UnityEngine::Sprite*>(il2cpp_utils::MakeFunc<System::Func_2<System::Threading::Tasks::Task_1<Array<uint8_t>*>*, UnityEngine::Sprite*>*>(
-			*[](System::Threading::Tasks::Task_1<Array<uint8_t>*>* rawCoverTask)->UnityEngine::Sprite* {
-				Array<uint8_t>* rawCover = rawCoverTask->get_Result();
-				UnityEngine::Texture2D* texture;
-				if (rawCover == nullptr || rawCover->Length() == 0) {
-					texture = UnityEngine::Texture2D::get_whiteTexture();
+	System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* PreviewBeatmapStub::GetCoverImageAsync(System::Threading::CancellationToken cancellationToken) {
+		if (_preview) {
+			getLogger().debug("Use localPreview");
+			return _preview->GetCoverImageAsync(cancellationToken);
+		}
+		if (coverImage)
+			return System::Threading::Tasks::Task_1<UnityEngine::Sprite*>::New_ctor(coverImage);
+		else {
+			using namespace QuestUI;
+			getLogger().debug("Try getting CoverImage from BeatSaver");
+			auto task = System::Threading::Tasks::Task_1<UnityEngine::Sprite*>::New_ctor();
+			std::string levelid = to_utf8(csstrtostr(levelID));
+			auto beatmap = BeatSaver::API::GetBeatmapByHash(GetHash(levelid));
+			if (beatmap.has_value()) {
+				std::vector<uint8_t> bytes = BeatSaver::API::GetCoverImage(*beatmap);
+				if (task->TrySetResult(BeatSaberUI::VectorToSprite(bytes))) {
+					getLogger().debug("Set coverImage from BeatSaver");
 				}
 				else {
-					// in the future make this actually load bytes
-					texture = UnityEngine::Texture2D::get_whiteTexture();
+					task->TrySetResult(static_cast<UnityEngine::Sprite*>(nullptr));
 				}
-				return UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0, 0, 2, 2), UnityEngine::Vector2(0, 0), 100, 0, UnityEngine::SpriteMeshType::_get_FullRect(), UnityEngine::Vector4(2, 2, 2, 2), false);
 			}
-		));*/
+			else {
+				getLogger().debug("Failed to get beatmap information from BeatSaver");
+			}
+			coverImage = task->get_ResultOnSuccess();
+			return task;
+		}
 	}
 
-	MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
-		//MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = (MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket*)*il2cpp_utils::New(MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket());
-		MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket* packet = new MultiplayerExtensions::Beatmaps::PreviewBeatmapPacket();
+	System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>* PreviewBeatmapStub::GetPreviewAudioClipAsync(System::Threading::CancellationToken cancellationToken) {
+		if (_preview) {
+			return _preview->GetPreviewAudioClipAsync(cancellationToken);
+		}
+		else {
+			return nullptr;
+		}
+	}
+
+	MultiQuestensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
+		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
+		MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>());
 
 		packet->levelId = levelID;
+		packet->levelHash = levelHash;
 
 		packet->songName = songName;
 		packet->songSubName = songSubName;
@@ -85,25 +175,75 @@ namespace MultiQuestensions::Beatmaps {
 		packet->levelAuthorName = levelAuthorName;
 
 		packet->beatsPerMinute = beatsPerMinute;
-
-		_rawCoverGetter->Wait();
-		packet->coverImage = _rawCoverGetter->get_Result();
+		packet->songDuration = songDuration;
 
 		packet->characteristic = characteristic;
 		packet->difficulty = difficulty;
-
 		return packet;
 	}
 
-	System::Threading::Tasks::Task_1<Array<uint8_t>*>* PreviewBeatmapStub::GetRawCoverAsync(System::Threading::CancellationToken cancellationToken) {
-		return _rawCoverGetter;
+#pragma region All the pain in form of getter functions
+
+	Il2CppString* PreviewBeatmapStub::get_levelID() {
+		return levelID;
 	}
 
-	System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* PreviewBeatmapStub::GetCoverImageAsync(System::Threading::CancellationToken cancellationToken) {
-		return _coverGetter;
+	Il2CppString* PreviewBeatmapStub::get_songName() {
+		return songName;
 	}
 
-	System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>* PreviewBeatmapStub::GetPreviewAudioClipAsync(System::Threading::CancellationToken cancellationToken) {
-		return _audioGetter;
+	Il2CppString* PreviewBeatmapStub::get_songSubName() {
+		return songSubName;
 	}
+
+	Il2CppString* PreviewBeatmapStub::get_songAuthorName() {
+		return songAuthorName;
+	}
+
+	Il2CppString* PreviewBeatmapStub::get_levelAuthorName() {
+		return levelAuthorName;
+	}
+
+	float PreviewBeatmapStub::get_beatsPerMinute() {
+		return beatsPerMinute;
+	}
+
+	float PreviewBeatmapStub::get_songDuration() {
+		return songDuration;
+	}
+
+	float PreviewBeatmapStub::get_songTimeOffset() {
+		return songTimeOffset;
+	}
+
+	float PreviewBeatmapStub::get_previewDuration() {
+		return previewDuration;
+	}
+
+	float PreviewBeatmapStub::get_previewStartTime() {
+		return previewStartTime;
+	}
+
+	float PreviewBeatmapStub::get_shuffle() {
+		return shuffle;
+	}
+
+	float PreviewBeatmapStub::get_shufflePeriod() {
+		return shufflePeriod;
+	}
+
+	GlobalNamespace::EnvironmentInfoSO* PreviewBeatmapStub::get_allDirectionsEnvironmentInfo() {
+		return allDirectionsEnvironmentInfo;
+	}
+
+	GlobalNamespace::EnvironmentInfoSO* PreviewBeatmapStub::get_environmentInfo() {
+		return environmentInfo;
+	}
+
+	Array<GlobalNamespace::PreviewDifficultyBeatmapSet*>* PreviewBeatmapStub::get_previewDifficultyBeatmapSets() {
+		return previewDifficultyBeatmapSets;
+	}
+
+#pragma endregion
+
 }

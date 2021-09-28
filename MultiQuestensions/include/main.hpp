@@ -9,12 +9,15 @@
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
-#include "codegen/include/LiteNetLib/Utils/INetSerializable.hpp"
 
 // Codegen includes
+#include "LiteNetLib/Utils/INetSerializable.hpp"
 #include "GlobalNamespace/MultiplayerSessionManager.hpp"
 #include "GlobalNamespace/IMenuRpcManager.hpp"
 #include "GlobalNamespace/LobbyPlayersDataModel.hpp"
+#include "GlobalNamespace/ILobbyPlayersDataModel.hpp"
+//#include "GlobalNamespace/ILobbyPlayerDataModel.hpp"
+#include "GlobalNamespace/ILevelGameplaySetupData.hpp"
 #include "GlobalNamespace/BeatmapLevelsModel.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 
@@ -23,6 +26,9 @@
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicCollectionSO.hpp"
+#include "GlobalNamespace/HMMainThreadDispatcher.hpp"
+
+#include "GlobalNamespace/LobbyGameStateController.hpp"
 
 // Cpp includes
 #include <map>
@@ -32,3 +38,12 @@
 // Define these functions here so that we can easily read configuration and log information from other files
 Configuration& getConfig();
 Logger& getLogger();
+
+// Utilities
+Il2CppString* LevelIdToHash(Il2CppString*);
+
+extern std::string GetHash(const std::string& levelId);
+
+extern ModInfo modInfo;
+
+extern std::vector<std::string> DownloadedSongIds;
