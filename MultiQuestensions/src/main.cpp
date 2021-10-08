@@ -133,14 +133,19 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
     }
 }
 
-std::map<std::string, Extensions::ExtendedPlayer*> _extendedPlayers;
-Extensions::ExtendedPlayer* localExtendedPlayer;
+std::map<std::string, SafePtr<Extensions::ExtendedPlayer>> _extendedPlayers;
+//System::Collections::Generic::Dictionary_2<Il2CppString*, Extensions::ExtendedPlayer*>* extendedPlayers;
+//SafePtr<System::Collections::Generic::Dictionary_2<std::string, Extensions::ExtendedPlayer*>*> extendedPlayersSPTR;
+//SafePtr<Extensions::ExtendedPlayer*> localExtendedPlayerSPTR;
+SafePtr<Extensions::ExtendedPlayer> localExtendedPlayer;
 IPlatformUserModel* platformUserModel;
 
 static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPlayerPacket* packet, IConnectedPlayer* player) {
     const std::string userId = to_utf8(csstrtostr(player->get_userId()));
+    //if (extendedPlayers->ContainsKey(player->get_userId())) {
     if (_extendedPlayers.contains(userId)) {
-        Extensions::ExtendedPlayer* extendedPlayer = _extendedPlayers.at(userId);
+        SafePtr<Extensions::ExtendedPlayer> extendedPlayer = _extendedPlayers.at(userId);
+        //Extensions::ExtendedPlayer* extendedPlayer = extendedPlayers->get_Item(player->get_userId());
         extendedPlayer->_connectedPlayer = player;
         extendedPlayer->platformID = packet->platformID;
         extendedPlayer->platform = packet->platform;
@@ -174,12 +179,14 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
         }
         if (extendedPlayer) {
             _extendedPlayers.emplace(userId, extendedPlayer);
+            //extendedPlayers->Add(player->get_userId(), extendedPlayer);
+            //if (!extendedPlayersSPTR) extendedPlayersSPTR = extendedPlayers;
 
             getLogger().debug("SetPlayerPlaceColor");
-            SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer), extendedPlayer->get_playerColor(), true);
+            SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
             getLogger().debug("CreateOrUpdateNameTag");
             // This packet is usually received before the avatar is actually created
-            CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer));
+            CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()));
             getLogger().debug("ExtendedPlayerPacket done");
 
             //extendedPlayerConnectedEvent::Invoke(extendedPlayer);
@@ -236,6 +243,7 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
     getLogger().debug("MultiplayerSessionManager.StartSession, creating localExtendedPlayerPacket");
     try {
         localExtendedPlayer = Extensions::ExtendedPlayer::CS_ctor(self->get_localPlayer());
+        //localExtendedPlayerSPTR = localExtendedPlayer;
 
         if (!UnityEngine::ColorUtility::TryParseHtmlString(il2cpp_utils::newcsstr(getConfig().config["color"].GetString()), localExtendedPlayer->playerColor))
             localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
@@ -494,9 +502,9 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
         loadingDifficultyBeatmap = nullptr;
         loadingGameplayModifiers = nullptr;
 
-        // call original method
-        LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
     }
+    // call original method
+    LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
 }
 
 MAKE_HOOK_MATCH(MenuRpcManager_InvokeSetCountdownEndTime, &MenuRpcManager::InvokeSetCountdownEndTime, void, MenuRpcManager* self, ::Il2CppString* userId, float newTime) {

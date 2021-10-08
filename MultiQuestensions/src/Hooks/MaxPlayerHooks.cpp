@@ -75,6 +75,7 @@ namespace MultiQuestensions {
         }
     }
 
+    // TODO: Find a fix for players disappearing when the below is run
     MAKE_HOOK_MATCH(CalculatePlayerIndexSequencePatch, &MultiplayerIntroAnimationController::CalculatePlayerIndexSequence, Queue_1<int>*, MultiplayerIntroAnimationController* self, IReadOnlyList_1<IConnectedPlayer*>* allActivePlayer) {
         getLogger().debug("Start: CalculatePlayerIndexSequencePatch");
         try {
@@ -133,6 +134,6 @@ namespace MultiQuestensions {
     void Hooks::MaxPlayerHooks() {
         INSTALL_HOOK(getLogger(), MultiplayerResultsPyramidPatch);
         INSTALL_HOOK(getLogger(), IntroAnimationPatch);
-        INSTALL_HOOK(getLogger(), CalculatePlayerIndexSequencePatch);
+        //INSTALL_HOOK(getLogger(), CalculatePlayerIndexSequencePatch);
     }
 }

@@ -16,6 +16,7 @@
 #include "GlobalNamespace/MultiplayerLobbyCenterStageManager.hpp"
 #include "GlobalNamespace/MultiplayerLobbyAvatarManager.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
+#include "GlobalNamespace/ConnectedPlayerManager_ConnectedPlayer.hpp"
 
 #include "System/Collections/Generic/List_1.hpp"
 
@@ -71,6 +72,17 @@ namespace MultiQuestensions {
     void SetPlayerPlaceColor(IConnectedPlayer* player, const Color& color, bool priority)
     {
         if (!initialized) return;
+
+        if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
+            getLogger().debug("SetPlayerPlaceColor ExtendedPlayer");
+
+        else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
+        else {
+            getLogger().debug("SetPlayerPlaceColor unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+            return;
+        }
+        getLogger().debug("SetPlayerPlaceColor player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+
         getLogger().debug("SetPlayerPlaceColor");
 
         LobbyAvatarPlaceLighting* place = GetConnectedPlayerPlace(player);
@@ -104,7 +116,7 @@ namespace MultiQuestensions {
         }
 
         for (auto& [key, extendedPlayer] : _extendedPlayers) {
-            SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer), extendedPlayer->get_playerColor(), true);
+            SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
         }
     }
 
@@ -203,7 +215,11 @@ namespace MultiQuestensions {
             if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
                 getLogger().debug("CreateOrUpdateNameTag ExtendedPlayer");
 
-            else getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
+            else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
+            else {
+                getLogger().debug("CreateOrUpdateNameTag unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+                return;
+            }
             getLogger().debug("CreateOrUpdateNameTag player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
 
             auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId()/*userId*/);
@@ -228,13 +244,12 @@ namespace MultiQuestensions {
     void HandleLobbyAvatarCreated(IConnectedPlayer* player) {
         const std::string userId = to_utf8(csstrtostr(player->get_userId()));
         if (_extendedPlayers.contains(userId))
-            player = reinterpret_cast<IConnectedPlayer*>(_extendedPlayers.at(userId));
+            player = reinterpret_cast<IConnectedPlayer*>(_extendedPlayers.at(userId)->get_self());
         CreateOrUpdateNameTag(player);
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyAvatarManager_AddPlayer, &MultiplayerLobbyAvatarManager::AddPlayer, void, MultiplayerLobbyAvatarManager* self, IConnectedPlayer* connectedPlayer) {
         MultiplayerLobbyAvatarManager_AddPlayer(self, connectedPlayer);
-        // TODO: Raise Event for when Lobby Avatar has been created
         if (!_avatarManager) _avatarManager = self;
         HandleLobbyAvatarCreated(connectedPlayer);
     }

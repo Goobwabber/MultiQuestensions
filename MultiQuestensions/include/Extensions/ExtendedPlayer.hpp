@@ -78,6 +78,10 @@ public:
         return _connectedPlayer->HasState(il2cpp_utils::newcsstr(state));
     }
 
+    constexpr ExtendedPlayer* get_self() {
+        return this;
+    }
+
     DECLARE_INSTANCE_METHOD(bool, get_isMe);
     DECLARE_INSTANCE_METHOD(Il2CppString*, get_userId);
     DECLARE_INSTANCE_METHOD(Il2CppString*, get_userName);
