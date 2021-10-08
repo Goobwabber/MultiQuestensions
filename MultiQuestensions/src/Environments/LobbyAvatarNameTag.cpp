@@ -147,7 +147,7 @@ namespace MultiQuestensions::Environments {
             imageView->set_fillCenter(true);
             imageView->set_preserveAspect(true);
             imageView->set_material(_bg->get_material()); // No Glow Billboard material
-            _playerIcons.emplace(slot, imageView);
+            _playerIcons.insert_or_assign(slot, imageView);
 
             auto rectTransform = iconObj->GetComponent<RectTransform*>();
             rectTransform->set_localScale({ 3.2f, 3.2f });

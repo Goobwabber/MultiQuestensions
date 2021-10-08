@@ -22,7 +22,7 @@ namespace MultiQuestensions::UI {
 		auto vertical = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
 
 		auto horizontal = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
-		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(20, 0, 18, 0)); // 100, 0, 18, 0
+		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(0, 0, 18, 0)); // 100, 0, 18, 0 // 20, 0, 18, 0
 
 		auto vertical2 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical2->get_gameObject()->AddComponent<ContentSizeFitter*>()
@@ -33,7 +33,7 @@ namespace MultiQuestensions::UI {
 		auto vertical3 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical3->get_gameObject()->AddComponent<ContentSizeFitter*>()
 			->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
-		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(30);
+		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(45);
 
 		auto vertical4 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical4->get_gameObject()->AddComponent<ContentSizeFitter*>()
@@ -43,10 +43,10 @@ namespace MultiQuestensions::UI {
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>
 
-		QuestUI::BeatSaberUI::CreateText(vertical4->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
+		//QuestUI::BeatSaberUI::CreateText(vertical4->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
 
-		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", getConfig().config["lagreducer"].GetBool(), SetLagReducer);
-		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
+		//lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", getConfig().config["lagreducer"].GetBool(), SetLagReducer);
+		//QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
 
 		UnityEngine::Color playerColor;
 		UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
@@ -97,7 +97,8 @@ namespace MultiQuestensions::UI {
 
 		auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
 			using namespace RuntimeSongLoader::API;
-			bool needRefresh = false;
+			bool needRefresh;
+			needRefresh = false;
 			for (auto hash : DownloadedSongIds) {
 				auto level = GetLevelByHash(hash);
 				if (level.has_value()) {
@@ -116,7 +117,7 @@ namespace MultiQuestensions::UI {
 		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes automatically downloaded songs from all multiplayer sessions since you launched the game.");
 
 
-		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
+		QuestUI::BeatSaberUI::CreateUIButton(vertical4->get_transform(), "Color", [colorPicker] {
 			colorPicker->Show();
 			}
 		);
