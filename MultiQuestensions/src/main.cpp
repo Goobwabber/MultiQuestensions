@@ -478,7 +478,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
     }
 }
 
-
+// Checks entitlement and stalls lobby until fullfilled, unless a game is already in progress.
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     getLogger().debug("LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished");
     self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
@@ -490,9 +490,10 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
     loadingGameplayModifiers = gameplayModifiers;
     bool entitlementStatusOK = true;
     std::string LevelID = to_utf8(csstrtostr(self->startedBeatmapId->get_levelID()));
+    // Checks each player, to see if they're in the lobby, and if they are, checks their entitlement status.
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
         std::string UserID =  to_utf8(csstrtostr(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
-        if (entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
+        if (self->dyn__lobbyPlayersDataModel()->GetPlayerIsInLobby(sessionManager->connectedPlayers->get_Item(i)->get_userId()) && entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
     }
     if (entitlementStatusOK) {
         lobbyGameStateController = nullptr;
@@ -502,32 +503,32 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
         loadingDifficultyBeatmap = nullptr;
         loadingGameplayModifiers = nullptr;
 
+        // call original method
+        LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
     }
-    // call original method
-    LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
 }
 
-MAKE_HOOK_MATCH(MenuRpcManager_InvokeSetCountdownEndTime, &MenuRpcManager::InvokeSetCountdownEndTime, void, MenuRpcManager* self, ::Il2CppString* userId, float newTime) {
-    getLogger().debug("InvokeSetCountdownEndTime: newTime: %f", newTime);
-    MenuRpcManager_InvokeSetCountdownEndTime(self, userId, newTime);
-}
+//MAKE_HOOK_MATCH(MenuRpcManager_InvokeSetCountdownEndTime, &MenuRpcManager::InvokeSetCountdownEndTime, void, MenuRpcManager* self, ::Il2CppString* userId, float newTime) {
+//    getLogger().debug("InvokeSetCountdownEndTime: newTime: %f", newTime);
+//    MenuRpcManager_InvokeSetCountdownEndTime(self, userId, newTime);
+//}
 
-MAKE_HOOK_MATCH(MenuRpcManager_InvokeStartLevel, &MenuRpcManager::InvokeStartLevel, void, MenuRpcManager* self, ::Il2CppString* userId, GlobalNamespace::BeatmapIdentifierNetSerializable* beatmapId, GlobalNamespace::GameplayModifiers* gameplayModifiers, float startTime) {
-    getLogger().debug("StartLevel: startTime: %f", startTime);
-    MenuRpcManager_InvokeStartLevel(self, userId, beatmapId, gameplayModifiers, startTime);
-}
+//MAKE_HOOK_MATCH(MenuRpcManager_InvokeStartLevel, &MenuRpcManager::InvokeStartLevel, void, MenuRpcManager* self, ::Il2CppString* userId, GlobalNamespace::BeatmapIdentifierNetSerializable* beatmapId, GlobalNamespace::GameplayModifiers* gameplayModifiers, float startTime) {
+//    getLogger().debug("StartLevel: startTime: %f", startTime);
+//    MenuRpcManager_InvokeStartLevel(self, userId, beatmapId, gameplayModifiers, startTime);
+//}
+//
+//MAKE_HOOK_MATCH(LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime, &LobbyGameStateController::HandleMenuRpcManagerSetCountdownEndTime, void, LobbyGameStateController* self, ::Il2CppString* userId, float countdownTime) {
+//    getLogger().debug("SetCountdownEndTime: raw=%f, synctime=%f, r-s=%f", countdownTime, self->multiplayerSessionManager->get_syncTime(), countdownTime - self->multiplayerSessionManager->get_syncTime());
+//    LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime(self, userId, countdownTime);
+//}
 
-MAKE_HOOK_MATCH(LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime, &LobbyGameStateController::HandleMenuRpcManagerSetCountdownEndTime, void, LobbyGameStateController* self, ::Il2CppString* userId, float countdownTime) {
-    getLogger().debug("SetCountdownEndTime: raw=%f, synctime=%f, r-s=%f", countdownTime, self->multiplayerSessionManager->get_syncTime(), countdownTime - self->multiplayerSessionManager->get_syncTime());
-    LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime(self, userId, countdownTime);
-}
-
-MAKE_HOOK_MATCH(ConnectedPlayerManager_HandleSyncTimePacket, &ConnectedPlayerManager::HandleSyncTimePacket, void, ConnectedPlayerManager* self, GlobalNamespace::ConnectedPlayerManager::SyncTimePacket* packet, GlobalNamespace::IConnectedPlayer* player) {
-    //getLogger().debug("SetCountdownEndTime: raw=%f, synctime=%f, r-s=%f", countdownTime, self->multiplayerSessionManager->get_syncTime(), countdownTime - self->multiplayerSessionManager->get_syncTime());
-    getLogger().debug("HandleSyncTimePacket: syncTime=%f", packet->syncTime);
-
-    ConnectedPlayerManager_HandleSyncTimePacket(self, packet, player);
-}
+//MAKE_HOOK_MATCH(ConnectedPlayerManager_HandleSyncTimePacket, &ConnectedPlayerManager::HandleSyncTimePacket, void, ConnectedPlayerManager* self, GlobalNamespace::ConnectedPlayerManager::SyncTimePacket* packet, GlobalNamespace::IConnectedPlayer* player) {
+//    //getLogger().debug("SetCountdownEndTime: raw=%f, synctime=%f, r-s=%f", countdownTime, self->multiplayerSessionManager->get_syncTime(), countdownTime - self->multiplayerSessionManager->get_syncTime());
+//    getLogger().debug("HandleSyncTimePacket: syncTime=%f", packet->syncTime);
+//
+//    ConnectedPlayerManager_HandleSyncTimePacket(self, packet, player);
+//}
 
 MAKE_HOOK_MATCH(GameServerPlayerTableCell_SetData, &GameServerPlayerTableCell::SetData, void, GameServerPlayerTableCell* self, IConnectedPlayer* connectedPlayer, ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<AdditionalContentModel::EntitlementStatus>* getLevelEntitlementTask) {
     getLevelEntitlementTask = Task_1<AdditionalContentModel::EntitlementStatus>::New_ctor(AdditionalContentModel::EntitlementStatus::Owned);
@@ -604,10 +605,10 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
 
 #pragma region Debug Hooks
-    INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeSetCountdownEndTime);
-    INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeStartLevel);
-    INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime);
-    INSTALL_HOOK(getLogger(), ConnectedPlayerManager_HandleSyncTimePacket);
+    //INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeSetCountdownEndTime);
+    //INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeStartLevel);
+    //INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime);
+    //INSTALL_HOOK(getLogger(), ConnectedPlayerManager_HandleSyncTimePacket);
 #pragma endregion
 
 

@@ -23,10 +23,7 @@ namespace MultiQuestensions {
     static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
         std::string cUserId = to_utf8(csstrtostr(userId)).c_str();
         std::string cLevelId = to_utf8(csstrtostr(levelId)).c_str();
-        //entitlementDictionary.emplace(std::make_pair(cUserId,  cLevelId), entitlement.value);
-        //if (!entitlementDictionary.count(cUserId)) {
-        //    entitlementDictionary[cUserId] = std::map<std::string, int>;
-        //}
+
         entitlementDictionary[cUserId][cLevelId] = entitlement.value;
         if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
             lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(loadingPreviewBeatmapLevel, loadingBeatmapDifficulty, loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
