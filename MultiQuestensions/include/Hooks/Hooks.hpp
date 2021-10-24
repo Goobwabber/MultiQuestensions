@@ -1,5 +1,5 @@
 #pragma once
-#include "GlobalFieldsTemp.hpp"
+#include "GlobalFields.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "GlobalNamespace/NetworkPlayerEntitlementChecker.hpp"
 
@@ -74,12 +74,16 @@ namespace MultiQuestensions {
         static void NetworkplayerEntitlementChecker();
         static void MaxPlayerHooks();
         static void EnvironmentHooks();
+        static void QuickplayHooks();
+        static void SessionManagerAndExtendedPlayerHooks();
 
     public:
         static const void Install_Hooks() {
             NetworkplayerEntitlementChecker();
             MaxPlayerHooks();
             EnvironmentHooks();
+            QuickplayHooks();
+            SessionManagerAndExtendedPlayerHooks();
         }
     };
 }

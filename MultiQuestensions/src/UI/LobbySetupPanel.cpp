@@ -6,13 +6,16 @@
 #include "UnityEngine/RectOffset.hpp"
 
 #include "CodegenExtensions/ColorUtility.hpp"
-#include "GlobalFieldsTemp.hpp"
+#include "GlobalFields.hpp"
+#include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "songloader/shared/API.hpp"
+#include "UI/DownloadedSongsGSM.hpp"
 using namespace UnityEngine::UI;
 
 namespace MultiQuestensions::UI {
 
 	UnityEngine::UI::Toggle* LobbySetupPanel::lagReducerToggle;
+	bool LobbySetupPanel::needRefresh;
 
 	void SetLagReducer(bool value) {
 		getConfig().config["lagreducer"].SetBool(value);
@@ -95,26 +98,27 @@ namespace MultiQuestensions::UI {
 			}
 		);
 
-		auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
-			using namespace RuntimeSongLoader::API;
-			bool needRefresh;
-			needRefresh = false;
-			for (auto hash : DownloadedSongIds) {
-				auto level = GetLevelByHash(hash);
-				if (level.has_value()) {
-					std::string songPath = to_utf8(csstrtostr(level.value()->customLevelPath));
-					getLogger().debug("Deleting Song: %s", songPath.c_str());
-					DeleteSong(songPath, [&needRefresh] {
-						if (needRefresh) RefreshSongs(false);
-						}
-					);
-				}
-			}
-			needRefresh = true;
-			DownloadedSongIds.clear();
-			}
-		);
-		QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes automatically downloaded songs from all multiplayer sessions since you launched the game.");
+		//auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
+		//	using namespace RuntimeSongLoader::API;
+		//	needRefresh = false;
+		//	for (auto hash : DownloadedSongIds) {
+		//		auto level = GetLevelByHash(hash);
+		//		if (level.has_value()) {
+		//			std::string songPath = to_utf8(csstrtostr(level.value()->customLevelPath));
+		//			getLogger().debug("Deleting Song: %s", songPath.c_str());
+		//			DeleteSong(songPath, [&] {
+		//				if (needRefresh) {
+		//					RefreshSongs(false);
+		//				}
+		//			});
+		//		}
+		//	}
+		//	needRefresh = true;
+		//	DownloadedSongIds.clear();
+		//	UI::DownloadedSongsGSM::get_Instance()->Refresh();
+		//	}
+		//);
+		//QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes automatically downloaded songs from all multiplayer sessions since you launched the game.");
 
 
 		QuestUI::BeatSaberUI::CreateUIButton(vertical4->get_transform(), "Color", [colorPicker] {

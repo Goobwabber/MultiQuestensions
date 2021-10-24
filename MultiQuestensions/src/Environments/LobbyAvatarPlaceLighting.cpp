@@ -37,12 +37,12 @@ namespace MultiQuestensions::Environments {
     }
 
     void LobbyAvatarPlaceLighting::SetColor(const Color& color, bool immediate) {
-        getLogger().debug("SetColor 2 args, R: %f G: %f B: %f", color.r, color.g, color.b);
+        //getLogger().debug("SetColor 2 args, R: %f G: %f B: %f", color.r, color.g, color.b);
         targetColor = color;
-        getLogger().debug("SetColor 2 new targetColor, R: %f G: %f B: %f", targetColor.r, targetColor.g, targetColor.b);
+        //getLogger().debug("SetColor 2 new targetColor, R: %f G: %f B: %f", targetColor.r, targetColor.g, targetColor.b);
 
-        Color lerpColor = Color::Lerp(GetColor(), targetColor, Time::get_deltaTime() * smoothTime);
-        getLogger().debug("SetColor lerp, R: %f G: %f B: %f", lerpColor.r, lerpColor.g, lerpColor.b);
+        //Color lerpColor = Color::Lerp(GetColor(), targetColor, Time::get_deltaTime() * smoothTime);
+        //getLogger().debug("SetColor lerp, R: %f G: %f B: %f", lerpColor.r, lerpColor.g, lerpColor.b);
 
         if (immediate)
         {

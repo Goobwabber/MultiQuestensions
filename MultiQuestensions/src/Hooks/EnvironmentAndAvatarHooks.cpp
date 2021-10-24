@@ -1,6 +1,8 @@
 #include "main.hpp"
 #include "Hooks/Hooks.hpp"
-#include "GlobalFieldsTemp.hpp"
+#include "GlobalFields.hpp"
+#include "Hooks/EnvironmentAndAvatarHooks.hpp"
+#include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Environments/LobbyAvatarPlaceLighting.hpp"
 #include "Environments/LobbyAvatarNameTag.hpp"
 

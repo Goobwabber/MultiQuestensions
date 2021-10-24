@@ -19,13 +19,35 @@ namespace MultiQuestensions {
     //System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>* entitlementAction;
 #pragma endregion
 
+    // For debugging purposes
+    const char* entitlementText(EntitlementsStatus entitlement) {
+        switch (entitlement.value) {
+        case EntitlementsStatus::Unknown:
+            return "Unknown";
+        case EntitlementsStatus::NotOwned:
+            return "NotOwned";
+        case EntitlementsStatus::NotDownloaded:
+            return "NotDownloaded";
+        case EntitlementsStatus::Ok:
+            return "Ok";
+        }
+        return "";
+    }
+
     // Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
     static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
         std::string cUserId = to_utf8(csstrtostr(userId)).c_str();
         std::string cLevelId = to_utf8(csstrtostr(levelId)).c_str();
 
+        getLogger().debug("[HandleEntitlementReceived] Received Entitlement from user '%s' for level '%s' with status '%s'",
+            cUserId.c_str(),
+            cLevelId.c_str(),
+            entitlementText(entitlement)
+            );
+
         entitlementDictionary[cUserId][cLevelId] = entitlement.value;
         if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
+            getLogger().debug("[HandleEntitlementReceived] GameStarting, running 'HandleMultiplayerLevelLoaderCountdownFinished'");
             lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(loadingPreviewBeatmapLevel, loadingBeatmapDifficulty, loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
         }
     }

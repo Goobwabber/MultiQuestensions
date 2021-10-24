@@ -10,7 +10,8 @@ namespace MultiQuestensions::UI {
 		//static GlobalNamespace::IMultiplayerSessionManager* sessionManager;
 		//HMUI::CurvedTextMeshPro* modifierText;
 		static UnityEngine::UI::Toggle* lagReducerToggle;
-		static UnityEngine::UI::Toggle* customSongsToggle;
+		//static UnityEngine::UI::Toggle* customSongsToggle;
+		static bool needRefresh;
 
 	public:
 		static void AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager);

@@ -102,6 +102,9 @@
       <Filter>src\Environments</Filter>
     </ClCompile>
     <ClCompile Include="src\Hooks\EnvironmentAndAvatarHooks.cpp" />
+    <ClCompile Include="src\Hooks\QuickplayHooks.cpp" />
+    <ClCompile Include="src\UI\DownloadedSongsGSM.cpp" />
+    <ClCompile Include="src\Hooks\SessionManagerAndExtendedPlayerHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -212,8 +215,11 @@
     <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp">
       <Filter>include\Environments</Filter>
     </ClInclude>
-    <ClInclude Include="include\GlobalFieldsTemp.hpp">
+    <ClInclude Include="include\GlobalFields.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\UI\DownloadedSongsGSM.hpp" />
+    <ClInclude Include="include\Hooks\EnvironmentAndAvatarHooks.hpp" />
+    <ClInclude Include="include\Hooks\SessionManagerAndExtendedPlayerHooks.hpp" />
   </ItemGroup>
 </Project>
