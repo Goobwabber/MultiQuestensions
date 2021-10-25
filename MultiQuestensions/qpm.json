@@ -25,12 +25,12 @@
     },
     {
       "id": "custom-types",
-      "versionRange": "*",
+      "versionRange": "0.14.1",
       "additionalData": {}
     },
     {
       "id": "songloader",
-      "versionRange": "*",
+      "versionRange": "^0.7.1",
       "additionalData": {}
     },
     {
@@ -40,7 +40,7 @@
     },
     {
       "id": "songdownloader",
-      "versionRange": "*",
+      "versionRange": "^0.3.2",
       "additionalData": {}
     },
     {
