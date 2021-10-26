@@ -8,6 +8,8 @@
 
 #include "GlobalNamespace/ConnectedPlayerManager.hpp"
 
+#include "GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp"
+
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -201,8 +203,10 @@ MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_CreateParty, &MultiplayerLo
 }
 
 MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_ConnectToMatchmaking, &MultiplayerLobbyConnectionController::ConnectToMatchmaking, void, MultiplayerLobbyConnectionController* self, BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask, bool allowSongSelection) {
-    //static auto maskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
-    //songPackMask = songPackMask | SongPackMask(maskStr);
+    if (!gotSongPackOverrides) {
+        static auto maskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
+        songPackMask = songPackMask | SongPackMask(maskStr);
+    }
     MultiplayerLobbyConnectionController_ConnectToMatchmaking(self, beatmapDifficultyMask, songPackMask, allowSongSelection);
 }
 
@@ -212,7 +216,6 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigat
     bool hidePacksIfOneOrNone, bool hidePracticeButton, bool showPlayerStatsInDetailView, Il2CppString* actionButtonText, IBeatmapLevelPack* levelPackToBeSelectedAfterPresent,
     SelectLevelCategoryViewController::LevelCategory startLevelCategory, IPreviewBeatmapLevel* beatmapLevelToBeSelectedAfterPresent, bool enableCustomLevels) {
     getLogger().info("LevelSelectionNavigationController_Setup setting custom songs . . .");
-    getLogger().debug("SongPackMask: %s", to_utf8(csstrtostr(songPackMask.ToString())).c_str());
     LevelSelectionNavigationController_Setup(self, songPackMask, allowedBeatmapDifficultyMask, notAllowedCharacteristics, hidePacksIfOneOrNone, hidePracticeButton, showPlayerStatsInDetailView,
         actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, songPackMask.Contains(il2cpp_utils::newcsstr("custom_levelpack_CustomLevels")));
 }
@@ -278,18 +281,42 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                         auto beatmapName = beatmap.GetName();
                         getLogger().info("Downloading map: %s", beatmap.GetName().c_str());
                         BeatSaver::API::DownloadBeatmapAsync(beatmap,
-                            [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName, hash](bool error) {
+                            [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName, hash, beatmap](bool error) {
                                 if (error) {
-                                    getLogger().info("Failed downloading map: %s", beatmapName.c_str());
+                                    getLogger().info("Failed downloading map retrying: %s", beatmapName.c_str());
+                                    BeatSaver::API::DownloadBeatmapAsync(beatmap,
+                                        [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName, hash](bool error) {
+                                            if (error) {
+                                                getLogger().info("Failed downloading map: %s", beatmapName.c_str());
+                                            }
+                                            else {
+                                                getLogger().info("Downloaded map: %s", beatmapName.c_str());
+                                                DownloadedSongIds.emplace_back(hash);
+                                                QuestUI::MainThreadScheduler::Schedule(
+                                                    [self, beatmapId, gameplayModifiers, initialStartTime, hash] {
+                                                        RuntimeSongLoader::API::RefreshSongs(false,
+                                                            [self, beatmapId, gameplayModifiers, initialStartTime, hash](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
+                                                                UI::DownloadedSongsGSM::get_Instance()->InsertCell(hash);
+                                                                self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
+                                                                //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
+                                                                MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
+                                                                return;
+                                                            }
+                                                        );
+                                                    }
+                                                );
+                                            }
+                                        }
+                                    );
                                 }
                                 else {
                                     getLogger().info("Downloaded map: %s", beatmapName.c_str());
                                     DownloadedSongIds.emplace_back(hash);
                                     QuestUI::MainThreadScheduler::Schedule(
-                                        [self, beatmapId, gameplayModifiers, initialStartTime] {
-                                            UI::DownloadedSongsGSM::get_Instance()->Refresh();
+                                        [self, beatmapId, gameplayModifiers, initialStartTime, hash] {
                                             RuntimeSongLoader::API::RefreshSongs(false,
-                                                [self, beatmapId, gameplayModifiers, initialStartTime](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
+                                                [self, beatmapId, gameplayModifiers, initialStartTime, hash](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
+                                                    UI::DownloadedSongsGSM::get_Instance()->InsertCell(hash);
                                                     self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
                                                     //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
                                                     MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);

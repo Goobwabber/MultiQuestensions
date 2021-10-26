@@ -22,6 +22,7 @@ using namespace HMUI;
 DEFINE_TYPE(MultiQuestensions::UI, DownloadedSongsGSM);
 
 namespace MultiQuestensions::UI {
+    bool cellIsSelected = false;
     DownloadedSongsGSM* DownloadedSongsGSM::instance;
 
     void DownloadedSongsGSM::CreateCell(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask, CustomPreviewBeatmapLevel* level) {
@@ -48,6 +49,7 @@ namespace MultiQuestensions::UI {
         //}
         //if (refreshList) list->tableView->ReloadData();
         list->tableView->RefreshCellsContent();
+        getLogger().debug("CreateCell Finished");
     }
 
     void DownloadedSongsGSM::Delete() {
@@ -65,12 +67,10 @@ namespace MultiQuestensions::UI {
         needSongRefresh = true;
         DownloadedSongIds.erase(DownloadedSongIds.begin() + selectedIdx);
         list->tableView->ClearSelection();
-        //list->tableView->DeleteCells(selectedIdx, 1);
-        //list->data.erase(list->data.begin() + selectedIdx);
+        list->data.erase(list->data.begin() + selectedIdx);
         //list->tableView->RefreshCellsContent();
         Refresh();
         modal->Hide(true, nullptr);
-        list->tableView->ReloadData();
     }
 
     void DownloadedSongsGSM::DidActivate(bool firstActivation) {
@@ -78,7 +78,7 @@ namespace MultiQuestensions::UI {
             instance = this;
             //BeatSaberUI::CreateText(get_transform(), "Test")->set_alignment(TMPro::TextAlignmentOptions::Center);
 
-            modal = BeatSaberUI::CreateModal(get_transform(), { 80, 60 }, [this](HMUI::ModalView* self) {
+            modal = BeatSaberUI::CreateModal(get_transform(), { 55, 25 }, [this](HMUI::ModalView* self) {
                 list->tableView->ClearSelection();
                 });
             //QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Do you want to delete this song?");
@@ -97,21 +97,26 @@ namespace MultiQuestensions::UI {
 
             QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "<color=#ff0000>Delete</color>", [this]() -> void {
                 Delete();
+                cellIsSelected = false;
                 });
 
             QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "<color=#00ff00>Keep</color>", [this]() -> void {
                 DownloadedSongIds.erase(DownloadedSongIds.begin() + selectedIdx);
                 list->tableView->ClearSelection();
+                list->data.erase(list->data.begin() + selectedIdx);
                 Refresh();
                 modal->Hide(true, nullptr);
-                list->tableView->ReloadData();
+                cellIsSelected = false;
                 });
 
             list = BeatSaberUI::CreateScrollableList(get_transform(), { 80, 60 }, [this](int idx) {
                 getLogger().debug("Cell with idx %d clicked", idx);
+                cellIsSelected = true;
                 selectedIdx = idx;
                 modal->Show(true, true, nullptr);
                 });
+
+            NewList();
         }
         getLogger().debug("DownloadedSongsGSM::DidActivate");
 
@@ -135,7 +140,30 @@ namespace MultiQuestensions::UI {
         Refresh();
     }
 
+    void DownloadedSongsGSM::InsertCell(std::string hash) {
+        std::optional<CustomPreviewBeatmapLevel*> levelOpt = GetLevelByHash(hash);
+        if (levelOpt.has_value()) {
+            getLogger().info("Song with Hash '%s' added to list", hash.c_str());
+            CustomPreviewBeatmapLevel* level = levelOpt.value();
+            System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask = level->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
+            auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void()>)[coverTask, this, level] {
+                CreateCell(coverTask, level/*, list->NumberOfCells() + 1*/);
+                }
+            );
+            reinterpret_cast<System::Threading::Tasks::Task*>(coverTask)->ContinueWith(action);
+        }
+        else {
+            getLogger().error("Song with Hash '%s' not found, was it already deleted?", hash.c_str());
+        }
+    }
+
     void DownloadedSongsGSM::Refresh() {
+        list->tableView->ReloadData();
+        list->tableView->RefreshCellsContent();
+    }
+
+
+    void DownloadedSongsGSM::NewList() {
         //refreshList = false;
         list->data.clear();
         if (list->NumberOfCells() > 0) list->tableView->DeleteCells(0, list->NumberOfCells());
@@ -160,6 +188,7 @@ namespace MultiQuestensions::UI {
     //}
 
     void DownloadedSongsGSM::OnEnable() {
+        if (cellIsSelected) list->tableView->ClearSelection();
         list->tableView->ReloadData();
         list->tableView->RefreshCellsContent();
     }

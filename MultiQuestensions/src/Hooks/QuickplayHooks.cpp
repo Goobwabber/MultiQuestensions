@@ -29,51 +29,60 @@ using MSQSD_QPSPO_PredefinedPack = MasterServerQuickPlaySetupData::QuickPlaySong
 using MSQSD_QPSPO_LocalizedCustomPack = MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::LocalizedCustomPack;
 using MSQD_QPSPO_LocalizedCustomPackName = MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::LocalizedCustomPackName;
 
+bool gotSongPackOverrides = false;
+
 namespace MultiQuestensions {
     // Add our custom Packs
     MAKE_HOOK_MATCH(QuickPlaySongPacksDropdown_LazyInit, &QuickPlaySongPacksDropdown::LazyInit, void, QuickPlaySongPacksDropdown* self) {
-        if (!self->dyn__initialized()) {
-            if (self->dyn__quickPlaySongPacksOverride() == nullptr) self->dyn__quickPlaySongPacksOverride() = GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::New_ctor();
-            self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks() = System::Collections::Generic::List_1<GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::LocalizedCustomPack*>::New_ctor();
+        //if (!self->dyn__initialized() && self->dyn__quickPlaySongPacksOverride() == nullptr) {
+        if (self->dyn__quickPlaySongPacksOverride() == nullptr) {
+            gotSongPackOverrides = false;
+#pragma region Override Test
+            //self->dyn__quickPlaySongPacksOverride() = GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::New_ctor();
+            //self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks() = System::Collections::Generic::List_1<GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::LocalizedCustomPack*>::New_ctor();
 
-            if (self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds() == nullptr) self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds() =
-                System::Collections::Generic::List_1<GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::PredefinedPack*>::New_ctor();
+            //if (self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds() == nullptr) self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds() =
+            //    System::Collections::Generic::List_1<GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::PredefinedPack*>::New_ctor();
 
-            //BUILT_IN_LEVEL_PACKS
-            MSQSD_QPSPO_PredefinedPack* builtin = MSQSD_QPSPO_PredefinedPack::New_ctor();
-            builtin->dyn_order() = 1;
-            builtin->dyn_packId() = il2cpp_utils::newcsstr("BUILT_IN_LEVEL_PACKS");
+            ////BUILT_IN_LEVEL_PACKS
+            //MSQSD_QPSPO_PredefinedPack* builtin = MSQSD_QPSPO_PredefinedPack::New_ctor();
+            //builtin->dyn_order() = 1;
+            //builtin->dyn_packId() = il2cpp_utils::newcsstr("BUILT_IN_LEVEL_PACKS");
 
-            //ALL_LEVEL_PACKS
-            MSQSD_QPSPO_PredefinedPack* all = MSQSD_QPSPO_PredefinedPack::New_ctor();
-            all->dyn_order() = 3;
-            all->dyn_packId() = il2cpp_utils::newcsstr("ALL_LEVEL_PACKS");
+            ////ALL_LEVEL_PACKS
+            //MSQSD_QPSPO_PredefinedPack* all = MSQSD_QPSPO_PredefinedPack::New_ctor();
+            //all->dyn_order() = 3;
+            //all->dyn_packId() = il2cpp_utils::newcsstr("ALL_LEVEL_PACKS");
 
-            self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds()->Add(builtin);
-            self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds()->Add(all);
+            //self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds()->Add(builtin);
+            //self->dyn__quickPlaySongPacksOverride()->dyn_predefinedPackIds()->Add(all);
 
 
-            MSQSD_QPSPO_LocalizedCustomPack* custom = MSQSD_QPSPO_LocalizedCustomPack::New_ctor();
-            custom->dyn_order() = 2;
-            //newPack->dyn_order() = self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks()->get_Count() + 1;
-            custom->dyn_serializedName() = il2cpp_utils::newcsstr("custom_levelpack_CustomLevels");
+            //MSQSD_QPSPO_LocalizedCustomPack* custom = MSQSD_QPSPO_LocalizedCustomPack::New_ctor();
+            //custom->dyn_order() = 2;
+            ////newPack->dyn_order() = self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks()->get_Count() + 1;
+            //custom->dyn_serializedName() = il2cpp_utils::newcsstr("custom_levelpack_CustomLevels");
 
-            MSQD_QPSPO_LocalizedCustomPackName* custom_packName_Default;
-            custom_packName_Default = MSQD_QPSPO_LocalizedCustomPackName::New_ctor();
-            custom_packName_Default->dyn_packName() = il2cpp_utils::newcsstr("All + Custom Levels");
+            //MSQD_QPSPO_LocalizedCustomPackName* custom_packName_Default;
+            //custom_packName_Default = MSQD_QPSPO_LocalizedCustomPackName::New_ctor();
+            //custom_packName_Default->dyn_packName() = il2cpp_utils::newcsstr("All + Custom Levels");
 
-            Polyglot::Language currentLang = Polyglot::Localization::get_Instance()->get_SelectedLanguage();
-            custom_packName_Default->dyn_language() = Polyglot::LanguageExtensions::ToSerializedName(currentLang);
+            //Polyglot::Language currentLang = Polyglot::Localization::get_Instance()->get_SelectedLanguage();
+            //custom_packName_Default->dyn_language() = Polyglot::LanguageExtensions::ToSerializedName(currentLang);
 
-            custom->dyn_localizedNames() = Array<GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::LocalizedCustomPackName*>::New(
-                { custom_packName_Default }
-            );
-            custom->dyn_packIds()->Add(il2cpp_utils::newcsstr("custom_levelpack_CustomLevels"));
+            //custom->dyn_localizedNames() = Array<GlobalNamespace::MasterServerQuickPlaySetupData::QuickPlaySongPacksOverride::LocalizedCustomPackName*>::New(
+            //    { custom_packName_Default }
+            //);
+            //custom->dyn_packIds()->Add(il2cpp_utils::newcsstr("custom_levelpack_CustomLevels"));
+
+            //self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks()->Add(custom);
+
+#pragma endregion
+
             //custom->dyn_packIds()->Add(self->dyn__songPackMaskModel()->ToSerializedName(SongPackMask::get_all()));
 
             //getLogger().debug("SongPackMask All serializedName: %s", to_utf8(csstrtostr(self->dyn__songPackMaskModel()->ToSerializedName(SongPackMask::get_all()))).c_str());
 
-            self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks()->Add(custom);
 
             //MSQSD_QPSPO_LocalizedCustomPack* test = MSQSD_QPSPO_LocalizedCustomPack::New_ctor();
             //test->dyn_order() = 4;
@@ -108,7 +117,8 @@ namespace MultiQuestensions {
 
             //self->dyn__quickPlaySongPacksOverride()->dyn_localizedCustomPacks()->Add(test);
 
-        }
+        } else gotSongPackOverrides = true;
+
 
         //for (int i = 0; i < self->dyn__songPackMaskModel()->dyn__defaultSongPackMaskItems()->get_Count(); i++) {
         //    ::Il2CppString* pack = self->dyn__songPackMaskModel()->dyn__defaultSongPackMaskItems()->get_Item(i);
@@ -140,9 +150,9 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_HandleJoinQuickPlayViewControllerDidFinish, &MultiplayerModeSelectionFlowCoordinator::HandleJoinQuickPlayViewControllerDidFinish, void, MultiplayerModeSelectionFlowCoordinator* self, bool success) {
-        
+        std::string levelPackName = to_utf8(csstrtostr(self->dyn__joinQuickPlayViewController()->dyn__multiplayerModeSettings()->dyn_quickPlaySongPackMaskSerializedName()));
         if (success && 
-            to_utf8(csstrtostr(self->dyn__joinQuickPlayViewController()->dyn__multiplayerModeSettings()->dyn_quickPlaySongPackMaskSerializedName())) == "custom_levelpack_CustomLevels") {
+            (levelPackName == "custom_levelpack_CustomLevels" || levelPackName == "customlevels")) {
             self->dyn__simpleDialogPromptViewController()->Init(
                 il2cpp_utils::newcsstr("Custom Song Quickplay"),
                 il2cpp_utils::newcsstr("<color=#ff0000>This category includes songs of varying difficulty.\nIt may be more enjoyable to play in a private lobby with friends."),
