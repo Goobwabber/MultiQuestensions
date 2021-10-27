@@ -25,7 +25,7 @@ namespace MultiQuestensions::UI {
 		auto vertical = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
 
 		auto horizontal = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
-		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(0, 0, 18, 0)); // 100, 0, 18, 0 // 20, 0, 18, 0
+		horizontal->set_padding(UnityEngine::RectOffset::New_ctor(20, 0, 18, 0)); // 100, 0, 18, 0 // For Toggle on Right Side 20, 0, 18, 0 // No Offset 0, 0, 18, 0
 
 		auto vertical2 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical2->get_gameObject()->AddComponent<ContentSizeFitter*>()
@@ -36,7 +36,7 @@ namespace MultiQuestensions::UI {
 		auto vertical3 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical3->get_gameObject()->AddComponent<ContentSizeFitter*>()
 			->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::MinSize);
-		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(45);
+		vertical3->get_gameObject()->AddComponent<LayoutElement*>()->set_minWidth(15); // Default 45 // For Toggle on Right Side 15
 
 		auto vertical4 = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizontal->get_transform());
 		vertical4->get_gameObject()->AddComponent<ContentSizeFitter*>()
@@ -80,9 +80,6 @@ namespace MultiQuestensions::UI {
 				catch (const std::runtime_error& e) {
 					getLogger().error("%s", e.what());
 				}
-
-				//instance->SetColor(getModConfig().ClockColor.GetValue());
-				//getModConfig().ClockColor.SetValue(lastChangedColor);
 			},
 			[](UnityEngine::Color value) {
 				// TODO: Uncomment when MpEx supports live platform color updates
@@ -97,6 +94,11 @@ namespace MultiQuestensions::UI {
 				//}
 			}
 		);
+
+		auto autoDelete = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Auto-Delete Songs", getConfig().config["autoDelete"].GetBool(), [](bool value) {
+			getConfig().config["autoDelete"].SetBool(value);
+			getConfig().Write();
+			});
 
 		//auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
 		//	using namespace RuntimeSongLoader::API;
@@ -121,7 +123,7 @@ namespace MultiQuestensions::UI {
 		//QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes automatically downloaded songs from all multiplayer sessions since you launched the game.");
 
 
-		QuestUI::BeatSaberUI::CreateUIButton(vertical4->get_transform(), "Color", [colorPicker] {
+		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
 			colorPicker->Show();
 			}
 		);

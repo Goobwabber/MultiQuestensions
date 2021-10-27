@@ -52,6 +52,7 @@ namespace MultiQuestensions::UI {
         getLogger().debug("CreateCell Finished");
     }
 
+    // TODO: Add index check, check if index is out of bounds
     void DownloadedSongsGSM::Delete() {
         needSongRefresh = false;
         auto level = GetLevelByHash(DownloadedSongIds.at(selectedIdx));
@@ -73,6 +74,7 @@ namespace MultiQuestensions::UI {
         modal->Hide(true, nullptr);
     }
 
+    // TODO: Add keep all and delete all option
     void DownloadedSongsGSM::DidActivate(bool firstActivation) {
         if (firstActivation) {
             instance = this;
@@ -116,7 +118,7 @@ namespace MultiQuestensions::UI {
                 modal->Show(true, true, nullptr);
                 });
 
-            NewList();
+            //NewList();
         }
         getLogger().debug("DownloadedSongsGSM::DidActivate");
 
@@ -163,34 +165,36 @@ namespace MultiQuestensions::UI {
     }
 
 
-    void DownloadedSongsGSM::NewList() {
-        //refreshList = false;
-        list->data.clear();
-        if (list->NumberOfCells() > 0) list->tableView->DeleteCells(0, list->NumberOfCells());
-        for (std::string hash : DownloadedSongIds) {
-            getLogger().debug("Song with Hash '%s'", hash.c_str());
-            std::optional<CustomPreviewBeatmapLevel*> levelOpt = GetLevelByHash(hash);
-            if (levelOpt.has_value()) {
-                CustomPreviewBeatmapLevel* level = levelOpt.value();
-                System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask = level->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
-                auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void()>)[coverTask, this, level] {
-                    CreateCell(coverTask, level);
-                    }
-                );
-                reinterpret_cast<System::Threading::Tasks::Task*>(coverTask)->ContinueWith(action);
-            }
-        }
-        //refreshList = true;
-    }
+    //void DownloadedSongsGSM::NewList() {
+    //    //refreshList = false;
+    //    list->data.clear();
+    //    if (list->NumberOfCells() > 0) list->tableView->DeleteCells(0, list->NumberOfCells());
+    //    for (std::string hash : DownloadedSongIds) {
+    //        getLogger().debug("Song with Hash '%s'", hash.c_str());
+    //        std::optional<CustomPreviewBeatmapLevel*> levelOpt = GetLevelByHash(hash);
+    //        if (levelOpt.has_value()) {
+    //            CustomPreviewBeatmapLevel* level = levelOpt.value();
+    //            System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask = level->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
+    //            auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void()>)[coverTask, this, level] {
+    //                CreateCell(coverTask, level);
+    //                }
+    //            );
+    //            reinterpret_cast<System::Threading::Tasks::Task*>(coverTask)->ContinueWith(action);
+    //        }
+    //    }
+    //    //refreshList = true;
+    //}
 
     //void DownloadedSongsGSM::Awake() {
     //    QuestUI::BeatSaberUI::CreateText(get_transform(), "Test");
     //}
 
     void DownloadedSongsGSM::OnEnable() {
-        if (cellIsSelected) list->tableView->ClearSelection();
-        list->tableView->ReloadData();
-        list->tableView->RefreshCellsContent();
+        if (list && list->tableView) {
+            if (cellIsSelected) list->tableView->ClearSelection();
+            list->tableView->ReloadData();
+            list->tableView->RefreshCellsContent();
+        }
     }
 
     //void DownloadedSongsGSM::OnDisable() {
