@@ -11,7 +11,7 @@
 #include "GlobalNamespace/SongPackMaskModelSO.hpp"
 
 #include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
-#include "GlobalNamespace/JoinQuickplayViewController.hpp"
+#include "GlobalNamespace/JoinQuickPlayViewController.hpp"
 #include "GlobalNamespace/SimpleDialogPromptViewController.hpp"
 #include "GlobalNamespace/MultiplayerModeSettings.hpp"
 

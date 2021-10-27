@@ -158,8 +158,8 @@ jobs:
         name: libmultiquestensions.so
         path: ./MultiQuestensions/libs/arm64-v8a/libmultiquestensions.so
 
-    - name: Upload QMOD build
-      uses: actions/upload-artifact@v2
-      with:
-        name: multiquestensions.qmod
-        path: ./MultiQuestensions/multiquestensions.qmod
+    #- name: Upload QMOD build
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: multiquestensions.qmod
+    #    path: ./MultiQuestensions/multiquestensions.qmod
