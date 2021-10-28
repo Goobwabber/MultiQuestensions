@@ -9,6 +9,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::UI, CenterScreenLoading, UnityEngine::M
     DECLARE_INSTANCE_METHOD(void, Awake);
     DECLARE_INSTANCE_METHOD(void, OnDisable);
     DECLARE_INSTANCE_METHOD(void, ShowLoading);
+    // Note: downloadingProgress 1.0f = Full
     DECLARE_INSTANCE_METHOD(void, ShowDownloadingProgress, float downloadingProgress);
     DECLARE_INSTANCE_METHOD(void, HideLoading);
     static CenterScreenLoading* instance;

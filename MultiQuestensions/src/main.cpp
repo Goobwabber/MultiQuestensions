@@ -331,7 +331,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                             if (cslInstance) {
                                                 QuestUI::MainThreadScheduler::Schedule(
                                                     [cslInstance, downloadProgress] {
-                                                        cslInstance->ShowDownloadingProgress(downloadProgress);
+                                                        cslInstance->ShowDownloadingProgress(downloadProgress / 100);
                                                     });
                                             }
                                         }
@@ -360,7 +360,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                 if (cslInstance) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [cslInstance, downloadProgress] {
-                                            cslInstance->ShowDownloadingProgress(downloadProgress);
+                                            cslInstance->ShowDownloadingProgress(downloadProgress / 100);
                                         });
                                 }
                             }

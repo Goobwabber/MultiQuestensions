@@ -32,6 +32,7 @@ namespace MultiQuestensions::UI{
         GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
         GameObject* loadingControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadingControl, vertical->get_transform());
         loadingControl = loadingControlGameObject->GetComponent<LoadingControl*>();
+        loadingControl->Hide();
     }
 
     void CenterScreenLoading::OnDisable() {
