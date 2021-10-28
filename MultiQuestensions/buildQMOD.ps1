@@ -15,6 +15,7 @@ if ($new_BSHook -ne "") {
 }
 Write-Host "Compiling Mod"
 & $PSScriptRoot/build.ps1 -Version $VERSION
+& Copy-Item "./obj/local/arm64-v8a/libmultiquestensions.so" -Destination "./debug-builds/arm64-v8a/libmultiquestensions_$VERSION.so"
 }
 
 # TODO: Get the below working with Github Actions variables.

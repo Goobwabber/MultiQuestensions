@@ -326,8 +326,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                                     }
                                                 );
                                             }
-                                        }
-                                        , [cslInstance](float downloadProgress) {
+                                        }, [cslInstance](float downloadProgress) {
                                             if (cslInstance) {
                                                 QuestUI::MainThreadScheduler::Schedule(
                                                     [cslInstance, downloadProgress] {
@@ -355,8 +354,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                         }
                                     );
                                 }
-                            }
-                            , [cslInstance](float downloadProgress) {
+                            }, [cslInstance](float downloadProgress) {
                                 if (cslInstance) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [cslInstance, downloadProgress] {
