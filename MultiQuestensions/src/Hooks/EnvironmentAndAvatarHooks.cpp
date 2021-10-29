@@ -56,13 +56,13 @@ namespace MultiQuestensions {
 #pragma region LobbyAvatarPlaceLigting
     LobbyAvatarPlaceLighting* GetConnectedPlayerPlace(IConnectedPlayer* player)
     {
-        getLogger().debug("GetConnectedPlayerPlace");
+        //getLogger().debug("GetConnectedPlayerPlace");
         int sortIndex = _lobbyStateDataModel->get_localPlayer()->get_sortIndex();
-        getLogger().debug("GetConnectedPlayerPlace sortIndex %d, angleBetweenPlayersWithEvenAdjustment %f", sortIndex, angleBetweenPlayersWithEvenAdjustment);
+        //getLogger().debug("GetConnectedPlayerPlace sortIndex %d, angleBetweenPlayersWithEvenAdjustment %f", sortIndex, angleBetweenPlayersWithEvenAdjustment);
         //static auto* sortIndexMethod = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(IConnectedPlayer*), "get_sortIndex", 0));
         //int playerSortIndex = il2cpp_utils::RunMethodThrow<int>(player, sortIndexMethod);
         float outerCirclePositionAngleForPlayer = MultiplayerPlayerPlacement::GetOuterCirclePositionAngleForPlayer(player->get_sortIndex(), sortIndex, angleBetweenPlayersWithEvenAdjustment);
-        getLogger().debug("GetConnectedPlayerPlace outerCirclePositionAngleForPlayer %f", outerCirclePositionAngleForPlayer);
+        //getLogger().debug("GetConnectedPlayerPlace outerCirclePositionAngleForPlayer %f", outerCirclePositionAngleForPlayer);
         Vector3 playerWorldPosition = MultiplayerPlayerPlacement::GetPlayerWorldPosition(outerCircleRadius, outerCirclePositionAngleForPlayer, MultiplayerPlayerLayout::Circle);
         for (auto* place : avatarPlaces) {
             if (place->get_transform()->get_position() == playerWorldPosition && place->get_isActiveAndEnabled()) return place;
@@ -75,17 +75,22 @@ namespace MultiQuestensions {
     {
         if (!initialized) return;
 
-        if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
-            getLogger().debug("SetPlayerPlaceColor ExtendedPlayer");
+        //if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
+        //    getLogger().debug("SetPlayerPlaceColor ExtendedPlayer");
 
-        else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
-        else {
-            getLogger().debug("SetPlayerPlaceColor unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+        //else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
+        //else {
+        //    getLogger().debug("SetPlayerPlaceColor unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+        //    return;
+        //}
+        if (!(il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass) || il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))) {
+            getLogger().error("SetPlayerPlaceColor unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
             return;
         }
-        getLogger().debug("SetPlayerPlaceColor player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
 
-        getLogger().debug("SetPlayerPlaceColor");
+        //getLogger().debug("SetPlayerPlaceColor player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+
+        //getLogger().debug("SetPlayerPlaceColor");
 
         LobbyAvatarPlaceLighting* place = GetConnectedPlayerPlace(player);
 
@@ -124,7 +129,7 @@ namespace MultiQuestensions {
 
     void HandleLobbyEnvironmentLoaded() {
         initialized = false;
-        getLogger().debug("HandleLobbyEnvironmentLoaded Started");
+        //getLogger().debug("HandleLobbyEnvironmentLoaded Started");
         auto* nativeAvatarPlaces = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace*>();
         for (int i = 0; i < nativeAvatarPlaces->Length(); i++)
         {
@@ -139,10 +144,10 @@ namespace MultiQuestensions {
 
         innerCircleRadius = _placeManager->dyn__innerCircleRadius();
         minOuterCircleRadius = _placeManager->dyn__minOuterCircleRadius();
-        getLogger().debug("innerCircleRadius %f, minOuterCircleRadius %f", innerCircleRadius, minOuterCircleRadius);
+        //getLogger().debug("innerCircleRadius %f, minOuterCircleRadius %f", innerCircleRadius, minOuterCircleRadius);
         angleBetweenPlayersWithEvenAdjustment = MultiplayerPlayerPlacement::GetAngleBetweenPlayersWithEvenAdjustment(_lobbyStateDataModel->get_maxPartySize(), MultiplayerPlayerLayout::Circle);
         outerCircleRadius = fmax(MultiplayerPlayerPlacement::GetOuterCircleRadius(angleBetweenPlayersWithEvenAdjustment, innerCircleRadius), minOuterCircleRadius);
-        getLogger().debug("angleBetweenPlayersWithEvenAdjustment %f, outerCircleRadius %f", angleBetweenPlayersWithEvenAdjustment, outerCircleRadius);
+        //getLogger().debug("angleBetweenPlayersWithEvenAdjustment %f, outerCircleRadius %f", angleBetweenPlayersWithEvenAdjustment, outerCircleRadius);
 
         bool buildingsEnabled = (sessionManager->dyn__maxPlayerCount() <= 18);
         auto* Construction_tr = _menuEnvironmentManager->get_transform()->Find(il2cpp_utils::newcsstr("Construction"));
@@ -160,7 +165,7 @@ namespace MultiQuestensions {
 
         initialized = true;
         SetDefaultPlayerPlaceColors();
-        getLogger().debug("HandleLobbyEnvironmentLoaded Finished");
+        //getLogger().debug("HandleLobbyEnvironmentLoaded Finished");
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyController_ActivateMultiplayerLobby, &MultiplayerLobbyController::ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
@@ -185,19 +190,19 @@ namespace MultiQuestensions {
 #pragma region LobbyAvatarNameTag
     MultiplayerLobbyAvatarController* GetAvatarController(Il2CppString* userId)
     {
-        getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap");
+        //getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap");
         if (_refPlayerIdToAvatarMap == nullptr && _avatarManager)
             _refPlayerIdToAvatarMap = _avatarManager->dyn__playerIdToAvatarMap();
 
-        getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap Done");
+        //getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap Done");
 
         if (_refPlayerIdToAvatarMap != nullptr) {
             MultiplayerLobbyAvatarController* value;
-            getLogger().debug("Start GetAvatarController return MultiplayerLobbyAvatarController");
+            //getLogger().debug("Start GetAvatarController return MultiplayerLobbyAvatarController");
             return _refPlayerIdToAvatarMap->TryGetValue(userId, ByRef(value)) ? value : nullptr;
         }
 
-        getLogger().debug("GetAvatarController return nullptr, this part should never be triggered");
+        //getLogger().debug("GetAvatarController return nullptr, this part should never be triggered");
 
         return nullptr;
     }
@@ -212,30 +217,35 @@ namespace MultiQuestensions {
     void CreateOrUpdateNameTag(IConnectedPlayer* player)
     {
         try {
-            getLogger().debug("Start CreateOrUpdateNameTag: GetAvatarCaptionObject");
+            //getLogger().debug("Start CreateOrUpdateNameTag: GetAvatarCaptionObject");
             //Il2CppString* userId;
-            if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
-                getLogger().debug("CreateOrUpdateNameTag ExtendedPlayer");
+            //if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
+            //    getLogger().debug("CreateOrUpdateNameTag ExtendedPlayer");
 
-            else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
-            else {
-                getLogger().debug("CreateOrUpdateNameTag unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+            //else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
+            //else {
+            //    getLogger().debug("CreateOrUpdateNameTag unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+            //    return;
+            //}
+            //getLogger().debug("CreateOrUpdateNameTag player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+
+            if (!(il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass) || il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))) {
+                getLogger().error("CreateOrUpdateNameTag unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
                 return;
             }
-            getLogger().debug("CreateOrUpdateNameTag player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
 
             auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId()/*userId*/);
             if (objAvatarCaption == nullptr)
                 return;
 
-            getLogger().debug("Found GetAvatarCaptionObject");
+            //getLogger().debug("Found GetAvatarCaptionObject");
             LobbyAvatarNameTag* nameTag;
             if (!objAvatarCaption->TryGetComponent<LobbyAvatarNameTag*>(ByRef(nameTag))) {
-                getLogger().debug("Adding new LobbyAvatarNameTag Component");
+                //getLogger().debug("Adding new LobbyAvatarNameTag Component");
                 nameTag = objAvatarCaption->AddComponent<LobbyAvatarNameTag*>();
             }
 
-            getLogger().debug("SetPlayerInfo");
+            //getLogger().debug("SetPlayerInfo");
             nameTag->SetPlayerInfo(player);
         }
         catch (const std::runtime_error& e) {

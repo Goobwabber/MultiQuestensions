@@ -92,7 +92,7 @@ namespace MultiQuestensions::Environments {
         _nameText->set_text(extendedPlayer->get_userName());
         _nameText->set_color(extendedPlayer->get_playerColor());
 
-        getLogger().debug("SetExtendedPlayerInfo platform: %d", (int)extendedPlayer->get_platform());
+        //getLogger().debug("SetExtendedPlayerInfo platform: %d", (int)extendedPlayer->get_platform());
 
         switch (extendedPlayer->get_platform())
         {
@@ -134,7 +134,7 @@ namespace MultiQuestensions::Environments {
         HMUI::ImageView* imageView;
         if (!_playerIcons.contains(slot))
         {
-            getLogger().debug("SetIcon, create new Icon");
+            //getLogger().debug("SetIcon, create new Icon");
             auto iconObj = GameObject::New_ctor(il2cpp_utils::newcsstr(string_format("MQEPlayerIcon(%d)", (int)slot)));
             iconObj->get_transform()->SetParent(_bg->get_transform(), false);
             iconObj->get_transform()->SetSiblingIndex((int)slot);
@@ -161,7 +161,7 @@ namespace MultiQuestensions::Environments {
 
     void LobbyAvatarNameTag::RemoveIcon(PlayerIconSlot slot)
     {
-        getLogger().debug("RemoveIcon");
+        //getLogger().debug("RemoveIcon");
 
         if (!_enabled)
             return;

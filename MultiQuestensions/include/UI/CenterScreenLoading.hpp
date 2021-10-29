@@ -13,6 +13,8 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::UI, CenterScreenLoading, UnityEngine::M
     DECLARE_INSTANCE_METHOD(void, ShowDownloadingProgress, float downloadingProgress);
     DECLARE_INSTANCE_METHOD(void, HideLoading);
     static CenterScreenLoading* instance;
+    int playersReady;
 public:
     static CenterScreenLoading* get_Instance() { return instance; }
+    static void UpdatePlayersReady(int playerReady);
 )

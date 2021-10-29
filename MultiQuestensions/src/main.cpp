@@ -48,7 +48,6 @@ Logger& getLogger() {
 }
 
 
-
 // Converts a levelId to a levelHash
 Il2CppString* LevelIdToHash(Il2CppString* levelId) {
     if (Il2CppString::IsNullOrWhiteSpace(levelId)) {
@@ -72,6 +71,11 @@ namespace MultiQuestensions {
     GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 
     std::string moddedState = "modded";
+
+    Il2CppString* getCustomLevelSongPackMaskStr() {
+        static Il2CppString* songPackMaskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
+        return songPackMaskStr;
+    }
 }
 
 //using PD_ValueCollection = System::Collections::Generic::Dictionary_2<Il2CppString*, ILobbyPlayerDataModel*>::ValueCollection;
@@ -214,15 +218,13 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
 }
 
 MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_CreateParty, &MultiplayerLobbyConnectionController::CreateParty, void, MultiplayerLobbyConnectionController* self, CreateServerFormData data) {
-    static auto maskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
-    data.songPacks = SongPackMask::get_all() | SongPackMask(maskStr);
+    data.songPacks = SongPackMask::get_all() | SongPackMask(getCustomLevelSongPackMaskStr());
     MultiplayerLobbyConnectionController_CreateParty(self, data);
 }
 
 MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_ConnectToMatchmaking, &MultiplayerLobbyConnectionController::ConnectToMatchmaking, void, MultiplayerLobbyConnectionController* self, BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask, bool allowSongSelection) {
     if (!gotSongPackOverrides) {
-        static auto maskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
-        songPackMask = songPackMask | SongPackMask(maskStr);
+        songPackMask = songPackMask | SongPackMask(getCustomLevelSongPackMaskStr());
     }
     MultiplayerLobbyConnectionController_ConnectToMatchmaking(self, beatmapDifficultyMask, songPackMask, allowSongSelection);
 }
@@ -234,7 +236,7 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigat
     SelectLevelCategoryViewController::LevelCategory startLevelCategory, IPreviewBeatmapLevel* beatmapLevelToBeSelectedAfterPresent, bool enableCustomLevels) {
     getLogger().info("LevelSelectionNavigationController_Setup setting custom songs . . .");
     LevelSelectionNavigationController_Setup(self, songPackMask, allowedBeatmapDifficultyMask, notAllowedCharacteristics, hidePacksIfOneOrNone, hidePracticeButton, showPlayerStatsInDetailView,
-        actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, songPackMask.Contains(il2cpp_utils::newcsstr("custom_levelpack_CustomLevels")));
+        actionButtonText, levelPackToBeSelectedAfterPresent, startLevelCategory, beatmapLevelToBeSelectedAfterPresent, songPackMask.Contains(getCustomLevelSongPackMaskStr()));
 }
 
 static bool isMissingLevel = false;
@@ -389,10 +391,16 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
     bool entitlementStatusOK = true;
     std::string LevelID = to_utf8(csstrtostr(self->startedBeatmapId->get_levelID()));
     // Checks each player, to see if they're in the lobby, and if they are, checks their entitlement status.
+    int playersReady = 0;
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
         std::string UserID =  to_utf8(csstrtostr(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
-        if (self->dyn__lobbyPlayersDataModel()->GetPlayerIsInLobby(sessionManager->connectedPlayers->get_Item(i)->get_userId()) && entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
+        if (self->dyn__lobbyPlayersDataModel()->GetPlayerIsInLobby(sessionManager->connectedPlayers->get_Item(i)->get_userId())) {
+            if (entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
+            else playersReady++;
+        }
     }
+    getLogger().debug("[HandleMultiplayerLevelLoaderCountdownFinished] Players ready: '%d'", playersReady);
+    UI::CenterScreenLoading::UpdatePlayersReady(playersReady);
     if (entitlementStatusOK) {
         if (cslInstance) cslInstance->HideLoading();
         lobbyGameStateController = nullptr;
@@ -404,6 +412,7 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
 
         // call original method
         LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
+        entitlementDictionary.clear();
     }
 }
 

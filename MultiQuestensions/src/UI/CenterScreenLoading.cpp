@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "GlobalFields.hpp"
 #include "UI/CenterScreenLoading.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -43,10 +44,11 @@ namespace MultiQuestensions::UI{
     }
 
     void CenterScreenLoading::ShowLoading() {
-        getLogger().debug("CenterScreenLoading::ShowLoading");
+        getLogger().debug("CenterScreenLoading::ShowLoading, players ready (%d of %d)", 
+            playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1);
         if (loadingControl) {
-            static Il2CppString* string = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Loading...");
-            loadingControl->ShowLoading(string);
+            loadingControl->ShowLoading(il2cpp_utils::newcsstr(string_format("%d of %d players ready...",
+                playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1)));
         }
     }
 
@@ -64,4 +66,14 @@ namespace MultiQuestensions::UI{
             loadingControl->Hide();
         }
     }
+
+    void CenterScreenLoading::UpdatePlayersReady(int playerReady) {
+        if (instance) {
+            instance->playersReady = playerReady;
+            //instance->dyn__loadingText()->SetText(il2cpp_utils::newcsstr());
+            if (instance->loadingControl)
+                instance->ShowLoading();
+        }
+    }
+
 }
