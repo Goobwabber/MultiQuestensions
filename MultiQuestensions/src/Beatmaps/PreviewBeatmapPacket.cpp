@@ -36,18 +36,18 @@ namespace MultiQuestensions::Beatmaps {
 		getLogger().debug("PreviewBeatmapPacket::Deserialize");
 
 		levelId = reader->GetString();
-		getLogger().debug("levelID: %s", to_utf8(csstrtostr(levelId)).c_str());
+		//getLogger().debug("levelID: %s", to_utf8(csstrtostr(levelId)).c_str());
 		levelHash = reader->GetString();
-		getLogger().debug("levelHash: %s", to_utf8(csstrtostr(levelHash)).c_str());
+		//getLogger().debug("levelHash: %s", to_utf8(csstrtostr(levelHash)).c_str());
 		songName = reader->GetString();
 		songSubName = reader->GetString();
 		songAuthorName = reader->GetString();
 		levelAuthorName = reader->GetString();
-		getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
-			to_utf8(csstrtostr(songName)).c_str(),
-			to_utf8(csstrtostr(songSubName)).c_str(),
-			to_utf8(csstrtostr(songAuthorName)).c_str(),
-			to_utf8(csstrtostr(levelAuthorName)).c_str());
+		//getLogger().debug("songName: %s\n songSubName: %s\n songAuthorName: %s\n levelAuthorName: %s",
+		//	to_utf8(csstrtostr(songName)).c_str(),
+		//	to_utf8(csstrtostr(songSubName)).c_str(),
+		//	to_utf8(csstrtostr(songAuthorName)).c_str(),
+		//	to_utf8(csstrtostr(levelAuthorName)).c_str());
 		beatsPerMinute = reader->GetFloat();
 		songDuration = reader->GetFloat();
 

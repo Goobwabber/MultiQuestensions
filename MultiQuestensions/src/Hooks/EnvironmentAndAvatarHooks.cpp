@@ -19,6 +19,7 @@
 #include "GlobalNamespace/MultiplayerLobbyAvatarManager.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "GlobalNamespace/ConnectedPlayerManager_ConnectedPlayer.hpp"
+#include "GlobalNamespace/AvatarPoseRestrictions.hpp"
 
 #include "System/Collections/Generic/List_1.hpp"
 
@@ -266,11 +267,19 @@ namespace MultiQuestensions {
         HandleLobbyAvatarCreated(connectedPlayer);
     }
 
+    MAKE_HOOK_MATCH(AvatarPoseRestrictions_HandleAvatarPoseControllerPositionsWillBeSet, &AvatarPoseRestrictions::HandleAvatarPoseControllerPositionsWillBeSet, void, AvatarPoseRestrictions* self, Quaternion headRotation, Vector3 headPosition, Vector3 leftHandPosition, Vector3 rightHandPosition, ByRef<Vector3> newHeadPosition, ByRef<Vector3> newLeftHandPosition, ByRef<Vector3> newRightHandPosition) {
+        newHeadPosition.heldRef = headPosition;
+        newLeftHandPosition.heldRef = self->LimitHandPositionRelativeToHead(leftHandPosition, headPosition);
+        newRightHandPosition.heldRef = self->LimitHandPositionRelativeToHead(rightHandPosition, headPosition);
+        //AvatarPoseRestrictions_HandleAvatarPoseControllerPositionsWillBeSet(self, headRotation, headPosition, leftHandPosition, rightHandPosition, newHeadPosition, newLeftHandPosition, newRightHandPosition);
+    }
+
 #pragma endregion
 
     void Hooks::EnvironmentHooks() {
         INSTALL_HOOK(getLogger(), MultiplayerLobbyController_ActivateMultiplayerLobby);
         INSTALL_HOOK(getLogger(), LightWithIdMonoBehaviour_RegisterLight);
         INSTALL_HOOK(getLogger(), MultiplayerLobbyAvatarManager_AddPlayer);
+        INSTALL_HOOK_ORIG(getLogger(), AvatarPoseRestrictions_HandleAvatarPoseControllerPositionsWillBeSet);
     }
 }
