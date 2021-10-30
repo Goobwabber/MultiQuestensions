@@ -3,7 +3,7 @@ name: NDK Build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, rewrite, 1.17.1-Update ]
+    branches: [ main, rewrite ]
     paths:
       - 'MultiQuestensions/**'
       - '.github/workflows/ndk-build.yml'
@@ -43,7 +43,7 @@ env:
      version: 0.1.0-Dev-${{ github.run_number }}
      bs_hook: 2_3_0
      BS_Version: 1.17.1
-     ndkname: android-ndk-r23
+     #ndkname: android-ndk-r23
 
 jobs:
   build:
@@ -53,36 +53,36 @@ jobs:
     - uses: actions/checkout@v2
       name: Checkout
         
-    - name: Install Powershell
-      run: sudo apt-get install -y powershell
+    #- name: Install Powershell
+    #  run: sudo apt-get install -y powershell
       
-    - name: Cache Android NDK
-      id: cache-ndk
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ndk
-      with:
-        path: ndk
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-        restore-keys: |
-          ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+    #- name: Cache Android NDK
+    #  id: cache-ndk
+    #  uses: actions/cache@v2
+    #  env:
+    #    cache-name: cache-ndk
+    #  with:
+    #    path: ndk
+    #    key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+    #    restore-keys: |
+    #      ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
     
-    - name: Install Android NDK
-      if: steps.cache-ndk.outputs.cache-hit != 'true'
-      run: |
-        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux.zip
-        unzip -q ndk.zip
-        mv ${ndkname} ndk
+    #- name: Install Android NDK
+    #  if: steps.cache-ndk.outputs.cache-hit != 'true'
+    #  run: |
+    #    wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux.zip
+    #    unzip -q ndk.zip
+    #    mv ${ndkname} ndk
       
-    - name: Create ndkpath.txt
-      run: |
-        cd ndk
-        pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
-
     #- name: Create ndkpath.txt
     #  run: |
-    #    echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
-    #    cat ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+    #    cd ndk
+    #    pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+
+    - name: Create ndkpath.txt
+      run: |
+        echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+        cat ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
         
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
@@ -111,20 +111,6 @@ jobs:
         chmod +x ./QPM/QPM
         cd ./MultiQuestensions
         ../QPM/QPM restore
-        
-    #- name: Get SongDownloader
-    #  shell: bash
-    #  env:
-    #    URL: ${{ secrets.SONGDOWNLOADER }}
-    #  run: |
-    #    cd ${GITHUB_WORKSPACE}/MultiQuestensions/extern
-    #    wget -q -O songdownloader.zip "$URL"
-    #    unzip -q songdownloader.zip
-    #    echo 
-    #    echo Listing Folder
-    #    echo 
-    #    ls
-
 
     - name: Check dependency Folders
       run: |
@@ -149,17 +135,17 @@ jobs:
     - name: Upload debug Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: debug_libmultiquestensions.so
-        path: ./MultiQuestensions/obj/local/arm64-v8a/libmultiquestensions.so
+        name: debug_lib${{ env.module_id }}.so
+        path: ./MultiQuestensions/obj/local/arm64-v8a/lib${{ env.module_id }}.so
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libmultiquestensions.so
-        path: ./MultiQuestensions/libs/arm64-v8a/libmultiquestensions.so
+        name: lib${{ env.module_id }}.so
+        path: ./MultiQuestensions/libs/arm64-v8a/lib${{ env.module_id }}.so
 
-    #- name: Upload QMOD build
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: multiquestensions.qmod
-    #    path: ./MultiQuestensions/multiquestensions.qmod
+    - name: Upload QMOD build
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.module_id }}_v${{ env.version }}.qmod
+        path: ./MultiQuestensions/${{ env.module_id }}_v${{ env.version }}.qmod

@@ -12,6 +12,10 @@
 #include "GlobalNamespace/UserInfo.hpp"
 
 #include "CodegenExtensions/ColorUtility.hpp"
+
+#include "questui/shared/BeatSaberUI.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "songdownloader/shared/BeatSaverAPI.hpp"
 using namespace MultiQuestensions;
 using namespace GlobalNamespace;
 
@@ -25,13 +29,48 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
             Il2CppString* nullString = nullptr;
             IPreviewBeatmapLevel* nullLvl = nullptr;
             preview = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(nullString, nullLvl, packet));
+			getLogger().info("Try getting CoverImage from BeatSaver");
+			std::string levelid = to_utf8(csstrtostr(preview->get_levelID()));
+			BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelid),
+                [preview, player, packet](std::optional<BeatSaver::Beatmap> beatmap) {
+                    if (beatmap.has_value()) {
+                        BeatSaver::API::GetCoverImageAsync(*beatmap, [preview, player, packet](std::vector<uint8_t> bytes) {
+                            QuestUI::MainThreadScheduler::Schedule([packet, player, preview, bytes] {
+                                if (packet && player && preview && lobbyPlayersDataModel) {
+                                    preview->coverImage = QuestUI::BeatSaberUI::VectorToSprite(bytes);
+                                    BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+                                    lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
+                                }
+                                else {
+                                    getLogger().error("Error nullptr: packet='%p', player='%p', preview='%p', lobbyPlayersDataModel='%p'", packet, player, preview, lobbyPlayersDataModel);
+                                }
+                                }
+                            );
+                            }
+                        );
+                    }
+                    else {
+                        QuestUI::MainThreadScheduler::Schedule([packet, player, preview] {
+                            if (packet && player && preview) {
+                                BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+                                lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
+                            }
+                            else {
+                                getLogger().error("Error nullptr: packet='%p', player='%p', preview='%p', lobbyPlayersDataModel='%p'", packet, player, preview, lobbyPlayersDataModel);
+                            }
+                            }
+                        );
+                    }
+                }
+                );
+            return;
         }
         else {
             MultiQuestensions::Beatmaps::PreviewBeatmapPacket* nullpacket = nullptr;
             preview = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview, nullpacket));
         }
         BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
-        getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
+        //getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
         lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
     }
     catch (const std::runtime_error& e) {
