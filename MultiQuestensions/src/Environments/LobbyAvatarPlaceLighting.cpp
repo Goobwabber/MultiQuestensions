@@ -8,7 +8,9 @@ DEFINE_TYPE(MultiQuestensions::Environments, LobbyAvatarPlaceLighting);
 
 namespace MultiQuestensions::Environments {
 
-    void LobbyAvatarPlaceLighting::New() {}
+    void LobbyAvatarPlaceLighting::New() {
+        smoothTime = 2.0f;
+    }
 
     void LobbyAvatarPlaceLighting::OnEnable() {
         auto lightsArr = this->GetComponentsInChildren<TubeBloomPrePassLight*>();
@@ -21,6 +23,12 @@ namespace MultiQuestensions::Environments {
         lights.clear();
     }
 
+    inline static Color Lerp(Color const& a, Color const& b, float const& t)
+    {
+        float t_clamp = std::clamp(t, 0.0f, 1.0f);
+        return Color(a.r + (b.r - a.r) * t_clamp, a.g + (b.g - a.g) * t_clamp, a.b + (b.b - a.b) * t_clamp, a.a + (b.a - a.a) * t_clamp);
+    }
+
     void LobbyAvatarPlaceLighting::Update() {
         Color current = GetColor();
 
@@ -29,20 +37,15 @@ namespace MultiQuestensions::Environments {
 
         SetColor(targetColor);
 
-        // TODO: Figure out why the below causes color to be infinitely set to 0
-        //if (IsColorVeryCloseToColor(current, targetColor))
-        //    SetColor(targetColor);
-        //else
-        //    SetColor(Color::Lerp(current, targetColor, Time::get_deltaTime() * smoothTime));
+        if (IsColorVeryCloseToColor(current, targetColor))
+            SetColor(targetColor);
+        else
+            //SetColor(Color::Lerp(current, targetColor, Time::get_deltaTime() * smoothTime));
+            SetColor(Lerp(current, targetColor, Time::get_deltaTime() * smoothTime));
     }
 
     void LobbyAvatarPlaceLighting::SetColor(const Color& color, bool immediate) {
-        //getLogger().debug("SetColor 2 args, R: %f G: %f B: %f", color.r, color.g, color.b);
         targetColor = color;
-        //getLogger().debug("SetColor 2 new targetColor, R: %f G: %f B: %f", targetColor.r, targetColor.g, targetColor.b);
-
-        //Color lerpColor = Color::Lerp(GetColor(), targetColor, Time::get_deltaTime() * smoothTime);
-        //getLogger().debug("SetColor lerp, R: %f G: %f B: %f", lerpColor.r, lerpColor.g, lerpColor.b);
 
         if (immediate)
         {
@@ -62,7 +65,6 @@ namespace MultiQuestensions::Environments {
     }
 
     void LobbyAvatarPlaceLighting::SetColor(const Color& color) {
-        //getLogger().debug("SetColor, R: %f G: %f B: %f", color.r, color.g, color.b);
         for (TubeBloomPrePassLight* light : lights) {
             light->set_color(color);
             light->Refresh();

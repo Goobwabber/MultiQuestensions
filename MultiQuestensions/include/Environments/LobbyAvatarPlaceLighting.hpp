@@ -6,7 +6,7 @@
 
 DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, LobbyAvatarPlaceLighting, UnityEngine::MonoBehaviour, 
     std::vector<GlobalNamespace::TubeBloomPrePassLight*> lights;
-    float smoothTime = 2.0f;
+    DECLARE_INSTANCE_FIELD(float, smoothTime);
     DECLARE_INSTANCE_FIELD_DEFAULT(UnityEngine::Color, targetColor, UnityEngine::Color::get_black());
     DECLARE_INSTANCE_FIELD_DEFAULT(UnityEngine::Color, TargetColor, targetColor);
 
