@@ -17,10 +17,13 @@ DEFINE_TYPE(MultiQuestensions::UI, CenterScreenLoading);
 namespace MultiQuestensions::UI{
 
     CenterScreenLoading* CenterScreenLoading::instance;
+    int CenterScreenLoading::playersReady;
 
     void CenterScreenLoading::Awake() {
         getLogger().debug("CenterScreenLoading::Awake");
         instance = this;
+        screenController = get_gameObject()->GetComponentInParent<CenterStageScreenController*>();
+        gameStateController = lobbyGameStateController;
 
         UnityEngine::UI::VerticalLayoutGroup* vertical = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
         vertical->get_rectTransform()->set_sizeDelta({ 60, 60 });
@@ -38,41 +41,57 @@ namespace MultiQuestensions::UI{
 
     void CenterScreenLoading::OnDisable() {
         getLogger().debug("CenterScreenLoading::OnDisable");
+        isDownloading = false;
         if (loadingControl) {
             loadingControl->Hide();
         }
+        playersReady = 0;
     }
 
     void CenterScreenLoading::ShowLoading() {
-        getLogger().debug("CenterScreenLoading::ShowLoading, players ready (%d of %d)", 
-            playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1);
+        int maxPlayers = sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1;
+        int readyPlayers = std::min(playersReady + 1, maxPlayers);
+        getLogger().info("CenterScreenLoading::ShowLoading, players ready (%d of %d)", 
+            readyPlayers, maxPlayers);
         if (loadingControl) {
             loadingControl->ShowLoading(il2cpp_utils::newcsstr(string_format("%d of %d players ready...",
-                playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1)));
+                readyPlayers, maxPlayers)));
         }
     }
 
     void CenterScreenLoading::ShowDownloadingProgress(float downloadingProgress) {
         //getLogger().debug("CenterScreenLoading::ShowDownloadingProgress: %f2", downloadingProgress);
+        isDownloading = (downloadingProgress < 100.0f);
         if (loadingControl) {
-            static Il2CppString* string = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Downloading...");
-            loadingControl->ShowDownloadingProgress(string, downloadingProgress);
+            //static Il2CppString* string = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Downloading...");
+            loadingControl->ShowDownloadingProgress(il2cpp_utils::newcsstr(string_format("Downloading (%.2f%%)...", downloadingProgress)), downloadingProgress / 100);
         }
     }
 
     void CenterScreenLoading::HideLoading() {
         getLogger().debug("CenterScreenLoading::HideLoading");
-        if (loadingControl) {
-            loadingControl->Hide();
+        if (get_Instance() && get_Instance()->loadingControl) {
+            get_Instance()->loadingControl->Hide();
         }
     }
 
-    void CenterScreenLoading::UpdatePlayersReady(int playerReady) {
-        if (instance) {
-            instance->playersReady = playerReady;
-            //instance->dyn__loadingText()->SetText(il2cpp_utils::newcsstr());
-            if (instance->loadingControl)
-                instance->ShowLoading();
+
+    void CenterScreenLoading::FixedUpdate() {
+        if (isDownloading)
+        {
+            return;
+        }
+        else if (screenController->get_countdownShown() && gameStateController && sessionManager->get_syncTime() >= gameStateController->get_startTime() && gameStateController->get_levelStartInitiated())
+        {
+            if (loadingControl)
+                loadingControl->ShowLoading(il2cpp_utils::newcsstr(string_format("%d of %d players ready...",
+                    playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1)));
+        }
+        else
+        {
+            if (loadingControl)
+                loadingControl->Hide();
+            playersReady = 0;
         }
     }
 

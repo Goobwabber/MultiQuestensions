@@ -34,7 +34,7 @@ namespace MultiQuestensions {
             MultiplayerResultsPyramidPatch(self, (IReadOnlyList_1<MultiplayerPlayerResultsData*>*)newResultsData, badgeStartTransform, badgeMidTransform);
         }
         catch (const std::runtime_error& e) {
-            getLogger().critical("Hook MultiplayerResultsPyramidPatch File " __FILE__ " at Line %d: %s", __LINE__, e.what());
+            getLogger().critical("REPORT TO ENDER: Hook MultiplayerResultsPyramidPatch File " __FILE__ " at Line %d: %s", __LINE__, e.what());
             MultiplayerResultsPyramidPatch(self, resultsData, badgeStartTransform, badgeMidTransform);
         }
     }
@@ -57,7 +57,14 @@ namespace MultiQuestensions {
 
                     // Mute duplicated animations except one (otherwise audio is very loud)
                     TimelineAsset* animationTimeline = reinterpret_cast<TimelineAsset*>(self->introPlayableDirector->get_playableAsset());
-                    List<TrackAsset*>* outputTracks = Enumerable::ToList<TrackAsset*>(animationTimeline->GetOutputTracks());
+                    
+                    static auto* Enumerable_ToList_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "ToList", 1));
+                    static auto* Enumerable_ToList = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_ToList_Generic, { classof(TrackAsset*) }));
+
+                    //List<TrackAsset*>* outputTracks = Enumerable::ToList<TrackAsset*>(animationTimeline->GetOutputTracks());
+                    List<TrackAsset*>* outputTracks = il2cpp_utils::RunMethodThrow<List_1<TrackAsset*>*, false>(static_cast<Il2CppClass*>(nullptr),
+                        Enumerable_ToList, animationTimeline->GetOutputTracks());
+
                     for (int i = 0; i < outputTracks->get_Count(); i++) {
                         TrackAsset* currentTrack = outputTracks->get_Item(i);
                         bool isAudio = il2cpp_utils::AssignableFrom<AudioTrack*>(reinterpret_cast<Il2CppObject*>(currentTrack)->klass);
@@ -75,7 +82,7 @@ namespace MultiQuestensions {
             self->introPlayableDirector = realDirector;
         }
         catch (const std::runtime_error& e) {
-            getLogger().critical("Hook IntroAnimationPatch" __FILE__ " at Line %d: %s", __LINE__, e.what());
+            getLogger().critical("REPORT TO ENDER: Hook IntroAnimationPatch" __FILE__ " at Line %d: %s", __LINE__, e.what());
             IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
         }
     }
@@ -89,13 +96,11 @@ namespace MultiQuestensions {
     MAKE_HOOK_MATCH(MultiplayerIntroAnimationController_BindTimeline, &MultiplayerIntroAnimationController::BindTimeline, void, MultiplayerIntroAnimationController* self) {
         cpispt = BindTimeline;
         MultiplayerIntroAnimationController_BindTimeline(self);
-        cpispt = None;
     }
 
     MAKE_HOOK_MATCH(MultiplayerOutroAnimationController_BindOutroTimeline, &MultiplayerOutroAnimationController::BindOutroTimeline, void, MultiplayerOutroAnimationController* self) {
         cpispt = BindOutroTimeline;
         MultiplayerOutroAnimationController_BindOutroTimeline(self);
-        cpispt = None;
     }
 
     MAKE_HOOK_MATCH(MultiplayerPlayersManager_get_allActiveAtGameStartPlayers, &MultiplayerPlayersManager::get_allActiveAtGameStartPlayers, IReadOnlyList_1<GlobalNamespace::IConnectedPlayer*>*, MultiplayerPlayersManager* self) {
@@ -110,6 +115,7 @@ namespace MultiQuestensions {
         static auto* Enumerable_Take = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_Take_Generic, { classof(IConnectedPlayer*) }));
 
         if (cpispt == BindTimeline) {
+            cpispt = None;
             try {
                 List_1<IConnectedPlayer*>* listActivePlayers = il2cpp_utils::RunMethodThrow<List_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr),
                     Enumerable_ToList, reinterpret_cast<IEnumerable_1<IConnectedPlayer*>*>(self->dyn__allActiveAtGameStartPlayers()));
@@ -151,18 +157,19 @@ namespace MultiQuestensions {
                 return reinterpret_cast<IReadOnlyList_1<IConnectedPlayer*>*>(selectedActivePlayers);
             }
             catch (const std::runtime_error& e) {
-                getLogger().critical("Hook MultiplayerPlayersManager_get_allActiveAtGameStartPlayers" __FILE__ " at Line %d: %s", __LINE__, e.what());
+                getLogger().critical("REPORT TO ENDER: Hook MultiplayerPlayersManager_get_allActiveAtGameStartPlayers" __FILE__ " at Line %d: %s", __LINE__, e.what());
             }
         }
         else if (cpispt == BindOutroTimeline) {
+            cpispt = None;
 
             auto* result = il2cpp_utils::RunMethodThrow<IEnumerable_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr),
                 Enumerable_Take, reinterpret_cast<List_1<IConnectedPlayer*>*>(self->dyn__allActiveAtGameStartPlayers()), 4);
-
+            
             return reinterpret_cast<IReadOnlyList_1<IConnectedPlayer*>*>(il2cpp_utils::RunMethodThrow<List_1<IConnectedPlayer*>*, false>(static_cast<Il2CppClass*>(nullptr),
                 Enumerable_ToList, result));
         }
-
+        cpispt = None;
         return self->dyn__allActiveAtGameStartPlayers();
     }
 

@@ -62,7 +62,7 @@ namespace MultiQuestensions::Environments {
     }
 
     void LobbyAvatarPlaceLighting::SetColor(const Color& color) {
-        getLogger().debug("SetColor, R: %f G: %f B: %f", color.r, color.g, color.b);
+        //getLogger().debug("SetColor, R: %f G: %f B: %f", color.r, color.g, color.b);
         for (TubeBloomPrePassLight* light : lights) {
             light->set_color(color);
             light->Refresh();

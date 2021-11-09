@@ -44,10 +44,10 @@ namespace MultiQuestensions {
 			}
 			catch (const std::exception& e) {
 				getLogger().warning("An C++ exception was thrown while processing custom packet");
-				getLogger().error("%s", e.what());
+				getLogger().error("REPORT TO ENDER: %s", e.what());
 			}
 			catch (...) {
-				getLogger().warning("An Unknown exception was thrown while processing custom packet");
+				getLogger().warning("REPORT TO ENDER: An Unknown exception was thrown while processing custom packet");
 			}
 		}
 		int processedBytes = reader->get_Position() - prevPosition;

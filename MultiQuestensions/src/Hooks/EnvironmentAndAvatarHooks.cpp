@@ -250,7 +250,7 @@ namespace MultiQuestensions {
             nameTag->SetPlayerInfo(player);
         }
         catch (const std::runtime_error& e) {
-            getLogger().error("CreateOrUpdateNameTag Failed: %s", e.what());
+            getLogger().error("REPORT TO ENDER: CreateOrUpdateNameTag Failed: %s", e.what());
         }
     }
 

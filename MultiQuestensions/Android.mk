@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MPEX_PROTOCOL ?= 0.6.1
+MPEX_PROTOCOL ?= 1.0.0
 LOCAL_PATH := $(call my-dir)
 TARGET_ARCH_ABI := $(APP_ABI)
 

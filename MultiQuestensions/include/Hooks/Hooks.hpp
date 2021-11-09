@@ -57,7 +57,7 @@ namespace MultiQuestensions {
         return levelId.starts_with(RuntimeSongLoader::API::GetCustomLevelsPrefix());
     }
 
-    extern bool HasSong(std::string levelId);
+    extern bool HasSong(const std::string& levelId);
 
 
     extern GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
@@ -76,6 +76,7 @@ namespace MultiQuestensions {
         static void EnvironmentHooks();
         static void QuickplayHooks();
         static void SessionManagerAndExtendedPlayerHooks();
+        static void InstallerHooks();
 
     public:
         static const void Install_Hooks() {
@@ -84,6 +85,7 @@ namespace MultiQuestensions {
             EnvironmentHooks();
             QuickplayHooks();
             SessionManagerAndExtendedPlayerHooks();
+            InstallerHooks();
         }
     };
 }

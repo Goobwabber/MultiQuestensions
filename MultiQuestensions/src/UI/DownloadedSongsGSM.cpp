@@ -12,10 +12,13 @@
 #include "HMUI/ModalView.hpp"
 #include "System/Threading/Tasks/Task.hpp"
 #include "System/Action_1.hpp"
+
+#include "GlobalFields.hpp"
 using namespace GlobalNamespace;
 using namespace QuestUI;
 using namespace RuntimeSongLoader::API;
 using namespace HMUI;
+using namespace MultiQuestensions;
 
 
 DEFINE_TYPE(MultiQuestensions::UI, DownloadedSongsGSM);
@@ -26,8 +29,8 @@ namespace MultiQuestensions::UI {
 
     void DownloadedSongsGSM::CreateCell(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask, CustomPreviewBeatmapLevel* level) {
         getLogger().debug("CreateCell");
-        UnityEngine::Sprite* cover = coverTask->get_ResultOnSuccess();
-        if (cover) {
+        UnityEngine::Sprite* cover = coverTask->get_Result();
+        if (cover && level) {
             // "<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>]"
             list->data.emplace_back(CustomListTableData::CustomCellInfo{
                 to_utf8(csstrtostr(level->get_songName())),
@@ -35,32 +38,40 @@ namespace MultiQuestensions::UI {
                 cover
                 });
         }
-        else {
+        else if (level) {
             list->data.emplace_back(CustomListTableData::CustomCellInfo{
             to_utf8(csstrtostr(level->get_songName())),
             to_utf8(csstrtostr(level->get_songAuthorName())) + " [" + to_utf8(csstrtostr(level->get_levelAuthorName())) + "]",
             level->get_defaultCoverImage()
                 });
-        }
-        list->tableView->RefreshCellsContent();
+        } else getLogger().error("Nullptr in UI: cover '%p', level '%p'", cover, level);
+        if (list && list->tableView)
+            list->tableView->RefreshCellsContent();
+        else getLogger().error("Nullptr in UI: list '%p', list->tableView '%p'", list, list->tableView);
         getLogger().debug("CreateCell Finished");
     }
 
     // TODO: Add index check, check if index is out of bounds
     void DownloadedSongsGSM::Delete() {
-        needSongRefresh = false;
-        auto level = GetLevelByHash(DownloadedSongIds.at(selectedIdx));
-        if (level.has_value()) {
-            std::string songPath = to_utf8(csstrtostr(level.value()->customLevelPath));
-            getLogger().info("Deleting Song: %s", songPath.c_str());
-            DeleteSong(songPath, [&] {
-                if (needSongRefresh) {
-                    RefreshSongs(false);
-                }
-                });
+        try {
+            needSongRefresh = false;
+            auto level = GetLevelByHash(DownloadedSongIds.at(selectedIdx));
+            if (level.has_value()) {
+                std::string songPath = to_utf8(csstrtostr(level.value()->customLevelPath));
+                getLogger().info("Deleting Song: %s", songPath.c_str());
+                DeleteSong(songPath, [&] {
+                    if (needSongRefresh) {
+                        RefreshSongs(false);
+                    }
+                    });
+                if (lobbyGameStateController) lobbyGameStateController->menuRpcManager->SetIsEntitledToLevel(level.value()->get_levelID(), EntitlementsStatus::NotOwned);
+            }
+            needSongRefresh = true;
+            DownloadedSongIds.erase(DownloadedSongIds.begin() + selectedIdx);
         }
-        needSongRefresh = true;
-        DownloadedSongIds.erase(DownloadedSongIds.begin() + selectedIdx);
+        catch (const std::exception& e) {
+            getLogger().critical("REPORT TO ENDER: Exception encountered trying to delete song: %s", e.what());
+        }
         list->tableView->ClearSelection();
         list->data.erase(list->data.begin() + selectedIdx);
         Refresh();
@@ -111,10 +122,10 @@ namespace MultiQuestensions::UI {
         std::optional<CustomPreviewBeatmapLevel*> levelOpt = GetLevelByHash(hash);
         if (levelOpt.has_value()) {
             getLogger().info("Song with Hash '%s' added to list", hash.c_str());
-            CustomPreviewBeatmapLevel* level = levelOpt.value();
-            System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask = level->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
-            auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void()>)[coverTask, this, level] {
-                CreateCell(coverTask, level/*, list->NumberOfCells() + 1*/);
+            lastDownloaded = levelOpt.value();
+            System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask = lastDownloaded->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
+            auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void()>)[coverTask, this] {
+                CreateCell(coverTask, lastDownloaded/*, list->NumberOfCells() + 1*/);
                 }
             );
             reinterpret_cast<System::Threading::Tasks::Task*>(coverTask)->ContinueWith(action);

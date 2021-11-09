@@ -15,6 +15,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::UI, DownloadedSongsGSM, UnityEngine::Mo
     static DownloadedSongsGSM* instance;
     DECLARE_INSTANCE_FIELD(HMUI::ModalView*, modal);
     DECLARE_INSTANCE_FIELD(QuestUI::CustomListTableData*, list);
+    DECLARE_INSTANCE_FIELD(GlobalNamespace::CustomPreviewBeatmapLevel*, lastDownloaded);
 
     DECLARE_INSTANCE_METHOD(void, DidActivate, bool firstActivation);
     DECLARE_INSTANCE_METHOD(void, OnEnable);

@@ -15,6 +15,7 @@
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
 #include "questui/shared/QuestUI.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
 
 
 //#include "GlobalNamespace/LobbySetupViewController.hpp"
@@ -29,7 +30,7 @@ using namespace MultiQuestensions;
 #endif
 #ifndef MPEX_PROTOCOL
 #warning No MPEX_PROTOCOL set
-#define MPEX_PROTOCOL "0.6.1"
+#define MPEX_PROTOCOL "1.0.0"
 #endif
 
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -101,7 +102,7 @@ MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString
             else getLogger().debug("beatmapLevel is null");
         }
     }
-    getLogger().debug("GetExistingPreview return nullptr " __FILE__ " Line: %d", __LINE__);
+    getLogger().debug("GetExistingPreview return nullptr");
     return nullptr;
 }
 
@@ -145,7 +146,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
                     return;
                 }
                 catch (const std::runtime_error& e) {
-                    getLogger().error("An Exception occured during class creation: %s", e.what());
+                    getLogger().critical("REPORT TO ENDER: An Exception occured during class creation: %s", e.what());
                 }
             }
         }
@@ -210,11 +211,13 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
             DeleteSong(songPath, [&] {
                 RefreshSongs(false);
                 DownloadedSongIds.pop_back();
-                });
+            });
+            if (lobbyGameStateController) lobbyGameStateController->menuRpcManager->SetIsEntitledToLevel(levelOpt.value()->get_levelID(), EntitlementsStatus::NotOwned);
         }
     }
-    if (firstActivation)
+    if (firstActivation) {
         MultiQuestensions::UI::LobbySetupPanel::AddSetupPanel(self->get_rectTransform(), sessionManager);
+    }
 }
 
 MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_CreateParty, &MultiplayerLobbyConnectionController::CreateParty, void, MultiplayerLobbyConnectionController* self, CreateServerFormData data) {
@@ -222,12 +225,12 @@ MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_CreateParty, &MultiplayerLo
     MultiplayerLobbyConnectionController_CreateParty(self, data);
 }
 
-MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_ConnectToMatchmaking, &MultiplayerLobbyConnectionController::ConnectToMatchmaking, void, MultiplayerLobbyConnectionController* self, BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask, bool allowSongSelection) {
-    if (!gotSongPackOverrides) {
-        songPackMask = songPackMask | SongPackMask(getCustomLevelSongPackMaskStr());
-    }
-    MultiplayerLobbyConnectionController_ConnectToMatchmaking(self, beatmapDifficultyMask, songPackMask, allowSongSelection);
-}
+//MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_ConnectToMatchmaking, &MultiplayerLobbyConnectionController::ConnectToMatchmaking, void, MultiplayerLobbyConnectionController* self, BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask, bool allowSongSelection) {
+//    if (!gotSongPackOverrides) {
+//        songPackMask = songPackMask | SongPackMask(getCustomLevelSongPackMaskStr());
+//    }
+//    MultiplayerLobbyConnectionController_ConnectToMatchmaking(self, beatmapDifficultyMask, songPackMask, allowSongSelection);
+//}
 
 // Show the custom levels tab in multiplayer
 MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigationController::Setup, void, LevelSelectionNavigationController* self,
@@ -270,13 +273,8 @@ MAKE_HOOK_MATCH(LobbySetupViewController_SetStartGameEnabled, &LobbySetupViewCon
 }
 
 namespace MultiQuestensions {
-    bool HasSong(std::string levelId) {
-        for (auto& song : RuntimeSongLoader::API::GetLoadedSongs()) {
-            if (to_utf8(csstrtostr(song->levelID)) == levelId) {
-                return true;
-            }
-        }
-        return false;
+    bool HasSong(const std::string& levelId) {
+        return static_cast<bool>(RuntimeSongLoader::API::GetLevelById(levelId));
     }
 }
 
@@ -288,7 +286,6 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
     MultiQuestensions::UI::CenterScreenLoading* cslInstance = MultiQuestensions::UI::CenterScreenLoading::get_Instance();
     if (IsCustomLevel(levelId)) {
         if (HasSong(levelId)) {
-            cslInstance->ShowLoading();
             getLogger().debug("MultiplayerLevelLoader_LoadLevel, HasSong, calling original");
             MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
             return;
@@ -306,7 +303,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                 if (error) {
                                     getLogger().info("Failed downloading map retrying: %s", beatmapName.c_str());
                                     BeatSaver::API::DownloadBeatmapAsync(beatmap,
-                                        [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName, hash, cslInstance](bool error) {
+                                        [self, beatmapId, gameplayModifiers, initialStartTime, beatmapName, hash](bool error) {
                                             if (error) {
                                                 getLogger().info("Failed downloading map: %s", beatmapName.c_str());
                                             }
@@ -314,12 +311,12 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                                 getLogger().info("Downloaded map: %s", beatmapName.c_str());
                                                 DownloadedSongIds.emplace_back(hash);
                                                 QuestUI::MainThreadScheduler::Schedule(
-                                                    [self, beatmapId, gameplayModifiers, initialStartTime, hash, cslInstance] {
+                                                    [self, beatmapId, gameplayModifiers, initialStartTime, hash] {
                                                         RuntimeSongLoader::API::RefreshSongs(false,
-                                                            [self, beatmapId, gameplayModifiers, initialStartTime, hash, cslInstance](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
+                                                            [self, beatmapId, gameplayModifiers, initialStartTime, hash](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
                                                                 if (!getConfig().config["autoDelete"].GetBool()) UI::DownloadedSongsGSM::get_Instance()->InsertCell(hash);
+                                                                getLogger().debug("Pointer Check before loading level: self='%p', beatmapId='%p', gameplayModifiers='%p'", self, beatmapId, gameplayModifiers);
                                                                 self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
-                                                                cslInstance->ShowLoading();
                                                                 //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
                                                                 MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
                                                                 return;
@@ -332,7 +329,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                             if (cslInstance) {
                                                 QuestUI::MainThreadScheduler::Schedule(
                                                     [cslInstance, downloadProgress] {
-                                                        cslInstance->ShowDownloadingProgress(downloadProgress / 100);
+                                                        cslInstance->ShowDownloadingProgress(downloadProgress);
                                                     });
                                             }
                                         }
@@ -342,12 +339,12 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                     getLogger().info("Downloaded map: %s", beatmapName.c_str());
                                     DownloadedSongIds.emplace_back(hash);
                                     QuestUI::MainThreadScheduler::Schedule(
-                                        [self, beatmapId, gameplayModifiers, initialStartTime, hash, cslInstance] {
+                                        [self, beatmapId, gameplayModifiers, initialStartTime, hash] {
                                             RuntimeSongLoader::API::RefreshSongs(false,
-                                                [self, beatmapId, gameplayModifiers, initialStartTime, hash, cslInstance](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
+                                                [self, beatmapId, gameplayModifiers, initialStartTime, hash](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
                                                     if (!getConfig().config["autoDelete"].GetBool()) UI::DownloadedSongsGSM::get_Instance()->InsertCell(hash);
-                                                    self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
-                                                    cslInstance->ShowLoading();
+                                                    getLogger().debug("Pointer Check before loading level: self='%p', beatmapId='%p', gameplayModifiers='%p'", self, beatmapId, gameplayModifiers);
+                                                    self->dyn__loaderState() = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
                                                     //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
                                                     MultiplayerLevelLoader_LoadLevel(self, beatmapId, gameplayModifiers, initialStartTime);
                                                     return;
@@ -360,7 +357,7 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                 if (cslInstance) {
                                     QuestUI::MainThreadScheduler::Schedule(
                                         [cslInstance, downloadProgress] {
-                                            cslInstance->ShowDownloadingProgress(downloadProgress / 100);
+                                            cslInstance->ShowDownloadingProgress(downloadProgress);
                                         });
                                 }
                             }
@@ -379,10 +376,8 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
 // Checks entitlement and stalls lobby until fullfilled, unless a game is already in progress.
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     getLogger().debug("LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished");
-    MultiQuestensions::UI::CenterScreenLoading* cslInstance = MultiQuestensions::UI::CenterScreenLoading::get_Instance();
-    if (cslInstance) cslInstance->ShowLoading();
-    self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
     lobbyGameStateController = self;
+    //self->dyn__multiplayerLevelLoader()->dyn__loaderState() = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
     loadingPreviewBeatmapLevel = previewBeatmapLevel;
     loadingBeatmapDifficulty = beatmapDifficulty;
     loadingBeatmapCharacteristic = beatmapCharacteristic;
@@ -391,29 +386,35 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
     bool entitlementStatusOK = true;
     std::string LevelID = to_utf8(csstrtostr(self->startedBeatmapId->get_levelID()));
     // Checks each player, to see if they're in the lobby, and if they are, checks their entitlement status.
-    int playersReady = 0;
+    MultiQuestensions::UI::CenterScreenLoading::playersReady = 0;
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
-        std::string UserID =  to_utf8(csstrtostr(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
-        if (self->dyn__lobbyPlayersDataModel()->GetPlayerIsInLobby(sessionManager->connectedPlayers->get_Item(i)->get_userId())) {
+        Il2CppString* csUserID = sessionManager->connectedPlayers->get_Item(i)->get_userId();
+        std::string UserID =  to_utf8(csstrtostr(csUserID));
+        if (self->dyn__lobbyPlayersDataModel()->GetPlayerIsInLobby(csUserID)) {
             if (entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
-            else playersReady++;
+            else MultiQuestensions::UI::CenterScreenLoading::playersReady++;
         }
     }
-    getLogger().debug("[HandleMultiplayerLevelLoaderCountdownFinished] Players ready: '%d'", playersReady);
-    UI::CenterScreenLoading::UpdatePlayersReady(playersReady);
+    getLogger().debug("[HandleMultiplayerLevelLoaderCountdownFinished] Players ready: '%d'", MultiQuestensions::UI::CenterScreenLoading::playersReady + 1);
+    self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
     if (entitlementStatusOK) {
-        if (cslInstance) cslInstance->HideLoading();
-        lobbyGameStateController = nullptr;
+        //if (cslInstance) cslInstance->HideLoading();
         loadingPreviewBeatmapLevel = nullptr;
-        //loadingBeatmapDifficulty = beatmapDifficulty;
+        //loadingBeatmapDifficulty.dyn_value__() = 1000;
         loadingBeatmapCharacteristic = nullptr;
         loadingDifficultyBeatmap = nullptr;
         loadingGameplayModifiers = nullptr;
 
         // call original method
+        MultiQuestensions::UI::CenterScreenLoading::HideLoading();
         LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
         entitlementDictionary.clear();
     }
+}
+
+MAKE_HOOK_MATCH(LobbyGameStateController_Activate, &LobbyGameStateController::Activate, void, LobbyGameStateController* self) {
+    lobbyGameStateController = self;
+    LobbyGameStateController_Activate(self);
 }
 
 //MAKE_HOOK_MATCH(MenuRpcManager_InvokeSetCountdownEndTime, &MenuRpcManager::InvokeSetCountdownEndTime, void, MenuRpcManager* self, ::Il2CppString* userId, float newTime) {
@@ -438,8 +439,15 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
 //    ConnectedPlayerManager_HandleSyncTimePacket(self, packet, player);
 //}
 
+// TODO: This allows for overwriting entitlement as it doesn't check entitlement for other players selection
 MAKE_HOOK_MATCH(GameServerPlayerTableCell_SetData, &GameServerPlayerTableCell::SetData, void, GameServerPlayerTableCell* self, IConnectedPlayer* connectedPlayer, ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<AdditionalContentModel::EntitlementStatus>* getLevelEntitlementTask) {
+    getLogger().debug("GameServerPlayerTableCell_SetData Set Entitlement Owned");
     getLevelEntitlementTask = Task_1<AdditionalContentModel::EntitlementStatus>::New_ctor(AdditionalContentModel::EntitlementStatus::Owned);
+    //if (playerData && reinterpret_cast<ILevelGameplaySetupData*>(playerData)->get_beatmapLevel()) {
+    //    std::string UserID = to_utf8(csstrtostr(connectedPlayer->get_userId()));
+    //    std::string LevelID = to_utf8(csstrtostr(reinterpret_cast<ILevelGameplaySetupData*>(playerData)->get_beatmapLevel()->get_levelID()));
+    //    if (!playerData->get_isInLobby() && entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) getLevelEntitlementTask->TrySetResult(AdditionalContentModel::EntitlementStatus::NotOwned);
+    //}
     GameServerPlayerTableCell_SetData(self, connectedPlayer, playerData, hasKickPermissions, allowSelection, getLevelEntitlementTask);
 }
 
@@ -455,17 +463,19 @@ void saveDefaultConfig() {
     ConfigDocument& config = getConfig().config;
 
     if (config.HasMember("color") && 
-        config.HasMember("autoDelete")) {
+        config.HasMember("autoDelete") &&
+        config.HasMember("LagReducer")) {
         getLogger().info("Config file already exists.");
         return;
     }  
 
     //config.RemoveAllMembers();
-    config.SetObject();
+    if (!config.IsObject())
+        config.SetObject();
     auto& allocator = config.GetAllocator();
 
-    if (!config.HasMember("lagreducer"))
-        config.AddMember("lagreducer", false, allocator);
+    if (!config.HasMember("LagReducer"))
+        config.AddMember("LagReducer", false, allocator);
     if (!config.HasMember("autoDelete"))
         config.AddMember("autoDelete", false, allocator);
     if (!config.HasMember("color"))
@@ -498,7 +508,7 @@ extern "C" void load() {
 
     custom_types::Register::AutoRegister();
 
-    QuestUI::Register::RegisterGameplaySetupMenu<UI::DownloadedSongsGSM*>(modInfo, "MP Downloaded Songs", QuestUI::Register::Online);
+    QuestUI::Register::RegisterGameplaySetupMenu<UI::DownloadedSongsGSM*>(modInfo, "MP Downloaded", QuestUI::Register::Online);
 
     getLogger().info("Installing hooks...");
     Hooks::Install_Hooks();
@@ -506,20 +516,21 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), LobbyPlayersSetLocalBeatmap);
     INSTALL_HOOK(getLogger(), LobbyPlayersSelectedBeatmap);
 
-    INSTALL_HOOK(getLogger(), MultiplayerLevelLoader_LoadLevel);
+    INSTALL_HOOK_ORIG(getLogger(), MultiplayerLevelLoader_LoadLevel);
     //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetPlayerLevelEntitlementsAsync);
     if (Modloader::getMods().find("BeatTogether") != Modloader::getMods().end()) {
         getLogger().info("Hello BeatTogether!");
     }
     else getLogger().warning("BeatTogether was not found! Is Multiplayer modded?");
 
-    INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished);
+    INSTALL_HOOK_ORIG(getLogger(), LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished);
+    INSTALL_HOOK(getLogger(), LobbyGameStateController_Activate);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetPlayersMissingLevelText);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_SetStartGameEnabled);
     INSTALL_HOOK(getLogger(), LobbySetupViewController_DidActivate);
 
     INSTALL_HOOK(getLogger(), MultiplayerLobbyConnectionController_CreateParty);
-    INSTALL_HOOK(getLogger(), MultiplayerLobbyConnectionController_ConnectToMatchmaking);
+    //INSTALL_HOOK(getLogger(), MultiplayerLobbyConnectionController_ConnectToMatchmaking);
 
     INSTALL_HOOK(getLogger(), LevelSelectionNavigationController_Setup);
     INSTALL_HOOK(getLogger(), CenterStageScreenController_Setup);

@@ -7,8 +7,9 @@ DEFINE_TYPE(MultiQuestensions::Extensions, ExtendedPlayerPacket)
 
 namespace MultiQuestensions::Extensions {
 
-    static constexpr Il2CppString* const MQE_Protocol() {
-        return il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>(MPEX_PROTOCOL);
+    static Il2CppString* MQE_Protocol() {
+        static Il2CppString* protocol = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>(MPEX_PROTOCOL);
+        return protocol;
     }
 
 #pragma region ExtendedPlayer

@@ -16,5 +16,5 @@ namespace MultiQuestensions::UI {
 	public:
 		static void AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager);
 	};
-	void SetCustomSongs(bool value);
+	//void SetCustomSongs(bool value);
 }

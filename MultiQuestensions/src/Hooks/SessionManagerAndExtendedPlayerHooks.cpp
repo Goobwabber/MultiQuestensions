@@ -3,6 +3,7 @@
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "GlobalFields.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
+#include "UI/CenterScreenLoading.hpp"
 
 #include "Beatmaps/PreviewBeatmapStub.hpp"
 
@@ -74,10 +75,10 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
         lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
     }
     catch (const std::runtime_error& e) {
-        getLogger().error("%s", e.what());
+        getLogger().error("REPORT TO ENDER: %s", e.what());
     }
     catch (...) {
-        getLogger().debug("Unknown exception in HandlePreviewBeatmapPacket");
+        getLogger().debug("REPORT TO ENDER: Unknown exception in HandlePreviewBeatmapPacket");
     }
 }
 
@@ -124,7 +125,7 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
             }
         }
         catch (const std::runtime_error& e) {
-            getLogger().error("Exception while trying to create ExtendedPlayer: %s", e.what());
+            getLogger().error("REPORT TO ENDER: Exception while trying to create ExtendedPlayer: %s", e.what());
         }
         if (extendedPlayer) {
             _extendedPlayers.emplace(userId, extendedPlayer);
@@ -162,7 +163,7 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
         }
     }
     catch (const std::runtime_error& e) {
-        getLogger().error("%s", e.what());
+        getLogger().error("REPORT TO ENDER: %s", e.what());
     }
 }
 
@@ -190,7 +191,7 @@ MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, Mu
 MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsafe("", "MultiplayerSessionManager", "StartSession", 1), void, MultiplayerSessionManager* self, ConnectedPlayerManager* connectedPlayerManager) {
     SessionManager_StartSession(self, connectedPlayerManager);
     getLogger().debug("MultiplayerSessionManager.StartSession, creating localExtendedPlayerPacket");
-    try {
+    //try {
         localExtendedPlayer = Extensions::ExtendedPlayer::CS_ctor(self->get_localPlayer());
         //localExtendedPlayerSPTR = localExtendedPlayer;
 
@@ -210,12 +211,10 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
         );
 
         reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
-                                                                // TODO: ^ Got a crash here at some point
-    }
-    catch (const std::runtime_error& e) {
-        getLogger().error("%s", e.what());
-    }
-    // System::Action_1<GlobalNamespace::IConnectedPlayer*>*
+    //}
+    //catch (const std::runtime_error& e) {
+    //    getLogger().error("%s", e.what());
+    //}
     self->add_playerConnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerConnected));
     self->add_playerDisconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerDisconnected));
     //self->add_disconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>*>(classof(System::Action_1<GlobalNamespace::DisconnectedReason>*>*), static_cast<Il2CppObject*>(nullptr), HandleDisconnect));

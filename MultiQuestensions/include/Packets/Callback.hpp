@@ -32,36 +32,32 @@ namespace MultiQuestensions {
 			//packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
 			TPacket packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
 			if (packet == nullptr) {
-				getLogger().debug("Packet is nullptr");
 				reader->SkipBytes(size);
 			}
 			else {
-				getLogger().debug("packet->Deserialize(reader);");
 				try {
 					packet->Deserialize(reader);
 				}
 				catch (const std::exception& e) {
 					getLogger().debug("Exception Deserializing Packet");
-					getLogger().error("%s", e.what());
+					getLogger().error("REPORT TO ENDER: %s", e.what());
 				}
 				catch (...) {
-					getLogger().debug("Unknown exception Deserializing Packet");
+					getLogger().debug("REPORT TO ENDER: Unknown exception Deserializing Packet");
 				}
 			}
 			if (action != nullptr) {
-				getLogger().debug("action(packet, player);");
 				try {
 					action(packet, player);
 				}
 				catch (const std::exception& e) {
 					getLogger().error("Exception running action");
-					getLogger().error("%s", e.what());
+					getLogger().error("REPORT TO ENDER: %s", e.what());
 				}
 				catch (...) {
-					getLogger().debug("Unknown exception Deserializing Packet");
+					getLogger().debug("REPORT TO ENDER: Unknown exception Deserializing Packet");
 				}
 			}
-			else getLogger().debug("action is nullptr");
 		}
 	};
 }

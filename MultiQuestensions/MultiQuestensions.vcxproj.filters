@@ -106,6 +106,8 @@
     <ClCompile Include="src\UI\DownloadedSongsGSM.cpp" />
     <ClCompile Include="src\Hooks\SessionManagerAndExtendedPlayerHooks.cpp" />
     <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
+    <ClCompile Include="src\Utils\CustomData.cpp" />
+    <ClCompile Include="src\Hooks\InstallerHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -223,5 +225,6 @@
     <ClInclude Include="include\Hooks\EnvironmentAndAvatarHooks.hpp" />
     <ClInclude Include="include\Hooks\SessionManagerAndExtendedPlayerHooks.hpp" />
     <ClInclude Include="include\UI\CenterScreenLoading.hpp" />
+    <ClInclude Include="shared\Utils\CustomData.hpp" />
   </ItemGroup>
 </Project>

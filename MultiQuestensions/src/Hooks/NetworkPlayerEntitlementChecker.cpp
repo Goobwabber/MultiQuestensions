@@ -46,9 +46,13 @@ namespace MultiQuestensions {
             );
 
         entitlementDictionary[cUserId][cLevelId] = entitlement.value;
-        if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
+        if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting && loadingPreviewBeatmapLevel && loadingBeatmapCharacteristic && loadingDifficultyBeatmap && loadingGameplayModifiers) {
             getLogger().debug("[HandleEntitlementReceived] GameStarting, running 'HandleMultiplayerLevelLoaderCountdownFinished'");
             lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(loadingPreviewBeatmapLevel, loadingBeatmapDifficulty, loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
+        }
+        else if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
+            getLogger().error("[HandleEntitlementReceived] GameStarting but level data not available");
+            getLogger().debug("[HandleEntitlementReceived] checking pointers: loadingPreviewBeatmapLevel='%p', loadingBeatmapDifficulty set to '%d', loadingBeatmapCharacteristic='%p', loadingDifficultyBeatmap='%p', loadingGameplayModifiers='%p'", loadingPreviewBeatmapLevel, static_cast<int>(loadingBeatmapDifficulty), loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
         }
     }
 
@@ -58,16 +62,35 @@ namespace MultiQuestensions {
         getLogger().info("NetworkPlayerEntitlementChecker_GetEntitlementStatus: %s", levelId.c_str());
         if (IsCustomLevel(levelId)) {
             if (HasSong(levelId)) {
+                //std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> level = RuntimeSongLoader::API::GetLevelById(levelId);
                 return Task_1<EntitlementsStatus>::New_ctor(EntitlementsStatus::Ok);
             }
             else {
                 auto task = Task_1<EntitlementsStatus>::New_ctor();
                 BeatSaver::API::GetBeatmapByHashAsync(GetHash(levelId),
-                    [task](std::optional<BeatSaver::Beatmap> beatmap) {
+                    [task, levelId](std::optional<BeatSaver::Beatmap> beatmaps) {
                         QuestUI::MainThreadScheduler::Schedule(
-                            [task, beatmap] {
-                                if (beatmap.has_value()) {
-                                    task->TrySetResult(EntitlementsStatus::NotDownloaded);
+                            [task, beatmaps, levelId] {
+                                if (beatmaps.has_value()) {
+                                    // TODO: Server side check, possibly something better mod side as well, this would just prevent downloading
+                                    // Possibly taking a look at this https://github.com/BSMGPink/PinkCore/blob/master/include/Utils/RequirementUtils.hpp
+                                    //for (auto& beatmap : beatmaps->GetVersions()) {
+                                    auto& beatmap = beatmaps->GetVersions().front();
+                                    std::string mapHash = beatmap.GetHash();
+                                    std::transform(mapHash.begin(), mapHash.end(), mapHash.begin(), toupper);
+                                    if (mapHash == GetHash(levelId)) {
+                                        for (auto& diff : beatmap.GetDiffs()) {
+                                            if (diff.GetChroma() || diff.GetNE()) {
+                                                task->TrySetResult(EntitlementsStatus::NotOwned);
+                                                getLogger().info("Map contains Chroma or NE difficulty, returning NotOwned");
+                                                return;
+                                            }
+                                        }
+                                        task->TrySetResult(EntitlementsStatus::NotDownloaded);
+                                        return;
+                                    } else getLogger().error("Hash returned by BeatSaver doesn't match requested hash: Expected: '%s' got '%s'", GetHash(levelId).c_str(), mapHash.c_str());
+                                    //}
+                                    task->TrySetResult(EntitlementsStatus::NotOwned);
                                 }
                                 else {
                                     task->TrySetResult(EntitlementsStatus::NotOwned);
@@ -89,7 +112,7 @@ namespace MultiQuestensions {
         //    HandleEntitlementReceived(userId, beatmapId, status);
         //    });
         //self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
-        self->rpcManager->add_setIsEntitledToLevelEvent(
+        self->dyn__rpcManager()->add_setIsEntitledToLevelEvent(
         il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
             HandleEntitlementReceived(userId, beatmapId, status);
             }));
@@ -105,7 +128,7 @@ namespace MultiQuestensions {
 #pragma endregion
 
     void Hooks::NetworkplayerEntitlementChecker() {
-        INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
+        INSTALL_HOOK_ORIG(getLogger(), NetworkPlayerEntitlementChecker_GetEntitlementStatus);
         INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_Start);
         //INSTALL_HOOK(getLogger(), NetworkPlayerEntitlementChecker_OnDestroy);
     }
