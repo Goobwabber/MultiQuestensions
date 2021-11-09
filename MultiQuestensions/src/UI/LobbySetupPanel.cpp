@@ -8,6 +8,7 @@
 #include "CodegenExtensions/ColorUtility.hpp"
 #include "GlobalFields.hpp"
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
+#include "Hooks/EnvironmentAndAvatarHooks.hpp"
 #include "songloader/shared/API.hpp"
 #include "UI/DownloadedSongsGSM.hpp"
 using namespace UnityEngine::UI;
@@ -73,12 +74,13 @@ namespace MultiQuestensions::UI {
 		//QuestUI::BeatSaberUI::CreateColorPickerModal(parent->get_transform(), "Player Color Selection", playerColor);
 
 		auto colorPicker = QuestUI::BeatSaberUI::CreateColorPickerModal(parent, "Player Color Selection", playerColor,
-			[&playerColor](UnityEngine::Color value) {
+			[&playerColor, sessionManager](UnityEngine::Color value) {
 				playerColor = value;
 				getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
 				getConfig().Write();
 				try {
 					localExtendedPlayer->playerColor = value;
+					SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
 					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
 					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
 					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
@@ -87,8 +89,9 @@ namespace MultiQuestensions::UI {
 					getLogger().error("REPORT TO ENDER: %s", e.what());
 				}
 			},
-			[] {
+			[sessionManager] {
 				try {
+					SetPlayerPlaceColor(sessionManager->get_localPlayer(), localExtendedPlayer->get_playerColor(), true);
 					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
 					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
 					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
@@ -97,7 +100,8 @@ namespace MultiQuestensions::UI {
 					getLogger().error("REPORT TO ENDER: %s", e.what());
 				}
 			},
-			[](UnityEngine::Color value) {
+			[sessionManager](UnityEngine::Color value) {
+				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
 				// TODO: Uncomment when MpEx supports live platform color updates
 				
 				//try {
