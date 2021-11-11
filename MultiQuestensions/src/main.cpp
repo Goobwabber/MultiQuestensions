@@ -30,7 +30,7 @@ using namespace MultiQuestensions;
 #endif
 #ifndef MPEX_PROTOCOL
 #warning No MPEX_PROTOCOL set
-#define MPEX_PROTOCOL "1.0.0"
+#define MPEX_PROTOCOL "0.7.0"
 #endif
 
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -464,7 +464,8 @@ void saveDefaultConfig() {
 
     if (config.HasMember("color") && 
         config.HasMember("autoDelete") &&
-        config.HasMember("LagReducer")) {
+        config.HasMember("LagReducer") &&
+        config.HasMember("MaxPlayers")) {
         getLogger().info("Config file already exists.");
         return;
     }  
@@ -474,6 +475,8 @@ void saveDefaultConfig() {
         config.SetObject();
     auto& allocator = config.GetAllocator();
 
+    if (!config.HasMember("MaxPlayers"))
+        config.AddMember("MaxPlayers", 10, allocator);
     if (!config.HasMember("LagReducer"))
         config.AddMember("LagReducer", false, allocator);
     if (!config.HasMember("autoDelete"))

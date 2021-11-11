@@ -106,7 +106,6 @@
     <ClCompile Include="src\UI\DownloadedSongsGSM.cpp" />
     <ClCompile Include="src\Hooks\SessionManagerAndExtendedPlayerHooks.cpp" />
     <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
-    <ClCompile Include="src\Utils\CustomData.cpp" />
     <ClCompile Include="src\Hooks\InstallerHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -203,7 +202,7 @@
     <ClInclude Include="include\UI\LobbySetupPanel.hpp">
       <Filter>include\UI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementChecker.cpp">
+    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementCheckerHooks.cpp">
       <Filter>src\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp">

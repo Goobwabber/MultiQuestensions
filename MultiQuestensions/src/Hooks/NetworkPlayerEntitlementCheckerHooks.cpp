@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "Hooks/Hooks.hpp"
+#include "Utils/CustomData.hpp"
 using namespace GlobalNamespace;
 using namespace System::Threading::Tasks;
 
@@ -63,7 +64,9 @@ namespace MultiQuestensions {
         if (IsCustomLevel(levelId)) {
             if (HasSong(levelId)) {
                 //std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> level = RuntimeSongLoader::API::GetLevelById(levelId);
-                return Task_1<EntitlementsStatus>::New_ctor(EntitlementsStatus::Ok);
+                if (MultiQuestensions::Utils::HasRequirement(RuntimeSongLoader::API::GetLevelById(levelId)))
+                    return Task_1<EntitlementsStatus>::New_ctor(EntitlementsStatus::Ok);
+                else return Task_1<EntitlementsStatus>::New_ctor(EntitlementsStatus::NotOwned);
             }
             else {
                 auto task = Task_1<EntitlementsStatus>::New_ctor();
@@ -80,9 +83,19 @@ namespace MultiQuestensions {
                                     std::transform(mapHash.begin(), mapHash.end(), mapHash.begin(), toupper);
                                     if (mapHash == GetHash(levelId)) {
                                         for (auto& diff : beatmap.GetDiffs()) {
-                                            if (diff.GetChroma() || diff.GetNE()) {
+                                            if (diff.GetChroma() && Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
                                                 task->TrySetResult(EntitlementsStatus::NotOwned);
-                                                getLogger().info("Map contains Chroma or NE difficulty, returning NotOwned");
+                                                getLogger().info("Map contains Chroma difficulty and Chroma is installed, returning NotOwned as Chroma currently causes issues in Multiplayer");
+                                                return;
+                                            }
+                                            else if (diff.GetNE() && Modloader::getMods().find("NoodleExtensions") == Modloader::getMods().end()) {
+                                                task->TrySetResult(EntitlementsStatus::NotOwned);
+                                                getLogger().info("Map contains NE difficulty but NoodleExtensions doesn't seem to be installed, returning NotOwned");
+                                                return;
+                                            }
+                                            else if (diff.GetME() && Modloader::getMods().find("MappingExtensions") == Modloader::getMods().end()) {
+                                                task->TrySetResult(EntitlementsStatus::NotOwned);
+                                                getLogger().info("Map contains ME difficulty but MappingExtensions doesn't seem to be installed, returning NotOwned");
                                                 return;
                                             }
                                         }
