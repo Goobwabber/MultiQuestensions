@@ -121,8 +121,8 @@ namespace MultiQuestensions::UI {
     void DownloadedSongsGSM::InsertCell(std::string hash) {
         std::optional<CustomPreviewBeatmapLevel*> levelOpt = GetLevelByHash(hash);
         if (levelOpt.has_value()) {
-            getLogger().info("Song with Hash '%s' added to list", hash.c_str());
             lastDownloaded = levelOpt.value();
+            getLogger().info("Song with Hash '%s' added to list", hash.c_str());
             System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask = lastDownloaded->GetCoverImageAsync(System::Threading::CancellationToken::get_None());
             auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void()>)[coverTask, this] {
                 CreateCell(coverTask, lastDownloaded/*, list->NumberOfCells() + 1*/);

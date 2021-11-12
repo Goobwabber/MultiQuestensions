@@ -32,14 +32,14 @@ namespace MultiQuestensions::Utils {
                                             return false;
                                         }
                                     }
-                                    if (dB["_customData"].HasMember("_suggestions") && dB["_customData"]["_suggestions"].IsArray() &&
-                                        !dB["_customData"]["_suggestions"].Empty()) {
-                                        for (auto& sug : dB["_customData"]["_suggestions"].GetArray()) {
-                                            getLogger().debug("Found suggestion: %s", sug.GetString());
-                                            if (strcmp(sug.GetString(), "Chroma") == 0 && Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
-                                                getLogger().error("Suggestion Chroma and Chroma installed, returning false, as Chroma may cause crashes");
-                                                return false;
-                                            }
+                                }
+                                if (dB["_customData"].HasMember("_suggestions") && dB["_customData"]["_suggestions"].IsArray() &&
+                                    !dB["_customData"]["_suggestions"].Empty()) {
+                                    for (auto& sug : dB["_customData"]["_suggestions"].GetArray()) {
+                                        getLogger().debug("Found suggestion: %s", sug.GetString());
+                                        if (strcmp(sug.GetString(), "Chroma") == 0 && Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
+                                            getLogger().error("Suggestion Chroma and Chroma installed, returning false, as Chroma may cause crashes");
+                                            return false;
                                         }
                                     }
                                 }

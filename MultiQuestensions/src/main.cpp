@@ -314,7 +314,8 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                                     [self, beatmapId, gameplayModifiers, initialStartTime, hash] {
                                                         RuntimeSongLoader::API::RefreshSongs(false,
                                                             [self, beatmapId, gameplayModifiers, initialStartTime, hash](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
-                                                                if (!getConfig().config["autoDelete"].GetBool()) UI::DownloadedSongsGSM::get_Instance()->InsertCell(hash);
+                                                                auto* downloadedSongsGSM = UI::DownloadedSongsGSM::get_Instance();
+                                                                if (!getConfig().config["autoDelete"].GetBool() && downloadedSongsGSM) downloadedSongsGSM->InsertCell(hash);
                                                                 getLogger().debug("Pointer Check before loading level: self='%p', beatmapId='%p', gameplayModifiers='%p'", self, beatmapId, gameplayModifiers);
                                                                 self->loaderState = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
                                                                 //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
@@ -342,7 +343,8 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
                                         [self, beatmapId, gameplayModifiers, initialStartTime, hash] {
                                             RuntimeSongLoader::API::RefreshSongs(false,
                                                 [self, beatmapId, gameplayModifiers, initialStartTime, hash](const std::vector<GlobalNamespace::CustomPreviewBeatmapLevel*>& songs) {
-                                                    if (!getConfig().config["autoDelete"].GetBool()) UI::DownloadedSongsGSM::get_Instance()->InsertCell(hash);
+                                                    auto* downloadedSongsGSM = UI::DownloadedSongsGSM::get_Instance();
+                                                    if (!getConfig().config["autoDelete"].GetBool() && downloadedSongsGSM) downloadedSongsGSM->InsertCell(hash);
                                                     getLogger().debug("Pointer Check before loading level: self='%p', beatmapId='%p', gameplayModifiers='%p'", self, beatmapId, gameplayModifiers);
                                                     self->dyn__loaderState() = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
                                                     //getLogger().debug("MultiplayerLevelLoader_LoadLevel, Downloaded, calling original");
