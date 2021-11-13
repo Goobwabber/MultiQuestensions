@@ -4,6 +4,8 @@
 using namespace GlobalNamespace;
 using namespace System::Threading::Tasks;
 
+std::string missingLevelText;
+
 namespace MultiQuestensions {
 
 #pragma region Fields
@@ -37,8 +39,8 @@ namespace MultiQuestensions {
 
     // Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
     static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
-        std::string cUserId = to_utf8(csstrtostr(userId)).c_str();
-        std::string cLevelId = to_utf8(csstrtostr(levelId)).c_str();
+        std::string cUserId = to_utf8(csstrtostr(userId));
+        std::string cLevelId = to_utf8(csstrtostr(levelId));
 
         getLogger().debug("[HandleEntitlementReceived] Received Entitlement from user '%s' for level '%s' with status '%s'",
             cUserId.c_str(),
@@ -46,6 +48,20 @@ namespace MultiQuestensions {
             entitlementText(entitlement)
             );
 
+        if (entitlement == EntitlementsStatus::NotOwned && MultiQuestensions::Utils::HasRequirement(RuntimeSongLoader::API::GetLevelById(cLevelId))) {
+            IConnectedPlayer* player = sessionManager->GetPlayerByUserId(userId);
+            if (player) {
+                if (!player->HasState(getMEStateStr()))
+                    missingLevelText = "One or more players are missing the following Requirement: Mapping Extensions";
+                else if (!player->HasState(getNEStateStr()))
+                    missingLevelText = "One or more players are missing the following Requirement: Noodle Extensions";
+                else if (!player->HasState(getChromaStateStr()))
+                    missingLevelText = "One or more players are missing the following Requirement: Chroma";
+            }
+            else {
+                missingLevelText = "Error Checking Requirement: Player not found";
+            }
+        }
         entitlementDictionary[cUserId][cLevelId] = entitlement.value;
         if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting && loadingPreviewBeatmapLevel && loadingBeatmapCharacteristic && loadingDifficultyBeatmap && loadingGameplayModifiers) {
             getLogger().debug("[HandleEntitlementReceived] GameStarting, running 'HandleMultiplayerLevelLoaderCountdownFinished'");
@@ -59,6 +75,7 @@ namespace MultiQuestensions {
 
 #pragma region Hooks
     MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPlayerEntitlementChecker::GetEntitlementStatus, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, Il2CppString* levelIdCS) {
+        missingLevelText.clear();
         std::string levelId = to_utf8(csstrtostr(levelIdCS));
         getLogger().info("NetworkPlayerEntitlementChecker_GetEntitlementStatus: %s", levelId.c_str());
         if (IsCustomLevel(levelId)) {
@@ -83,25 +100,32 @@ namespace MultiQuestensions {
                                     std::transform(mapHash.begin(), mapHash.end(), mapHash.begin(), toupper);
                                     if (mapHash == GetHash(levelId)) {
                                         for (auto& diff : beatmap.GetDiffs()) {
-                                            if (diff.GetChroma() && Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
+                                            if (diff.GetChroma() && !AllPlayersHaveChroma() && Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
                                                 task->TrySetResult(EntitlementsStatus::NotOwned);
-                                                getLogger().info("Map contains Chroma difficulty and Chroma is installed, returning NotOwned as Chroma currently causes issues in Multiplayer");
+                                                getLogger().warning("Map contains Chroma difficulty and Chroma is installed, returning NotOwned as Chroma currently causes issues in Multiplayer");
+                                                missingLevelText = "Chroma Requirement block, please uninstall Chroma";
                                                 return;
                                             }
-                                            else if (diff.GetNE() && Modloader::getMods().find("NoodleExtensions") == Modloader::getMods().end()) {
+                                            else if (diff.GetNE() && !AllPlayersHaveNE() && Modloader::getMods().find("NoodleExtensions") == Modloader::getMods().end()) {
                                                 task->TrySetResult(EntitlementsStatus::NotOwned);
-                                                getLogger().info("Map contains NE difficulty but NoodleExtensions doesn't seem to be installed, returning NotOwned");
+                                                getLogger().warning("Map contains NE difficulty but NoodleExtensions doesn't seem to be installed, returning NotOwned");
+                                                missingLevelText = "You or another Player is Missing the following Requirement: Noodle Extensions";
                                                 return;
                                             }
-                                            else if (diff.GetME() && Modloader::getMods().find("MappingExtensions") == Modloader::getMods().end()) {
+                                            else if (diff.GetME() && !AllPlayersHaveME() && Modloader::getMods().find("MappingExtensions") == Modloader::getMods().end()) {
                                                 task->TrySetResult(EntitlementsStatus::NotOwned);
-                                                getLogger().info("Map contains ME difficulty but MappingExtensions doesn't seem to be installed, returning NotOwned");
+                                                getLogger().warning("Map contains ME difficulty but MappingExtensions doesn't seem to be installed, returning NotOwned");
+                                                missingLevelText = "You or another Player is Missing the following Requirement: Mapping Extensions";
                                                 return;
                                             }
                                         }
                                         task->TrySetResult(EntitlementsStatus::NotDownloaded);
                                         return;
-                                    } else getLogger().error("Hash returned by BeatSaver doesn't match requested hash: Expected: '%s' got '%s'", GetHash(levelId).c_str(), mapHash.c_str());
+                                    }
+                                    else {
+                                        getLogger().error("Hash returned by BeatSaver doesn't match requested hash: Expected: '%s' got '%s'", GetHash(levelId).c_str(), mapHash.c_str());
+                                        missingLevelText = string_format("Hash returned by BeatSaver doesn't match requested hash: Expected: '%s' got '%s'", GetHash(levelId).c_str(), mapHash.c_str());
+                                    }
                                     //}
                                     task->TrySetResult(EntitlementsStatus::NotOwned);
                                 }

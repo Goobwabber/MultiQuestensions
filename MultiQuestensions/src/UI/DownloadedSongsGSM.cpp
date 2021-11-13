@@ -26,6 +26,7 @@ DEFINE_TYPE(MultiQuestensions::UI, DownloadedSongsGSM);
 namespace MultiQuestensions::UI {
     bool cellIsSelected = false;
     DownloadedSongsGSM* DownloadedSongsGSM::instance;
+    std::vector<std::string> DownloadedSongsGSM::mapQueue;
 
     void DownloadedSongsGSM::CreateCell(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>* coverTask, CustomPreviewBeatmapLevel* level) {
         getLogger().debug("CreateCell");
@@ -45,6 +46,10 @@ namespace MultiQuestensions::UI {
             level->get_defaultCoverImage()
                 });
         } else getLogger().error("Nullptr in UI: cover '%p', level '%p'", cover, level);
+        if (!mapQueue.empty()) {
+            InsertCell(mapQueue.back());
+            mapQueue.pop_back();
+        }
         if (list && list->tableView)
             list->tableView->RefreshCellsContent();
         else getLogger().error("Nullptr in UI: list '%p', list->tableView '%p'", list, list->tableView);
@@ -142,6 +147,10 @@ namespace MultiQuestensions::UI {
 
     void DownloadedSongsGSM::OnEnable() {
         if (list && list->tableView) {
+            if (!mapQueue.empty()) {
+                InsertCell(mapQueue.back());
+                mapQueue.pop_back();
+            }
             if (cellIsSelected) list->tableView->ClearSelection();
             list->tableView->ReloadData();
             list->tableView->RefreshCellsContent();

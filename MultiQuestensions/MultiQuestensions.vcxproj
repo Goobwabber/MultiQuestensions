@@ -36,6 +36,7 @@
     <ClCompile Include="src\UI\LobbySetupPanel.cpp" />
     <ClCompile Include="src\UI\DownloadedSongsGSM.cpp" />
     <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
+    <ClCompile Include="src\Utils\CustomData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />

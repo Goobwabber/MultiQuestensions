@@ -59,6 +59,10 @@ namespace MultiQuestensions {
 
     extern bool HasSong(const std::string& levelId);
 
+    extern Il2CppString* getModdedStateStr();
+    extern Il2CppString* getMEStateStr();
+    extern Il2CppString* getNEStateStr();
+    extern Il2CppString* getChromaStateStr();
 
     extern GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 

@@ -14,7 +14,7 @@ if ($env:MPEX_PROTOCOL) {
 $MpEx_Protocol = $env:MPEX_PROTOCOL
 }
 if (!($MpEx_Protocol)) {
-$MpEx_Protocol = "0.7.0"
+$MpEx_Protocol = "0.7.1"
 }
 if ((Test-Path "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp", "./extern/beatsaber-hook/src/inline-hook/inlineHook.c", "./extern/beatsaber-hook/src/inline-hook/relocate.c") -contains $false) {
     Write-Host "Critical: Missing inline-hook"

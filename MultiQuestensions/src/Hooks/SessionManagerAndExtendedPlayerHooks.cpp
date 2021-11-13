@@ -209,8 +209,14 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
             else getLogger().error("Failed to get local network player!");
             }
         );
-
         reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+
+        self->SetLocalPlayerState(getModdedStateStr(), true);
+        self->SetLocalPlayerState(getMEStateStr(), Modloader::getMods().find("MappingExtensions") != Modloader::getMods().end());
+        self->SetLocalPlayerState(getNEStateStr(), Modloader::getMods().find("NoodleExtensions") != Modloader::getMods().end());
+        self->SetLocalPlayerState(getChromaStateStr(), /*Modloader::getMods().find("Chroma") != Modloader::getMods().end()*/ false);
+        // TODO: Do this check correctly once Chroma got an Update for Multiplayer
+
     //}
     //catch (const std::runtime_error& e) {
     //    getLogger().error("%s", e.what());

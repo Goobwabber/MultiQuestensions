@@ -107,6 +107,7 @@
     <ClCompile Include="src\Hooks\SessionManagerAndExtendedPlayerHooks.cpp" />
     <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
     <ClCompile Include="src\Hooks\InstallerHooks.cpp" />
+    <ClCompile Include="src\Utils\CustomData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">

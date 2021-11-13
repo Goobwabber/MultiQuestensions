@@ -53,9 +53,9 @@ namespace MultiQuestensions::UI {
 			//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
 			//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
 			//modal->Show(true, true, nullptr);
-			QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), 
-				"Chroma detected!\r\nChroma may cause crashes,\r\nif you're experiencing issues,\r\nthen it may be best\r\nto try disabling Chroma",
-				{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
+			//QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), 
+			//	"Chroma detected!\r\nChroma may cause crashes,\r\nif you're experiencing issues,\r\nthen it may be best\r\nto try disabling Chroma",
+			//	{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
 			getLogger().warning("Chroma detected");
 		}
 		else getLogger().debug("Chroma not detected");

@@ -29,4 +29,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::UI, DownloadedSongsGSM, UnityEngine::Mo
     bool needSongRefresh;
     public:
     static DownloadedSongsGSM* get_Instance() { return instance; }
+
+    static std::vector<std::string> mapQueue;
+
 )

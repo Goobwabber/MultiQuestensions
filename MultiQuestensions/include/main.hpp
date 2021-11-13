@@ -49,3 +49,11 @@ extern ModInfo modInfo;
 extern std::vector<std::string> DownloadedSongIds;
 
 extern bool gotSongPackOverrides;
+
+extern std::string missingLevelText;
+
+namespace MultiQuestensions {
+    extern bool AllPlayersHaveNE();
+    extern bool AllPlayersHaveME();
+    extern bool AllPlayersHaveChroma();
+}
