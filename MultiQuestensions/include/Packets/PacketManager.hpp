@@ -1,13 +1,12 @@
 #pragma once
 #include "main.hpp"
+#include "Callback.hpp"
 #include "PacketSerializer.hpp"
 
+#include <future>
+#include <algorithm>
 #include "GlobalNamespace/MultiplayerSessionManager_MessageType.hpp"
-#include "GlobalNamespace/ThreadStaticPacketPool_1.hpp"
 #include "GlobalNamespace/PacketPool_1.hpp"
-
-template <class T>
-using PacketCallback = void (*)(T, GlobalNamespace::IConnectedPlayer*);
 
 namespace MultiQuestensions {
 	class PacketManager {
@@ -21,36 +20,43 @@ namespace MultiQuestensions {
 		void SendUnreliable(LiteNetLib::Utils::INetSerializable* message);
 
 		template <class TPacket>
+		void RegisterCallback(std::string identifier, PacketCallback<TPacket> callback) {
+			CallbackWrapper<TPacket>* newCallback = new CallbackWrapper<TPacket>(callback);
+			if (identifier.empty()) {
+				getLogger().error("Cannot register callback: Identifier null.");
+				return;
+			}
+			else {
+				packetSerializer->RegisterCallback(identifier, newCallback);
+			}
+		}
+
+		template <class TPacket>
 		void RegisterCallback(PacketCallback<TPacket> callback) {
 			Il2CppReflectionType* packetType = csTypeOf(TPacket);
 			if (packetType == nullptr) {
 				getLogger().info("Packet Type null.");
 				return;
 			}
-			Il2CppString* identifier = packetType->ToString()->Replace(il2cpp_utils::createcsstr((std::string)"::"), il2cpp_utils::createcsstr((std::string)"."));
-			getLogger().info(to_utf8(csstrtostr(identifier)));
 
-			auto* newCallback = il2cpp_utils::MakeDelegate<CallbackAction*>(classof(CallbackAction*), &callback, *[](PacketCallback<TPacket> context, LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player) {
-				TPacket packet = GlobalNamespace::ThreadStaticPacketPool_1<TPacket>::get_pool()->Obtain();
-				if (packet == nullptr) {
-					reader->SkipBytes(size);
-				}
-				else {
-					packet->Deserialize(reader);
-				}
-
-				(*context)(packet, player);
-			});
-
-			if (identifier == nullptr) {
-				getLogger().error("Cannot register callback: Identifier null.");
-				return;
-			} else if (newCallback == nullptr) {
-				getLogger().error("Cannot register callback: Callback null.");
-				return;
-			} else {
-				packetSerializer->RegisterCallback(identifier, newCallback);
+			std::string identifier = to_utf8(csstrtostr(packetType->ToString()));
+			int pos = 0;
+			while ((pos = identifier.find("::")) != std::string::npos)
+			{
+				identifier.replace(pos, 2, ".");
+				pos++;
 			}
+
+			RegisterCallback<TPacket>(identifier, callback);
 		}
+
+		template <class TPacket>
+		void UnregisterCallback() {
+			packetSerializer->UnregisterCallback<TPacket>();
+		}
+
+		void UnregisterCallback(std::string identifier);
 	};
+
+	extern PacketManager* packetManager;
 }

@@ -53,3 +53,8 @@ out/
 extern/
 Android.mk.backup
 qpm.shared.json
+
+log_timestamp
+
+# Quest modding stuff
+*.qmod

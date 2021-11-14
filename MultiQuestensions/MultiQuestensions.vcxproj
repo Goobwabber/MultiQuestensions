@@ -14,23 +14,73 @@
     <None Include=".gitignore" />
     <None Include="Android.mk" />
     <None Include="Application.mk" />
-    <None Include="bmbfmod.json" />
+    <None Include="cpp.hint" />
     <None Include="ndkbuild.props" Condition="Exists('ndkbuild.props')" />
     <None Include="qpm.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Assets\Sprites.cpp" />
     <ClCompile Include="src\Beatmaps\PreviewBeatmapPacket.cpp" />
     <ClCompile Include="src\Beatmaps\PreviewBeatmapStub.cpp" />
+    <ClCompile Include="src\Environments\LobbyAvatarPlaceLighting.cpp" />
+    <ClCompile Include="src\Environments\LobbyAvatarNameTag.cpp" />
+    <ClCompile Include="src\Extensions\ExtendedPlayer.cpp" />
+    <ClCompile Include="src\Hooks\MaxPlayerHooks.cpp" />
+    <ClCompile Include="src\Hooks\EnvironmentAndAvatarHooks.cpp" />
+    <ClCompile Include="src\Hooks\QuickplayHooks.cpp" />
+    <ClCompile Include="src\Hooks\SessionManagerAndExtendedPlayerHooks.cpp" />
+    <ClCompile Include="src\Hooks\InstallerHooks.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Packets\PacketManager.cpp" />
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />
+    <ClCompile Include="src\UI\LobbySetupPanel.cpp" />
+    <ClCompile Include="src\UI\DownloadedSongsGSM.cpp" />
+    <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
+    <ClCompile Include="src\Utils\CustomData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="extern\questui\shared\ArrayUtil.hpp" />
+    <ClInclude Include="extern\questui\shared\BeatSaberUI.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Backgroundable.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\ExternalComponents.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreen.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenManager.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\FloatingScreen\FloatingScreenMoverPointer.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\MainThreadScheduler.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Components\Settings\IncrementSetting.hpp" />
+    <ClInclude Include="extern\questui\shared\CustomTypes\Data\CustomDataType.hpp" />
+    <ClInclude Include="extern\questui\shared\eventmacros.hpp" />
+    <ClInclude Include="extern\questui\shared\QuestUI.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Beatmap.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristic.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\BeatmapCharacteristicDifficulty.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Difficulties.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Metadata.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Page.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\Stats.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\BeatSaver\User.hpp" />
+    <ClInclude Include="extern\songdownloader\shared\Types\TypeMacros.hpp" />
+    <ClInclude Include="extern\songloader\shared\API.hpp" />
+    <ClInclude Include="include\Assets\Sprites.hpp" />
     <ClInclude Include="include\Beatmaps\PreviewBeatmapPacket.hpp" />
     <ClInclude Include="include\Beatmaps\PreviewBeatmapStub.hpp" />
+    <ClInclude Include="include\Environments\LobbyAvatarNameTag.hpp" />
+    <ClInclude Include="include\Environments\LobbyAvatarPlaceLighting.hpp" />
+    <ClInclude Include="include\Extensions\ExtendedPlayer.hpp" />
+    <ClInclude Include="include\GlobalFields.hpp" />
+    <ClInclude Include="include\Hooks\EnvironmentAndAvatarHooks.hpp" />
+    <ClInclude Include="include\Hooks\SessionManagerAndExtendedPlayerHooks.hpp" />
+    <ClInclude Include="include\Hooks\Hooks.hpp" />
     <ClInclude Include="include\main.hpp" />
+    <ClInclude Include="include\Packets\Callback.hpp" />
     <ClInclude Include="include\Packets\PacketManager.hpp" />
     <ClInclude Include="include\Packets\PacketSerializer.hpp" />
+    <ClInclude Include="include\UI\DownloadedSongsGSM.hpp" />
+    <ClInclude Include="include\UI\CenterScreenLoading.hpp" />
+    <ClInclude Include="include\UI\LobbySetupPanel.hpp" />
+    <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp" />
+    <ClInclude Include="shared\Utils\CustomData.hpp" />
+    <ClInclude Include="src\Hooks\NetworkPlayerEntitlementCheckerHooks.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1c603531-cd52-4be0-a840-ba695bb7e0c7}</ProjectGuid>
@@ -62,10 +112,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeIncludeSearchPath>
-    <NMakePreprocessorDefinitions>ID='"Mod ID"';VERSION='"Mod Version"'</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>ID='"Mod ID"';VERSION='"Mod Version"';MPEX_PROTOCOL='"0.6.1"'</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" NDK_PROJECT_PATH=$(ProjectDir) APP_BUILD_SCRIPT=$(ProjectDir)Android.mk NDK_APPLICATION_MK=$(ProjectDir)Application.mk</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" -B</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(NdkPath)\build\ndk-build.cmd" clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared;..\android-ndk-r23\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\**;..\android-ndk-r23\sources\cxx-stl\system\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++abi\include</NMakeForcedIncludes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeIncludeSearchPath>
@@ -73,6 +124,7 @@
     <NMakeBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" NDK_PROJECT_PATH=$(ProjectDir) APP_BUILD_SCRIPT=$(ProjectDir)Android.mk NDK_APPLICATION_MK=$(ProjectDir)Application.mk</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" -B</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(NdkPath)\build\ndk-build.cmd" clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeForcedIncludes>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
   </ItemDefinitionGroup>
