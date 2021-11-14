@@ -101,6 +101,10 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
         extendedPlayer->platform = packet->platform;
         extendedPlayer->playerColor = packet->playerColor;
         extendedPlayer->mpexVersion = packet->mpexVersion;
+
+        // Updates Color and NameTag
+        SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
+        CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()));
     }
     else {
         getLogger().info("Received 'ExtendedPlayerPacket' from '%s' with platformID: '%s'  mpexVersion: '%s'",
@@ -116,8 +120,8 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
                 getLogger().warning(
                     "###################################################################\r\n"
                     "Different MultiplayerExtensions protocol detected!\r\n"
-                    "The player '%s' is using MultiplayerExtensions %s while you are using MultiQuestensions " MPEX_PROTOCOL "\r\n"
-                    "For best compatibility all players should use the same version of MultiplayerExtensions.\r\n"
+                    "The player '%s' is using MpEx protocol version %s while you are using MpEx protocol " MPEX_PROTOCOL "\r\n"
+                    "For best compatibility all players should use a compatible version of MultiplayerExtensions/MultiQuestensions.\r\n"
                     "###################################################################",
                     to_utf8(csstrtostr(player->get_userName())).c_str(),
                     to_utf8(csstrtostr(extendedPlayer->mpexVersion)).c_str()
@@ -132,9 +136,9 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
             //extendedPlayers->Add(player->get_userId(), extendedPlayer);
             //if (!extendedPlayersSPTR) extendedPlayersSPTR = extendedPlayers;
 
-            getLogger().debug("SetPlayerPlaceColor");
+            //getLogger().debug("SetPlayerPlaceColor");
             SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
-            getLogger().debug("CreateOrUpdateNameTag");
+            //getLogger().debug("CreateOrUpdateNameTag");
             // This packet is usually received before the avatar is actually created
             CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()));
             getLogger().debug("ExtendedPlayerPacket done");
@@ -154,7 +158,7 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
             if (localExtendedPlayer->get_platformID() != nullptr)
             {
                 Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
-                getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+                //getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
                 packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
             }
             getLogger().debug("ExtendedPlayerPacket sent");

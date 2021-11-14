@@ -53,9 +53,9 @@ namespace MultiQuestensions::UI {
 			//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
 			//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
 			//modal->Show(true, true, nullptr);
-			//QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), 
-			//	"Chroma detected!\r\nChroma may cause crashes,\r\nif you're experiencing issues,\r\nthen it may be best\r\nto try disabling Chroma",
-			//	{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
+			QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), 
+				"Chroma detected!\r\nPlease disable Chroma inside BMBF.",
+				{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
 			getLogger().warning("Chroma detected");
 		}
 		else getLogger().debug("Chroma not detected");
@@ -78,31 +78,21 @@ namespace MultiQuestensions::UI {
 				playerColor = value;
 				getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
 				getConfig().Write();
-				try {
-					localExtendedPlayer->playerColor = value;
-					SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
-					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
-					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
-					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
-				}
-				catch (const std::runtime_error& e) {
-					getLogger().error("REPORT TO ENDER: %s", e.what());
-				}
+				localExtendedPlayer->playerColor = value;
+				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
+				Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+				getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+				packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
 			},
 			[sessionManager] {
-				try {
-					SetPlayerPlaceColor(sessionManager->get_localPlayer(), localExtendedPlayer->get_playerColor(), true);
-					Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
-					getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
-					packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
-				}
-				catch (const std::runtime_error& e) {
-					getLogger().error("REPORT TO ENDER: %s", e.what());
-				}
+				SetPlayerPlaceColor(sessionManager->get_localPlayer(), localExtendedPlayer->get_playerColor(), true);
+				//Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+				//getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
+				//packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
 			},
 			[sessionManager](UnityEngine::Color value) {
 				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
-				// TODO: Uncomment when MpEx supports live platform color updates
+				// TODO: Uncomment when MpEx supports live platform color updates or maybe not because that might be too much packets sent
 				
 				//try {
 				//	Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), value);
@@ -119,6 +109,7 @@ namespace MultiQuestensions::UI {
 			getConfig().config["autoDelete"].SetBool(value);
 			getConfig().Write();
 			});
+		QuestUI::BeatSaberUI::AddHoverHint(autoDelete->get_gameObject(), "Automatically deletes downloaded songs after playing them.");
 
 		//auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
 		//	using namespace RuntimeSongLoader::API;
@@ -143,10 +134,11 @@ namespace MultiQuestensions::UI {
 		//QuestUI::BeatSaberUI::AddHoverHint(deleteDownloadedSongs->get_gameObject(), "Deletes automatically downloaded songs from all multiplayer sessions since you launched the game.");
 
 
-		QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
+		auto colorPickerButton = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Color", [colorPicker] {
 			colorPicker->Show();
 			}
 		);
+		QuestUI::BeatSaberUI::AddHoverHint(colorPickerButton->get_gameObject(), "Lets you pick your own personal platform and Name Tag color for everyone to see.");
 
 		//customSongsToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Custom Songs", getConfig().config["customsongs"].GetBool(), SetCustomSongs);
 		//QuestUI::BeatSaberUI::AddHoverHint(customSongsToggle->get_gameObject(), "Toggles custom songs for all players");

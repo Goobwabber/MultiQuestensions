@@ -526,10 +526,10 @@ void saveDefaultConfig() {
     getLogger().info("Creating config file...");
     ConfigDocument& config = getConfig().config;
 
-    if (config.HasMember("color") && 
-        config.HasMember("autoDelete") &&
-        config.HasMember("LagReducer") &&
-        config.HasMember("MaxPlayers")) {
+    if (config.HasMember("color") && config["color"].IsString() &&
+        config.HasMember("autoDelete") && config["autoDelete"].IsBool() &&
+        config.HasMember("LagReducer") && config["LagReducer"].IsBool() &&
+        config.HasMember("MaxPlayers") && config["MaxPlayers"].IsInt()) {
         getLogger().info("Config file already exists.");
         return;
     }  
@@ -539,13 +539,13 @@ void saveDefaultConfig() {
         config.SetObject();
     auto& allocator = config.GetAllocator();
 
-    if (!config.HasMember("MaxPlayers"))
+    if (!(config.HasMember("MaxPlayers") && config["MaxPlayers"].IsInt()))
         config.AddMember("MaxPlayers", 10, allocator);
-    if (!config.HasMember("LagReducer"))
+    if (!(config.HasMember("LagReducer") && config["LagReducer"].IsBool()))
         config.AddMember("LagReducer", false, allocator);
-    if (!config.HasMember("autoDelete"))
+    if (!(config.HasMember("autoDelete") && config["autoDelete"].IsBool()))
         config.AddMember("autoDelete", false, allocator);
-    if (!config.HasMember("color"))
+    if (!(config.HasMember("color") && config["color"].IsString()))
         config.AddMember("color", "#08C0FF", allocator);
 
     //config.AddMember("freemod", false, allocator);
