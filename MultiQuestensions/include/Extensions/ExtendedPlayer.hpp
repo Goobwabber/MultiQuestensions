@@ -30,8 +30,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     Il2CppObject, "MultiplayerExtensions.Extensions",
     EPInterfaces, 0, nullptr,
 
-    static const constexpr UnityEngine::Color DefaultColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
-
     DECLARE_INSTANCE_FIELD(GlobalNamespace::IConnectedPlayer*, _connectedPlayer);
 
     /// <summary>
@@ -39,13 +37,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     /// </summary>
     DECLARE_INSTANCE_FIELD(Il2CppString*, platformID);
     DECLARE_INSTANCE_METHOD(Il2CppString*, get_platformID);
-
-    /// <summary>
-    /// Platform
-    /// </summary>
-    public:
-    Platform platform = Platform::OculusQuest;
-    Platform get_platform();
 
     /// <summary>
     /// MultiplayerExtensions version reported by BSIPA.
@@ -65,7 +56,28 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
 
     DECLARE_CTOR(ExtendedPlayer_ctor, GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, int platform, UnityEngine::Color playerColor, Il2CppString* mpexVersion);
 
+    DECLARE_INSTANCE_METHOD(bool, get_isMe);
+    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userId);
+    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userName);
+    DECLARE_INSTANCE_METHOD(float, get_currentLatency);
+    DECLARE_INSTANCE_METHOD(bool, get_isConnected);
+    DECLARE_INSTANCE_METHOD(bool, get_isConnectionOwner);
+    DECLARE_INSTANCE_METHOD(float, get_offsetSyncTime);
+    DECLARE_INSTANCE_METHOD(int, get_sortIndex);
+    DECLARE_INSTANCE_METHOD(bool, get_isKicked);
+    DECLARE_INSTANCE_METHOD(GlobalNamespace::MultiplayerAvatarData, get_multiplayerAvatarData);
+    DECLARE_INSTANCE_METHOD(GlobalNamespace::DisconnectedReason, get_disconnectedReason);
+    DECLARE_INSTANCE_METHOD(bool, HasState, Il2CppString* state);
+
 public:
+    static const constexpr UnityEngine::Color DefaultColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
+
+    /// <summary>
+    /// Platform
+    /// </summary>
+        Platform platform = Platform::OculusQuest;
+        Platform get_platform();
+
     static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player);
     static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
     static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, Il2CppString* mpexVersion, UnityEngine::Color playerColor);
@@ -82,19 +94,6 @@ public:
         return this;
     }
 
-    DECLARE_INSTANCE_METHOD(bool, get_isMe);
-    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userId);
-    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userName);
-    DECLARE_INSTANCE_METHOD(float, get_currentLatency);
-    DECLARE_INSTANCE_METHOD(bool, get_isConnected);
-    DECLARE_INSTANCE_METHOD(bool, get_isConnectionOwner);
-    DECLARE_INSTANCE_METHOD(float, get_offsetSyncTime);
-    DECLARE_INSTANCE_METHOD(int, get_sortIndex);
-    DECLARE_INSTANCE_METHOD(bool, get_isKicked);
-    DECLARE_INSTANCE_METHOD(GlobalNamespace::MultiplayerAvatarData, get_multiplayerAvatarData);
-    DECLARE_INSTANCE_METHOD(GlobalNamespace::DisconnectedReason, get_disconnectedReason);
-    DECLARE_INSTANCE_METHOD(bool, HasState, Il2CppString* state);
-
 )
 #undef EPInterfaces
 
@@ -103,12 +102,9 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     Il2CppObject, "MultiplayerExtensions.Extensions",
     EPPInterfaces, 0, nullptr,
     DECLARE_CTOR(New);
-public:
-    static ExtendedPlayerPacket* Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
 
     // Player and platform information
     DECLARE_INSTANCE_FIELD(Il2CppString*, platformID);
-    Platform platform;
     DECLARE_INSTANCE_FIELD(Il2CppString*, mpexVersion);
     DECLARE_INSTANCE_FIELD(UnityEngine::Color, playerColor);
 
@@ -116,5 +112,9 @@ public:
     DECLARE_OVERRIDE_METHOD(void, Deserialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Deserialize", 1), LiteNetLib::Utils::NetDataReader* reader);
     DECLARE_OVERRIDE_METHOD(void, Release, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPoolablePacket*), "Release", 0));
 
+    public:
+        Platform platform;
+
+        static ExtendedPlayerPacket* Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
 )
 #undef EPPInterfaces

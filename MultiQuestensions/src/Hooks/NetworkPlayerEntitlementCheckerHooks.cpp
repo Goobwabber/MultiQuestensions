@@ -1,6 +1,7 @@
 #include "main.hpp"
 #include "Hooks/Hooks.hpp"
 #include "Utils/CustomData.hpp"
+#include "CS_DataStore.hpp"
 using namespace GlobalNamespace;
 using namespace System::Threading::Tasks;
 
@@ -63,13 +64,23 @@ namespace MultiQuestensions {
             }
         }
         entitlementDictionary[cUserId][cLevelId] = entitlement.value;
-        if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting && loadingPreviewBeatmapLevel && loadingBeatmapCharacteristic && loadingDifficultyBeatmap && loadingGameplayModifiers) {
-            getLogger().debug("[HandleEntitlementReceived] GameStarting, running 'HandleMultiplayerLevelLoaderCountdownFinished'");
-            lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(loadingPreviewBeatmapLevel, loadingBeatmapDifficulty, loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
-        }
-        else if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
+        if (lobbyGameStateController != nullptr && lobbyGameStateController->get_state() == MultiplayerLobbyState::GameStarting) {
+            DataStore* instance = DataStore::get_Instance();
+            if (instance && instance->loadingPreviewBeatmapLevel && instance->loadingBeatmapCharacteristic && instance->loadingDifficultyBeatmap && instance->loadingGameplayModifiers && instance->loadingBeatmapDifficulty) {
+                getLogger().debug("[HandleEntitlementReceived] GameStarting, running 'HandleMultiplayerLevelLoaderCountdownFinished'");
+                lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(instance->loadingPreviewBeatmapLevel, instance->loadingBeatmapDifficulty.value(), instance->loadingBeatmapCharacteristic, instance->loadingDifficultyBeatmap, instance->loadingGameplayModifiers);
+                return;
+            }
+            else if (lobbyGameStateController->dyn__multiplayerLevelLoader()) {
+                getLogger().debug("[HandleEntitlementReceived] GameStarting, DataStore empty trying to run 'HandleMultiplayerLevelLoaderCountdownFinished' with lvlLoader Data");
+                MultiplayerLevelLoader* lvlLoader = lobbyGameStateController->dyn__multiplayerLevelLoader();
+                if (lvlLoader->dyn__previewBeatmapLevel() && lvlLoader->dyn__beatmapId() && lvlLoader->dyn__beatmapCharacteristic() && lvlLoader->dyn__difficultyBeatmap() && lvlLoader->dyn__gameplayModifiers()) {
+                    lobbyGameStateController->HandleMultiplayerLevelLoaderCountdownFinished(lvlLoader->dyn__previewBeatmapLevel(), lvlLoader->dyn__beatmapId()->get_difficulty(), lvlLoader->dyn__beatmapCharacteristic(), lvlLoader->dyn__difficultyBeatmap(), lvlLoader->dyn__gameplayModifiers());
+                    return;
+                }
+            }
             getLogger().error("[HandleEntitlementReceived] GameStarting but level data not available");
-            getLogger().debug("[HandleEntitlementReceived] checking pointers: loadingPreviewBeatmapLevel='%p', loadingBeatmapDifficulty set to '%d', loadingBeatmapCharacteristic='%p', loadingDifficultyBeatmap='%p', loadingGameplayModifiers='%p'", loadingPreviewBeatmapLevel, static_cast<int>(loadingBeatmapDifficulty), loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
+            //getLogger().debug("[HandleEntitlementReceived] checking pointers: loadingPreviewBeatmapLevel='%p', loadingBeatmapDifficulty set to '%d', loadingBeatmapCharacteristic='%p', loadingDifficultyBeatmap='%p', loadingGameplayModifiers='%p'", loadingPreviewBeatmapLevel, static_cast<int>(loadingBeatmapDifficulty), loadingBeatmapCharacteristic, loadingDifficultyBeatmap, loadingGameplayModifiers);
         }
     }
 

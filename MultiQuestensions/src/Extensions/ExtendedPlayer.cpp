@@ -27,7 +27,7 @@ namespace MultiQuestensions::Extensions {
     }
 
     ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player) {
-        return THROW_UNLESS(il2cpp_utils::New<ExtendedPlayer*, il2cpp_utils::CreationType::Manual>(player, static_cast<Il2CppString*>(nullptr), 3, DefaultColor, static_cast<Il2CppString*>(nullptr)));
+        return THROW_UNLESS(il2cpp_utils::New<ExtendedPlayer*>(player, static_cast<Il2CppString*>(nullptr), 3, DefaultColor, static_cast<Il2CppString*>(nullptr)));
     }
     ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor) {
         return THROW_UNLESS(il2cpp_utils::New<ExtendedPlayer*>(player, platformID, (int)platform, playerColor, static_cast<Il2CppString*>(nullptr)));

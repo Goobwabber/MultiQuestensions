@@ -8,7 +8,6 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::UI, CenterScreenLoading, UnityEngine::M
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, loadingControl);
     DECLARE_INSTANCE_FIELD(GlobalNamespace::CenterStageScreenController*, screenController);
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LobbyGameStateController*, gameStateController);
-    bool isDownloading;
 
     DECLARE_INSTANCE_METHOD(void, Awake);
     DECLARE_INSTANCE_METHOD(void, OnDisable);
@@ -17,6 +16,9 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::UI, CenterScreenLoading, UnityEngine::M
     DECLARE_INSTANCE_METHOD(void, ShowDownloadingProgress, float downloadingProgress);
     //DECLARE_INSTANCE_METHOD(void, HideLoading);
     DECLARE_INSTANCE_METHOD(void, FixedUpdate);
+
+    bool isDownloading;
+
     static CenterScreenLoading* instance;
 public:
     static int playersReady;

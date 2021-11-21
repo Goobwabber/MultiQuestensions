@@ -15,9 +15,11 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, LobbyAvatarPlaceLighting,
     DECLARE_INSTANCE_METHOD(void, OnEnable);
     DECLARE_INSTANCE_METHOD(void, OnDisable);
     DECLARE_INSTANCE_METHOD(void, Update);
-    public:
-    void SetColor(const UnityEngine::Color& color, bool immediate);
     DECLARE_INSTANCE_METHOD(UnityEngine::Color, GetColor);
     DECLARE_INSTANCE_METHOD(bool, IsColorVeryCloseToColor, UnityEngine::Color color0, UnityEngine::Color color1);
+
+public:
+    void SetColor(const UnityEngine::Color& color, bool immediate);
+private:
     void SetColor(const UnityEngine::Color& color);
 )
