@@ -108,6 +108,7 @@
     <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
     <ClCompile Include="src\Hooks\InstallerHooks.cpp" />
     <ClCompile Include="src\Utils\CustomData.cpp" />
+    <ClCompile Include="src\CS_DataStore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\main.hpp">
@@ -226,5 +227,6 @@
     <ClInclude Include="include\Hooks\SessionManagerAndExtendedPlayerHooks.hpp" />
     <ClInclude Include="include\UI\CenterScreenLoading.hpp" />
     <ClInclude Include="shared\Utils\CustomData.hpp" />
+    <ClInclude Include="include\CS_DataStore.hpp" />
   </ItemGroup>
 </Project>

@@ -33,6 +33,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Packets\PacketManager.cpp" />
     <ClCompile Include="src\Packets\PacketSerializer.cpp" />
+    <ClCompile Include="src\CS_DataStore.cpp" />
     <ClCompile Include="src\UI\LobbySetupPanel.cpp" />
     <ClCompile Include="src\UI\DownloadedSongsGSM.cpp" />
     <ClCompile Include="src\UI\CenterScreenLoading.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="include\Extensions\ExtendedPlayer.hpp" />
     <ClInclude Include="include\GlobalFields.hpp" />
     <ClInclude Include="include\Hooks\EnvironmentAndAvatarHooks.hpp" />
+    <ClInclude Include="include\CS_DataStore.hpp" />
     <ClInclude Include="include\Hooks\SessionManagerAndExtendedPlayerHooks.hpp" />
     <ClInclude Include="include\Hooks\Hooks.hpp" />
     <ClInclude Include="include\main.hpp" />

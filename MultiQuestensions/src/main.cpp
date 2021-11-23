@@ -6,6 +6,7 @@
 #include "UI/LobbySetupPanel.hpp"
 #include "UI/DownloadedSongsGSM.hpp"
 #include "UI/CenterScreenLoading.hpp"
+#include "CS_DataStore.hpp"
 
 #include "GlobalNamespace/ConnectedPlayerManager.hpp"
 
@@ -138,7 +139,7 @@ MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString
     for (int i = 0; i < sessionManager->connectedPlayers->get_Count(); i++) {
         ILevelGameplaySetupData* playerData = reinterpret_cast<ILevelGameplaySetupData*>(lobbyPlayersDataModel->playersData->
             get_Item(sessionManager->connectedPlayers->get_Item(i)->get_userId()));
-        if (playerData->get_beatmapLevel() != nullptr && playerData->get_beatmapLevel()->get_levelID()->Equals(levelId)) {
+        if (playerData->get_beatmapLevel() != nullptr && csstrtostr(playerData->get_beatmapLevel()->get_levelID()) == csstrtostr(levelId)) {
             getLogger().debug("GetExistingPreview type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())->klass).c_str());
             if (il2cpp_utils::AssignableFrom<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(reinterpret_cast<Il2CppObject*>(playerData->get_beatmapLevel())->klass)) {
                 getLogger().debug(__FILE__ " Line: %d", __LINE__);
@@ -150,7 +151,7 @@ MultiQuestensions::Beatmaps::PreviewBeatmapStub* GetExistingPreview(Il2CppString
                 getLogger().debug("Check expected levelId: %s, \r\nactual levelId: %s, \r\nlevelIDs match? %s", 
                     to_utf8(csstrtostr(levelId)).c_str(), 
                     to_utf8(csstrtostr(playerData->get_beatmapLevel()->get_levelID())).c_str(), 
-                    playerData->get_beatmapLevel()->get_levelID()->Equals(levelId) ? "true" : "false");
+                    csstrtostr(playerData->get_beatmapLevel()->get_levelID()) == csstrtostr(levelId) ? "true" : "false");
             else getLogger().debug("beatmapLevel is null");
         }
     }
@@ -442,12 +443,17 @@ MAKE_HOOK_MATCH(MultiplayerLevelLoader_LoadLevel, &MultiplayerLevelLoader::LoadL
 MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished, &LobbyGameStateController::HandleMultiplayerLevelLoaderCountdownFinished, void, LobbyGameStateController* self, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::GameplayModifiers* gameplayModifiers) {
     getLogger().debug("LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished");
     lobbyGameStateController = self;
+
+    DataStore* instance = DataStore::get_Instance();
+    if (!instance) instance = DataStore::CS_Ctor(previewBeatmapLevel, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers, beatmapDifficulty);
+
+    instance->loadingPreviewBeatmapLevel = previewBeatmapLevel;
+    instance->loadingBeatmapDifficulty = beatmapDifficulty;
+    instance->loadingBeatmapCharacteristic = beatmapCharacteristic;
+    instance->loadingDifficultyBeatmap = difficultyBeatmap;
+    instance->loadingGameplayModifiers = gameplayModifiers;
+    
     //self->dyn__multiplayerLevelLoader()->dyn__loaderState() = MultiplayerLevelLoader::MultiplayerBeatmapLoaderState::NotLoading;
-    loadingPreviewBeatmapLevel = previewBeatmapLevel;
-    loadingBeatmapDifficulty = beatmapDifficulty;
-    loadingBeatmapCharacteristic = beatmapCharacteristic;
-    loadingDifficultyBeatmap = difficultyBeatmap;
-    loadingGameplayModifiers = gameplayModifiers;
     bool entitlementStatusOK = true;
     std::string LevelID = to_utf8(csstrtostr(self->startedBeatmapId->get_levelID()));
     // Checks each player, to see if they're in the lobby, and if they are, checks their entitlement status.
@@ -464,15 +470,16 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
     self->menuRpcManager->SetIsEntitledToLevel(previewBeatmapLevel->get_levelID(), EntitlementsStatus::Ok);
     if (entitlementStatusOK) {
         //if (cslInstance) cslInstance->HideLoading();
-        loadingPreviewBeatmapLevel = nullptr;
-        //loadingBeatmapDifficulty.dyn_value__() = 1000;
-        loadingBeatmapCharacteristic = nullptr;
-        loadingDifficultyBeatmap = nullptr;
-        loadingGameplayModifiers = nullptr;
+        //loadingPreviewBeatmapLevel = nullptr;
+        ////loadingBeatmapDifficulty.dyn_value__() = 1000;
+        //loadingBeatmapCharacteristic = nullptr;
+        //loadingDifficultyBeatmap = nullptr;
+        //loadingGameplayModifiers = nullptr;
+        DataStore::Clear();
 
         // call original method
         LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFinished(self, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, gameplayModifiers);
-        entitlementDictionary.clear();
+        //entitlementDictionary.clear();
     }
 }
 
@@ -526,10 +533,10 @@ void saveDefaultConfig() {
     getLogger().info("Creating config file...");
     ConfigDocument& config = getConfig().config;
 
-    if (config.HasMember("color") && 
-        config.HasMember("autoDelete") &&
-        config.HasMember("LagReducer") &&
-        config.HasMember("MaxPlayers")) {
+    if (config.HasMember("color") && config["color"].IsString() &&
+        config.HasMember("autoDelete") && config["autoDelete"].IsBool() &&
+        config.HasMember("LagReducer") && config["LagReducer"].IsBool() &&
+        config.HasMember("MaxPlayers") && config["MaxPlayers"].IsInt()) {
         getLogger().info("Config file already exists.");
         return;
     }  
@@ -539,13 +546,13 @@ void saveDefaultConfig() {
         config.SetObject();
     auto& allocator = config.GetAllocator();
 
-    if (!config.HasMember("MaxPlayers"))
+    if (!(config.HasMember("MaxPlayers") && config["MaxPlayers"].IsInt()))
         config.AddMember("MaxPlayers", 10, allocator);
-    if (!config.HasMember("LagReducer"))
+    if (!(config.HasMember("LagReducer") && config["LagReducer"].IsBool()))
         config.AddMember("LagReducer", false, allocator);
-    if (!config.HasMember("autoDelete"))
+    if (!(config.HasMember("autoDelete") && config["autoDelete"].IsBool()))
         config.AddMember("autoDelete", false, allocator);
-    if (!config.HasMember("color"))
+    if (!(config.HasMember("color") && config["color"].IsString()))
         config.AddMember("color", "#08C0FF", allocator);
 
     //config.AddMember("freemod", false, allocator);
