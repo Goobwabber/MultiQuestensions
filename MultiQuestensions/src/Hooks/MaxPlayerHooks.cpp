@@ -40,48 +40,50 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(IntroAnimationPatch, &MultiplayerIntroAnimationController::PlayIntroAnimation, void, MultiplayerIntroAnimationController* self, float maxDesiredIntroAnimationDuration, Action* onCompleted) {
-        targetIterations = ((((IReadOnlyCollection_1<GlobalNamespace::IConnectedPlayer*>*)self->multiplayerPlayersManager->allActiveAtGameStartPlayers)->get_Count() - 1) / 4) + 1;
         PlayableDirector* realDirector = self->introPlayableDirector;
-
+        if (targetIterations == 0)
+        {
+            targetIterations = floor((reinterpret_cast<IReadOnlyCollection_1<GlobalNamespace::IConnectedPlayer*>*>(self->multiplayerPlayersManager->allActiveAtGameStartPlayers)->get_Count() - 1) / 4) + 1;
+        }
         try {
             // Run animation one time for each set of 4 players
-            while (targetIterations > 0) {
-                if (targetIterations != 1) {
-                    // Create duplicated animations
-                    GameObject* newPlayableGameObject = GameObject::New_ctor();
-                    self->introPlayableDirector = newPlayableGameObject->AddComponent<PlayableDirector*>();
+            if (targetIterations != 1) {
+                // Create duplicated animations
+                GameObject* newPlayableGameObject = GameObject::New_ctor();
+                self->introPlayableDirector = newPlayableGameObject->AddComponent<PlayableDirector*>();
 
-                    using SetPlayableAsset = function_ptr_t<void, Il2CppObject*, PlayableAsset*>;
-                    static SetPlayableAsset setPlayableAsset = reinterpret_cast<SetPlayableAsset>(il2cpp_functions::resolve_icall("UnityEngine.Playables.PlayableDirector::SetPlayableAsset"));
-                    setPlayableAsset(self->introPlayableDirector, realDirector->get_playableAsset());
+                using SetPlayableAsset = function_ptr_t<void, Il2CppObject*, PlayableAsset*>;
+                static SetPlayableAsset setPlayableAsset = reinterpret_cast<SetPlayableAsset>(il2cpp_functions::resolve_icall("UnityEngine.Playables.PlayableDirector::SetPlayableAsset"));
+                setPlayableAsset(self->introPlayableDirector, realDirector->get_playableAsset());
 
-                    // Mute duplicated animations except one (otherwise audio is very loud)
-                    TimelineAsset* animationTimeline = reinterpret_cast<TimelineAsset*>(self->introPlayableDirector->get_playableAsset());
-                    
-                    static auto* Enumerable_ToList_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "ToList", 1));
-                    static auto* Enumerable_ToList = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_ToList_Generic, { classof(TrackAsset*) }));
+                // Mute duplicated animations except one (otherwise audio is very loud)
+                TimelineAsset* mutedTimeline = reinterpret_cast<TimelineAsset*>(self->introPlayableDirector->get_playableAsset());
 
-                    //List<TrackAsset*>* outputTracks = Enumerable::ToList<TrackAsset*>(animationTimeline->GetOutputTracks());
-                    List<TrackAsset*>* outputTracks = il2cpp_utils::RunMethodThrow<List_1<TrackAsset*>*, false>(static_cast<Il2CppClass*>(nullptr),
-                        Enumerable_ToList, animationTimeline->GetOutputTracks());
+                static auto* Enumerable_ToList_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "ToList", 1));
+                static auto* Enumerable_ToList = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_ToList_Generic, { classof(TrackAsset*) }));
 
-                    for (int i = 0; i < outputTracks->get_Count(); i++) {
-                        TrackAsset* currentTrack = outputTracks->get_Item(i);
-                        bool isAudio = il2cpp_utils::AssignableFrom<AudioTrack*>(reinterpret_cast<Il2CppObject*>(currentTrack)->klass);
-                        currentTrack->set_muted(isAudio);
-                    }
+                //List<TrackAsset*>* outputTracks = Enumerable::ToList<TrackAsset*>(animationTimeline->GetOutputTracks());
+                List<TrackAsset*>* outputTracks = il2cpp_utils::RunMethodThrow<List_1<TrackAsset*>*, false>(static_cast<Il2CppClass*>(nullptr),
+                    Enumerable_ToList, mutedTimeline->GetOutputTracks());
+
+                for (int i = 0; i < outputTracks->get_Count(); i++) {
+                    TrackAsset* currentTrack = outputTracks->get_Item(i);
+                    bool isAudio = il2cpp_utils::AssignableFrom<AudioTrack*>(reinterpret_cast<Il2CppObject*>(currentTrack)->klass);
+                    currentTrack->set_muted(isAudio);
                 }
-
-                self->bindingFinished = false;
-                IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
-                self->introPlayableDirector = realDirector;
-                targetIterations--;
             }
 
+            self->bindingFinished = false;
+            IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
             // Reset director to real director
             self->introPlayableDirector = realDirector;
+            targetIterations--;
+            if (targetIterations != 0)
+                self->PlayIntroAnimation(maxDesiredIntroAnimationDuration, onCompleted);
         }
         catch (const std::runtime_error& e) {
+            // Reset director to real director
+            self->introPlayableDirector = realDirector;
             getLogger().critical("REPORT TO ENDER: Hook IntroAnimationPatch" __FILE__ " at Line %d: %s", __LINE__, e.what());
             IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
         }
@@ -105,9 +107,6 @@ namespace MultiQuestensions {
 
     MAKE_HOOK_MATCH(MultiplayerPlayersManager_get_allActiveAtGameStartPlayers, &MultiplayerPlayersManager::get_allActiveAtGameStartPlayers, IReadOnlyList_1<GlobalNamespace::IConnectedPlayer*>*, MultiplayerPlayersManager* self) {
         getLogger().debug("Start: MultiplayerPlayersManager_get_allActiveAtGameStartPlayers");
-        // 09-21 14:30:26.025  4647  4672 D QuestHook[UtilsLogger|v2.3.0]: (il2cpp_utils::FindMethod) Method 27:
-        // 09-21 14:30:26.026  4647  4672 D QuestHook[UtilsLogger|v2.3.0]: (il2cpp_utils::FindMethod) static
-        // System.Collections.Generic.List<TSource> ToList(System.Collections.Generic.IEnumerable<TSource> source);
         static auto* Enumerable_ToList_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "ToList", 1));
         static auto* Enumerable_ToList = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_ToList_Generic, { classof(IConnectedPlayer*) }));
 
@@ -177,17 +176,6 @@ namespace MultiQuestensions {
         CreateServerFormData result = CreateServerFormController_get_formData(self);
         result.maxPlayers = (int)std::clamp(self->dyn__maxPlayersList()->value, 2.0f, fminf(getConfig().config["MaxPlayers"].GetFloat(), 100));
         return result;
-        //return CreateServerFormData
-        //{
-        //    (int)std::clamp(self->dyn__maxPlayersList()->value, 2.0f, 10.0f),
-        //    self->dyn__netDiscoverable(),
-        //    BeatmapDifficultyMask::All,
-        //    GameplayModifierMask::All,
-        //    SongPackMask::get_all(),
-        //    GameplayServerMode::Managed,
-        //    SongSelectionMode::OwnerPicks,
-        //    GameplayServerControlSettings::All
-        //};
     }
 
     MAKE_HOOK_MATCH(CreateServerFormController_Setup, &CreateServerFormController::Setup, void, CreateServerFormController* self, int selectedNumberOfPlayers, bool netDiscoverable) {
