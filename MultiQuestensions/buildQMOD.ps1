@@ -1,7 +1,7 @@
 # Builds a .qmod file for loading with QP
 if ($args.Count -eq 0) {
 $ModID = "multiquestensions"
-$BSHook = "2_3_0"
+$BSHook = "2_3_2"
 $VERSION = "0.1.0"
 $BS_Version = "1.17.1"
 $new_VERSION = Read-Host -Prompt "Input desired mod version (leave empty for default: '$VERSION')"
