@@ -96,11 +96,13 @@ namespace MultiQuestensions {
     CalculatePlayerIndexSequencePatchType cpispt = None;
 
     MAKE_HOOK_MATCH(MultiplayerIntroAnimationController_BindTimeline, &MultiplayerIntroAnimationController::BindTimeline, void, MultiplayerIntroAnimationController* self) {
+        getLogger().debug("Start: MultiplayerIntroAnimationController_BindTimeline");
         cpispt = BindTimeline;
         MultiplayerIntroAnimationController_BindTimeline(self);
     }
 
     MAKE_HOOK_MATCH(MultiplayerOutroAnimationController_BindOutroTimeline, &MultiplayerOutroAnimationController::BindOutroTimeline, void, MultiplayerOutroAnimationController* self) {
+        getLogger().debug("Start: MultiplayerOutroAnimationController_BindOutroTimeline");
         cpispt = BindOutroTimeline;
         MultiplayerOutroAnimationController_BindOutroTimeline(self);
     }

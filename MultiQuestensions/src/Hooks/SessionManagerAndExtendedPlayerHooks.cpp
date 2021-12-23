@@ -4,6 +4,7 @@
 #include "GlobalFields.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
 #include "UI/CenterScreenLoading.hpp"
+#include "Utils/SemVerChecker.hpp"
 
 #include "Beatmaps/PreviewBeatmapStub.hpp"
 
@@ -215,10 +216,11 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
         );
         reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
 
+        using namespace MultiQuestensions::Utils;
         self->SetLocalPlayerState(getModdedStateStr(), true);
-        self->SetLocalPlayerState(getMEStateStr(), Modloader::getMods().find("MappingExtensions") != Modloader::getMods().end());
-        self->SetLocalPlayerState(getNEStateStr(), Modloader::getMods().find("NoodleExtensions") != Modloader::getMods().end());
-        self->SetLocalPlayerState(getChromaStateStr(), /*Modloader::getMods().find("Chroma") != Modloader::getMods().end()*/ false);
+        self->SetLocalPlayerState(getMEStateStr(), MatchesVersion("MappingExtensions", "*"));
+        self->SetLocalPlayerState(getNEStateStr(), MatchesVersion("NoodleExtensions", "*"));
+        self->SetLocalPlayerState(getChromaStateStr(), MatchesVersion(ChromaID, ChromaVersionRange));
         // TODO: Do this check correctly once Chroma got an Update for Multiplayer
 
     //}

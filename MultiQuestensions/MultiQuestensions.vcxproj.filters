@@ -228,5 +228,6 @@
     <ClInclude Include="include\UI\CenterScreenLoading.hpp" />
     <ClInclude Include="shared\Utils\CustomData.hpp" />
     <ClInclude Include="include\CS_DataStore.hpp" />
+    <ClInclude Include="shared\Utils\SemVerChecker.hpp" />
   </ItemGroup>
 </Project>

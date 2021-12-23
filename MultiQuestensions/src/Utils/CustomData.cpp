@@ -1,8 +1,10 @@
 #include "main.hpp"
 #include "Utils/CustomData.hpp"
+#include "Utils/SemVerChecker.hpp"
 
 namespace MultiQuestensions::Utils {
     bool HasRequirement(const std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*>& beatmapOpt) {
+        using namespace MultiQuestensions::Utils;
         if (beatmapOpt)
         {
             std::string infodatPath = to_utf8(csstrtostr(beatmapOpt.value()->get_customLevelPath()));
@@ -28,19 +30,19 @@ namespace MultiQuestensions::Utils {
                                     !dB["_customData"]["_requirements"].Empty()) {
                                     for (auto& req : dB["_customData"]["_requirements"].GetArray()) {
                                         getLogger().debug("Found requirement: %s", req.GetString());
-                                        if (strcmp(req.GetString(), "Chroma") == 0 && !AllPlayersHaveChroma()) {
+                                        if (strcmp(req.GetString(), "Chroma") == 0 && (!AllPlayersHaveChroma() || !MatchesVersion(ChromaID, ChromaVersionRange))) {
                                             getLogger().warning("Requires Chroma");
-                                            missingLevelText = "Chroma Requirement block, please uninstall Chroma, as it currently causes crashes";
+                                            missingLevelText = "Chroma suggestion block, please install or update Chroma";
                                             return false;
                                         }
-                                        else if (strcmp(req.GetString(), "Noodle Extensions") == 0 && !AllPlayersHaveNE() && Modloader::getMods().find("NoodleExtensions") == Modloader::getMods().end()) {
+                                        else if (strcmp(req.GetString(), "Noodle Extensions") == 0 && (!AllPlayersHaveNE() || !MatchesVersion("NoodleExtensions", "*"))) {
                                             getLogger().warning("Requires Noodle Extensions but it was not installed");
-                                            missingLevelText = "You or another Player is Missing the following Requirement: Noodle Extensions";
+                                            missingLevelText = "You or another Player are Missing the following Requirement: Noodle Extensions";
                                             return false;
                                         }
-                                        else if (strcmp(req.GetString(), "Mapping Extensions") == 0 && !AllPlayersHaveME() && Modloader::getMods().find("MappingExtensions") == Modloader::getMods().end()) {
+                                        else if (strcmp(req.GetString(), "Mapping Extensions") == 0 && (!AllPlayersHaveME() || !MatchesVersion("MappingExtensions", "*"))) {
                                             getLogger().warning("Requires Mapping Extensions but it was not installed");
-                                            missingLevelText = "You or another Player is Missing the following Requirement: Mapping Extensions";
+                                            missingLevelText = "You or another Player are Missing the following Requirement: Mapping Extensions";
                                             return false;
                                         }
                                     }
@@ -49,11 +51,12 @@ namespace MultiQuestensions::Utils {
                                     !dB["_customData"]["_suggestions"].Empty()) {
                                     for (auto& sug : dB["_customData"]["_suggestions"].GetArray()) {
                                         getLogger().debug("Found suggestion: %s", sug.GetString());
-                                        if (strcmp(sug.GetString(), "Chroma") == 0 && Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
-                                            getLogger().warning("Suggestion Chroma and Chroma installed, returning false, as Chroma may cause crashes");
-                                            missingLevelText = "Chroma suggestion block, please uninstall Chroma, as it currently causes crashes";
+                                        if (strcmp(sug.GetString(), "Chroma") == 0 && (!AllPlayersHaveChroma() || !MatchesVersion(ChromaID, ChromaVersionRange))) {
+                                            getLogger().warning("Suggestion Chroma and Chroma outdated or missing");
+                                            missingLevelText = "Chroma suggestion block, please install or update Chroma";
                                             return false;
                                         }
+                                        getLogger().debug("Checking bools 'All players have chroma': %s, 'MatchesVersion': %s 'Combined check': %s", AllPlayersHaveChroma() ? "true" : "false", MatchesVersion(ChromaID, ChromaVersionRange) ? "true" : "false", (!AllPlayersHaveChroma() || !MatchesVersion(ChromaID, ChromaVersionRange)) ? "true" : "false");
                                     }
                                 }
                             }

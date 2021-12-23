@@ -11,6 +11,7 @@
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
 #include "songloader/shared/API.hpp"
 #include "UI/DownloadedSongsGSM.hpp"
+#include "Utils/SemVerChecker.hpp"
 using namespace UnityEngine::UI;
 
 namespace MultiQuestensions::UI {
@@ -46,19 +47,20 @@ namespace MultiQuestensions::UI {
 		vertical4->get_gameObject()->AddComponent<LayoutElement*>()
 			->set_minWidth(45);
 
-		if (Modloader::getMods().find("Chroma") != Modloader::getMods().end()) {
+		using namespace MultiQuestensions::Utils;
+		if (IsInstalled(ChromaID) && !MatchesVersion(ChromaID, ChromaVersionRange)) {
 			//HMUI::ModalView* modal = QuestUI::BeatSaberUI::CreateModal(parent, { 55, 25 }, std::nullptr_t());
 			//auto wrapper = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(modal->get_transform());
 			//auto container = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(wrapper->get_transform());
 			//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
 			//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
 			//modal->Show(true, true, nullptr);
-			QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(), 
-				"Chroma detected!\r\nPlease disable Chroma inside BMBF.",
+			QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(),
+				"Chroma outdated!\r\nPlease update to the latest version of Chroma.",
 				{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
-			getLogger().warning("Chroma detected");
+			getLogger().warning("Chroma outdated");
 		}
-		else getLogger().debug("Chroma not detected");
+		else getLogger().debug("Chroma not installed or version compatible");
 
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>
