@@ -24,7 +24,7 @@ using namespace GlobalNamespace;
 // Handles a PreviewBeatmapPacket used to transmit data about a custom song.
 static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
     getLogger().debug("'%s' selected song '%s'", to_utf8(csstrtostr(player->get_userId())).c_str(), to_utf8(csstrtostr(packet->levelHash)).c_str());
-    IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->beatmapLevelsModel->GetLevelPreviewForLevelId(packet->levelId);
+    IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->dyn__beatmapLevelsModel()->GetLevelPreviewForLevelId(packet->levelId);
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview;
     try {
         if (localPreview == nullptr) {
@@ -40,7 +40,7 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
                             QuestUI::MainThreadScheduler::Schedule([packet, player, preview, bytes] {
                                 if (packet && player && preview && lobbyPlayersDataModel) {
                                     preview->coverImage = QuestUI::BeatSaberUI::VectorToSprite(bytes);
-                                    BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+                                    BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->dyn__beatmapCharacteristicCollection()->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
                                     lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
                                 }
                                 else {
@@ -54,7 +54,7 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
                     else {
                         QuestUI::MainThreadScheduler::Schedule([packet, player, preview] {
                             if (packet && player && preview) {
-                                BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+                                BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->dyn__beatmapCharacteristicCollection()->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
                                 lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
                             }
                             else {
@@ -71,7 +71,7 @@ static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatm
             MultiQuestensions::Beatmaps::PreviewBeatmapPacket* nullpacket = nullptr;
             preview = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(packet->levelHash, localPreview, nullpacket));
         }
-        BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->beatmapCharacteristicCollection->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
+        BeatmapCharacteristicSO* characteristic = lobbyPlayersDataModel->dyn__beatmapCharacteristicCollection()->GetBeatmapCharacteristicBySerializedName(packet->characteristic);
         //getLogger().debug("Check difficulty as unsigned int: %u", packet->difficulty);
         lobbyPlayersDataModel->SetPlayerBeatmapLevel(player->get_userId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), packet->difficulty, characteristic);
     }
@@ -201,15 +201,15 @@ MAKE_HOOK_FIND_VERBOSE(SessionManager_StartSession, il2cpp_utils::FindMethodUnsa
         //localExtendedPlayerSPTR = localExtendedPlayer;
 
         if (!UnityEngine::ColorUtility::TryParseHtmlString(il2cpp_utils::newcsstr(getConfig().config["color"].GetString()), localExtendedPlayer->playerColor))
-            localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
+            localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f, 1.0f);
 
-        static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>()->get(0);
-        static auto UserInfoTask = localNetworkPlayerModel->platformUserModel->GetUserInfo();
+        static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>().get(0);
+        static auto UserInfoTask = localNetworkPlayerModel->dyn__platformUserModel()->GetUserInfo();
         static auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
             auto userInfo = userInfoTask->get_Result();
             if (userInfo) {
-                localExtendedPlayer->platformID = userInfo->platformUserId;
-                localExtendedPlayer->platform = (Extensions::Platform)userInfo->platform.value;
+                localExtendedPlayer->platformID = userInfo->dyn_platformUserId();
+                localExtendedPlayer->platform = (Extensions::Platform)userInfo->dyn_platform().value;
             }
             else getLogger().error("Failed to get local network player!");
             }

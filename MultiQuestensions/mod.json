@@ -3,15 +3,15 @@
     "name":  "MultiQuestensions",
     "id":  "multiquestensions",
     "author":  "EnderdracheLP and Goobie",
-    "version":  "0.1.1",
+    "version":  "0.1.2-Test",
     "packageId":  "com.beatgames.beatsaber",
-    "packageVersion":  "1.17.1",
+    "packageVersion":  "1.19.0",
     "description":  "Lightweight port of MultiplayerExtensions, the PC mod that adds features to official Multiplayer.",
     "modFiles":  [
                      "libmultiquestensions.so"
                  ],
     "libraryFiles":  [
-                         "libbeatsaber-hook_2_3_2.so"
+                         "libbeatsaber-hook_3_4_4.so"
                      ],
     "dependencies":  [
                          {

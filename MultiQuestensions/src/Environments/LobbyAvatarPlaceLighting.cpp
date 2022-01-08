@@ -14,8 +14,8 @@ namespace MultiQuestensions::Environments {
 
     void LobbyAvatarPlaceLighting::OnEnable() {
         auto lightsArr = this->GetComponentsInChildren<TubeBloomPrePassLight*>();
-        for (int i = 0; i < lightsArr->Length(); i++) {
-            this->lights.emplace_back(lightsArr->get(i));
+        for (int i = 0; i < lightsArr.Length(); i++) {
+            this->lights.emplace_back(lightsArr.get(i));
         }
     }
 

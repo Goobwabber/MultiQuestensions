@@ -40,24 +40,24 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(IntroAnimationPatch, &MultiplayerIntroAnimationController::PlayIntroAnimation, void, MultiplayerIntroAnimationController* self, float maxDesiredIntroAnimationDuration, Action* onCompleted) {
-        PlayableDirector* realDirector = self->introPlayableDirector;
+        PlayableDirector* realDirector = self->dyn__introPlayableDirector();
         if (targetIterations == 0)
         {
-            targetIterations = floor((reinterpret_cast<IReadOnlyCollection_1<GlobalNamespace::IConnectedPlayer*>*>(self->multiplayerPlayersManager->allActiveAtGameStartPlayers)->get_Count() - 1) / 4) + 1;
+            targetIterations = floor((reinterpret_cast<IReadOnlyCollection_1<GlobalNamespace::IConnectedPlayer*>*>(self->dyn__multiplayerPlayersManager()->dyn__allActiveAtGameStartPlayers())->get_Count() - 1) / 4) + 1;
         }
         try {
             // Run animation one time for each set of 4 players
             if (targetIterations != 1) {
                 // Create duplicated animations
                 GameObject* newPlayableGameObject = GameObject::New_ctor();
-                self->introPlayableDirector = newPlayableGameObject->AddComponent<PlayableDirector*>();
+                self->dyn__introPlayableDirector() = newPlayableGameObject->AddComponent<PlayableDirector*>();
 
                 using SetPlayableAsset = function_ptr_t<void, Il2CppObject*, PlayableAsset*>;
                 static SetPlayableAsset setPlayableAsset = reinterpret_cast<SetPlayableAsset>(il2cpp_functions::resolve_icall("UnityEngine.Playables.PlayableDirector::SetPlayableAsset"));
-                setPlayableAsset(self->introPlayableDirector, realDirector->get_playableAsset());
+                setPlayableAsset(self->dyn__introPlayableDirector(), realDirector->get_playableAsset());
 
                 // Mute duplicated animations except one (otherwise audio is very loud)
-                TimelineAsset* mutedTimeline = reinterpret_cast<TimelineAsset*>(self->introPlayableDirector->get_playableAsset());
+                TimelineAsset* mutedTimeline = reinterpret_cast<TimelineAsset*>(self->dyn__introPlayableDirector()->get_playableAsset());
 
                 static auto* Enumerable_ToList_Generic = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(Enumerable*), "ToList", 1));
                 static auto* Enumerable_ToList = THROW_UNLESS(il2cpp_utils::MakeGenericMethod(Enumerable_ToList_Generic, { classof(TrackAsset*) }));
@@ -73,18 +73,18 @@ namespace MultiQuestensions {
                 }
             }
 
-            self->bindingFinished = false;
+            self->dyn__bindingFinished() = false;
             IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
             // Reset director to real director
-            self->introPlayableDirector = realDirector;
+            self->dyn__introPlayableDirector() = realDirector;
             targetIterations--;
             if (targetIterations != 0)
                 self->PlayIntroAnimation(maxDesiredIntroAnimationDuration, onCompleted);
         }
         catch (const std::runtime_error& e) {
             // Reset director to real director
-            self->introPlayableDirector = realDirector;
-            getLogger().critical("REPORT TO ENDER: Hook IntroAnimationPatch" __FILE__ " at Line %d: %s", __LINE__, e.what());
+            self->dyn__introPlayableDirector() = realDirector;
+            getLogger().critical("REPORT TO ENDER: Hook IntroAnimationPatch Exception: %s", e.what());
             IntroAnimationPatch(self, maxDesiredIntroAnimationDuration, onCompleted);
         }
     }
@@ -158,7 +158,7 @@ namespace MultiQuestensions {
                 return reinterpret_cast<IReadOnlyList_1<IConnectedPlayer*>*>(selectedActivePlayers);
             }
             catch (const std::runtime_error& e) {
-                getLogger().critical("REPORT TO ENDER: Hook MultiplayerPlayersManager_get_allActiveAtGameStartPlayers" __FILE__ " at Line %d: %s", __LINE__, e.what());
+                getLogger().critical("REPORT TO ENDER: Hook MultiplayerPlayersManager_get_allActiveAtGameStartPlayers Exception: %s", e.what());
             }
         }
         else if (cpispt == BindOutroTimeline) {
@@ -191,7 +191,7 @@ namespace MultiQuestensions {
             std::vector<float> resultVec(rangeVec.begin(), rangeVec.end());
             self->dyn__maxPlayersList()->dyn__values() = il2cpp_utils::vectorToArray(resultVec);
         } catch (const std::runtime_error& e) {
-            getLogger().critical("REPORT TO ENDER: Hook CreateServerFormController_Setup caught on" __FILE__ " at Line %d: %s", __LINE__, e.what());
+            getLogger().critical("REPORT TO ENDER: Hook CreateServerFormController_Setup Exception: %s", e.what());
         }
         CreateServerFormController_Setup(self, selectedNumberOfPlayers, netDiscoverable);
     }

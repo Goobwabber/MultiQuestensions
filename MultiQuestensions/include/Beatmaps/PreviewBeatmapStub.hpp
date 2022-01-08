@@ -23,7 +23,7 @@ namespace MultiQuestensions::Beatmaps {
 }
 
 DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "System", "Object", sizeof(Il2CppObject),
-	{ classof(GlobalNamespace::IPreviewBeatmapLevel*) },
+	classof(GlobalNamespace::IPreviewBeatmapLevel*),
 
 	DECLARE_CTOR(FromPreviewPacket, Il2CppString* levelhash, GlobalNamespace::IPreviewBeatmapLevel* level, PreviewBeatmapPacket* lvl = nullptr);
 	//DECLARE_CTOR(FromPreview, Il2CppString* levelHash, GlobalNamespace::IPreviewBeatmapLevel*);
@@ -73,7 +73,7 @@ DECLARE_CLASS_INTERFACES(MultiQuestensions::Beatmaps, PreviewBeatmapStub, "Syste
 	DECLARE_OVERRIDE_METHOD(Array<GlobalNamespace::PreviewDifficultyBeatmapSet*>*, get_previewDifficultyBeatmapSets, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "get_previewDifficultyBeatmapSets", 0));
 
 	DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::Sprite*>*, GetCoverImageAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetCoverImageAsync", 1), System::Threading::CancellationToken cancellationToken);
-	DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, GetPreviewAudioClipAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetPreviewAudioClipAsync", 1), System::Threading::CancellationToken cancellationToken);
+	//DECLARE_OVERRIDE_METHOD(System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>*, GetPreviewAudioClipAsync, il2cpp_utils::FindMethodUnsafe(classof(GlobalNamespace::IPreviewBeatmapLevel*), "GetPreviewAudioClipAsync", 1), System::Threading::CancellationToken cancellationToken);
 
 	// C++ Definitions
 	private:

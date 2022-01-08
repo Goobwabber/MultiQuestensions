@@ -131,10 +131,10 @@ namespace MultiQuestensions {
     void HandleLobbyEnvironmentLoaded() {
         initialized = false;
         //getLogger().debug("HandleLobbyEnvironmentLoaded Started");
-        auto* nativeAvatarPlaces = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace*>();
-        for (int i = 0; i < nativeAvatarPlaces->Length(); i++)
+        auto nativeAvatarPlaces = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace*>();
+        for (int i = 0; i < nativeAvatarPlaces.Length(); i++)
         {
-            auto* nativeAvatarPlace = nativeAvatarPlaces->values[i];
+            auto nativeAvatarPlace = nativeAvatarPlaces[i];
 
             auto avatarPlace = nativeAvatarPlace->GetComponent<LobbyAvatarPlaceLighting*>();
             if (avatarPlace == nullptr)
@@ -170,10 +170,10 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyController_ActivateMultiplayerLobby, &MultiplayerLobbyController::ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
-        if (!_placeManager) _placeManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlaceManager*>()->values[0];
-        if (!_menuEnvironmentManager) _menuEnvironmentManager = Resources::FindObjectsOfTypeAll<MenuEnvironmentManager*>()->values[0];
-        if (!_stageManager) _stageManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyCenterStageManager*>()->values[0];
-        if (!_lobbyStateDataModel)  _lobbyStateDataModel = _placeManager->lobbyStateDataModel;
+        if (!_placeManager) _placeManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlaceManager*>()[0];
+        if (!_menuEnvironmentManager) _menuEnvironmentManager = Resources::FindObjectsOfTypeAll<MenuEnvironmentManager*>()[0];
+        if (!_stageManager) _stageManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyCenterStageManager*>()[0];
+        if (!_lobbyStateDataModel)  _lobbyStateDataModel = _placeManager->dyn__lobbyStateDataModel();
 
         self->dyn__innerCircleRadius() = 1;
         self->dyn__minOuterCircleRadius() = 4.4f;
@@ -183,7 +183,8 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(LightWithIdMonoBehaviour_RegisterLight, &LightWithIdMonoBehaviour::RegisterLight, void, LightWithIdMonoBehaviour* self) {
-        if (!(self->get_transform()->get_parent() != nullptr && self->get_transform()->get_parent()->get_name()->Contains(il2cpp_utils::newcsstr("LobbyAvatarPlace")))) LightWithIdMonoBehaviour_RegisterLight(self);
+        if (!(self->get_transform()->get_parent() != nullptr && self->get_transform()->get_parent()->get_name()->Contains(il2cpp_utils::newcsstr("LobbyAvatarPlace")))) 
+            LightWithIdMonoBehaviour_RegisterLight(self);
     }
 
 #pragma endregion

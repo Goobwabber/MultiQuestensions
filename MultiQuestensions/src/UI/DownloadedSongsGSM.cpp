@@ -62,14 +62,14 @@ namespace MultiQuestensions::UI {
             needSongRefresh = false;
             auto level = GetLevelByHash(DownloadedSongIds.at(selectedIdx));
             if (level.has_value()) {
-                std::string songPath = to_utf8(csstrtostr(level.value()->customLevelPath));
+                std::string songPath = to_utf8(csstrtostr(level.value()->get_customLevelPath()));
                 getLogger().info("Deleting Song: %s", songPath.c_str());
                 DeleteSong(songPath, [&] {
                     if (needSongRefresh) {
                         RefreshSongs(false);
                     }
                     });
-                if (lobbyGameStateController) lobbyGameStateController->menuRpcManager->SetIsEntitledToLevel(level.value()->get_levelID(), EntitlementsStatus::NotOwned);
+                if (lobbyGameStateController) lobbyGameStateController->dyn__menuRpcManager()->SetIsEntitledToLevel(level.value()->get_levelID(), EntitlementsStatus::NotOwned);
             }
             needSongRefresh = true;
             DownloadedSongIds.erase(DownloadedSongIds.begin() + selectedIdx);

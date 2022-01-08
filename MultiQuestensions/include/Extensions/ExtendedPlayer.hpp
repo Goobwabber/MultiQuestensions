@@ -70,7 +70,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     DECLARE_INSTANCE_METHOD(bool, HasState, Il2CppString* state);
 
 public:
-    static const constexpr UnityEngine::Color DefaultColor = UnityEngine::Color(0.031f, 0.752f, 1.0f);
+    static const constexpr UnityEngine::Color DefaultColor{ 0.031f, 0.752f, 1.0f, 1.0f };
 
     /// <summary>
     /// Platform

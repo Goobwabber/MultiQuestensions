@@ -150,7 +150,7 @@ namespace MultiQuestensions::Environments {
             _playerIcons.insert_or_assign(slot, imageView);
 
             auto rectTransform = iconObj->GetComponent<RectTransform*>();
-            rectTransform->set_localScale({ 3.2f, 3.2f });
+            rectTransform->set_localScale({ 3.2f, 3.2f, 0.0f });
         }
         else imageView = _playerIcons.at(slot);
 

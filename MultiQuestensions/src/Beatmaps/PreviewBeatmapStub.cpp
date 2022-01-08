@@ -80,14 +80,14 @@ namespace MultiQuestensions::Beatmaps {
 		}
 	}
 
-	System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>* PreviewBeatmapStub::GetPreviewAudioClipAsync(System::Threading::CancellationToken cancellationToken) {
-		if (_preview) {
-			return _preview->GetPreviewAudioClipAsync(cancellationToken);
-		}
-		else {
-			return nullptr;
-		}
-	}
+	//System::Threading::Tasks::Task_1<UnityEngine::AudioClip*>* PreviewBeatmapStub::GetPreviewAudioClipAsync(System::Threading::CancellationToken cancellationToken) {
+	//	if (_preview) {
+	//		return _preview->GetPreviewAudioClipAsync(cancellationToken);
+	//	}
+	//	else {
+	//		return nullptr;
+	//	}
+	//}
 
 	MultiQuestensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
 		getLogger().debug("Start PreviewBeatmapStub::GetPacket");

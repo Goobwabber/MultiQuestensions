@@ -8,6 +8,8 @@
 #include "GlobalNamespace/MasterServerQuickPlaySetupData_QuickPlaySongPacksOverride.hpp"
 #include "GlobalNamespace/MasterServerQuickPlaySetupData.hpp"
 
+#include "CodegenExtensions/TempBloomFilterUtil.hpp"
+
 //#include "GlobalNamespace/MasterServerQuickPlaySetupModel.hpp"
 #include "GlobalNamespace/SongPackMaskModelSO.hpp"
 
@@ -45,7 +47,7 @@ namespace MultiQuestensions {
             self->dyn__songPackMaskModel()->ToSongPackMask(
                 levelPackName
             ).Contains(
-                getCustomLevelSongPackMaskStr())
+                BloomFilterUtil::ToBloomFilter<BitMask128>(getCustomLevelSongPackMaskStr(), 2, 13))
             ) {
             self->dyn__simpleDialogPromptViewController()->Init(
                 il2cpp_utils::newcsstr("Custom Song Quickplay"),

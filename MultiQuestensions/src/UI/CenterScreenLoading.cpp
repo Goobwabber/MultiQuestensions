@@ -33,7 +33,7 @@ namespace MultiQuestensions::UI{
         layout->set_minWidth(60);
         //vertical->set_padding(UnityEngine::RectOffset::New_ctor(0, 0, 30, 10));
 
-        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
+        GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()[0]->get_gameObject();
         GameObject* loadingControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadingControl, vertical->get_transform());
         loadingControl = loadingControlGameObject->GetComponent<LoadingControl*>();
         loadingControl->Hide();
