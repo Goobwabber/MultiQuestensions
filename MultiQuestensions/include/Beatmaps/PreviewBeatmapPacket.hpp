@@ -18,17 +18,17 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Beatmaps, PreviewBeatmapP
 	DECLARE_CTOR(New);
 
 	// Basic Song Info/Metadata
-	DECLARE_INSTANCE_FIELD(Il2CppString*, levelId);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, levelHash);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, songName);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, songSubName);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, songAuthorName);
-	DECLARE_INSTANCE_FIELD(Il2CppString*, levelAuthorName);
+	DECLARE_INSTANCE_FIELD(StringW, levelId);
+	DECLARE_INSTANCE_FIELD(StringW, levelHash);
+	DECLARE_INSTANCE_FIELD(StringW, songName);
+	DECLARE_INSTANCE_FIELD(StringW, songSubName);
+	DECLARE_INSTANCE_FIELD(StringW, songAuthorName);
+	DECLARE_INSTANCE_FIELD(StringW, levelAuthorName);
 	DECLARE_INSTANCE_FIELD(float, beatsPerMinute);
 	DECLARE_INSTANCE_FIELD(float, songDuration);
 
 	// Selection Info
-	DECLARE_INSTANCE_FIELD(Il2CppString*, characteristic);
+	DECLARE_INSTANCE_FIELD(StringW, characteristic);
 	DECLARE_INSTANCE_FIELD(uint, difficulty);
 
 	DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Serialize", 1), LiteNetLib::Utils::NetDataWriter* writer);

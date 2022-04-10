@@ -47,7 +47,7 @@ namespace MultiQuestensions::Utils {
                                         }
                                     }
                                 }
-                                if (dB["_customData"].HasMember("_suggestions") && dB["_customData"]["_suggestions"].IsArray() &&
+                                /*if (dB["_customData"].HasMember("_suggestions") && dB["_customData"]["_suggestions"].IsArray() &&
                                     !dB["_customData"]["_suggestions"].Empty()) {
                                     for (auto& sug : dB["_customData"]["_suggestions"].GetArray()) {
                                         getLogger().debug("Found suggestion: %s", sug.GetString());
@@ -58,7 +58,7 @@ namespace MultiQuestensions::Utils {
                                         }
                                         getLogger().debug("Checking bools 'All players have chroma': %s, 'MatchesVersion': %s 'Combined check': %s", AllPlayersHaveChroma() ? "true" : "false", MatchesVersion(ChromaID, ChromaVersionRange) ? "true" : "false", (!AllPlayersHaveChroma() || !MatchesVersion(ChromaID, ChromaVersionRange)) ? "true" : "false");
                                     }
-                                }
+                                }*/
                             }
                             else getLogger().warning("No _customData or _requirements/_suggestions empty/not an array");
                         }

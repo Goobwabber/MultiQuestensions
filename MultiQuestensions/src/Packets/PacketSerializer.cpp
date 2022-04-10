@@ -21,7 +21,7 @@ namespace MultiQuestensions {
 		Il2CppReflectionType* packetType = il2cpp_utils::GetSystemType(il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(packet)));
 		getLogger().debug("Serialize packetType is: %s", to_utf8(csstrtostr(packetType->ToString())).c_str());
 		getLogger().debug("Registered types check: %s", registeredTypes[packetType].c_str());
-		writer->Put(il2cpp_utils::newcsstr(registeredTypes[packetType]));
+		writer->Put(StringW(registeredTypes[packetType]));
 		//writer->Put(packetType->ToString());
 		getLogger().debug("Writer Put");
 		getLogger().debug("Nullptr checking: packet: %p, writer: %p", packet, writer);
@@ -32,7 +32,7 @@ namespace MultiQuestensions {
 	void PacketSerializer::Deserialize(LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data) {
 		getLogger().debug("PacketSerializer::Deserialize");
 		int prevPosition = reader->get_Position();
-		std::string packetType = to_utf8(csstrtostr(reader->GetString()));
+		std::string packetType = reader->GetString();
 		getLogger().debug("packetType: %s", packetType.c_str());
 		length -= reader->get_Position() - prevPosition;
 		getLogger().debug("length: %d", length);

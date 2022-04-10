@@ -51,7 +51,7 @@ namespace MultiQuestensions {
 
     MultiplayerLobbyAvatarManager* _avatarManager;
 
-    Dictionary_2<Il2CppString*, MultiplayerLobbyAvatarController*>* _refPlayerIdToAvatarMap;
+    Dictionary_2<StringW, MultiplayerLobbyAvatarController*>* _refPlayerIdToAvatarMap;
 #pragma endregion
 
 #pragma region LobbyAvatarPlaceLigting
@@ -190,7 +190,7 @@ namespace MultiQuestensions {
 #pragma endregion
 
 #pragma region LobbyAvatarNameTag
-    MultiplayerLobbyAvatarController* GetAvatarController(Il2CppString* userId)
+    MultiplayerLobbyAvatarController* GetAvatarController(StringW userId)
     {
         //getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap");
         if (_refPlayerIdToAvatarMap == nullptr && _avatarManager)
@@ -209,10 +209,10 @@ namespace MultiQuestensions {
         return nullptr;
     }
 
-    GameObject* GetAvatarCaptionObject(Il2CppString* userId)
+    GameObject* GetAvatarCaptionObject(StringW userId)
     {
         auto avatarController = GetAvatarController(userId);
-        if (avatarController) return avatarController->get_transform()->Find(il2cpp_utils::newcsstr("AvatarCaption"))->get_gameObject();
+        if (avatarController) return avatarController->get_transform()->Find("AvatarCaption")->get_gameObject();
         else return nullptr;
     }
 
@@ -232,7 +232,7 @@ namespace MultiQuestensions {
             //getLogger().debug("CreateOrUpdateNameTag player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
 
             if (!(il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass) || il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))) {
-                getLogger().error("CreateOrUpdateNameTag unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
+                getLogger().error("REPORT TO ENDER: CreateOrUpdateNameTag unknown type: %s, this shouldn't happen!!!", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
                 return;
             }
 
@@ -256,9 +256,9 @@ namespace MultiQuestensions {
     }
 
     void HandleLobbyAvatarCreated(IConnectedPlayer* player) {
-        const std::string userId = to_utf8(csstrtostr(player->get_userId()));
-        if (_extendedPlayers.contains(userId))
-            player = reinterpret_cast<IConnectedPlayer*>(_extendedPlayers.at(userId)->get_self());
+        //const std::string userId = player->get_userId();
+        if (_extendedPlayers.contains(player->get_userId()))
+            player = reinterpret_cast<IConnectedPlayer*>(_extendedPlayers.at(player->get_userId())->get_self());
         CreateOrUpdateNameTag(player);
     }
 

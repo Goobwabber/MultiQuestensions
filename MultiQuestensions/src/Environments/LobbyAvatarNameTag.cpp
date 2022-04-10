@@ -15,18 +15,18 @@ using namespace HMUI;
 DEFINE_TYPE(MultiQuestensions::Environments, LobbyAvatarNameTag);
 
 namespace MultiQuestensions::Environments {
-    static Il2CppString* BG() {
-        static auto* bg = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("BG");
+    static StringW BG() {
+        static StringW bg("BG");
         return bg;
     }
 
-    static Il2CppString* Name() {
-        static auto* name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Name");
+    static StringW Name() {
+        static StringW name("Name");
         return name;
     }
 
-    static Il2CppString* Player() {
-        static auto* player = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Player");
+    static StringW Player() {
+        static StringW player("Player");
         return player;
     }
 
@@ -135,7 +135,7 @@ namespace MultiQuestensions::Environments {
         if (!_playerIcons.contains(slot))
         {
             //getLogger().debug("SetIcon, create new Icon");
-            auto iconObj = GameObject::New_ctor(il2cpp_utils::newcsstr(string_format("MQEPlayerIcon(%d)", (int)slot)));
+            auto iconObj = GameObject::New_ctor(string_format("MQEPlayerIcon(%d)", (int)slot).c_str());
             iconObj->get_transform()->SetParent(_bg->get_transform(), false);
             iconObj->get_transform()->SetSiblingIndex((int)slot);
             iconObj->set_layer(5);

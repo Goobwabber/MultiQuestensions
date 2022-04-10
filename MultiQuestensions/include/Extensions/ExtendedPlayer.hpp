@@ -35,30 +35,30 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     /// <summary>
     /// Platform User ID
     /// </summary>
-    DECLARE_INSTANCE_FIELD(Il2CppString*, platformID);
-    DECLARE_INSTANCE_METHOD(Il2CppString*, get_platformID);
+    DECLARE_INSTANCE_FIELD(StringW, platformID);
+    DECLARE_INSTANCE_METHOD(StringW, get_platformID);
 
     /// <summary>
     /// MultiplayerExtensions version reported by BSIPA.
     /// </summary>
-    DECLARE_INSTANCE_FIELD(Il2CppString*, mpexVersion);
-    DECLARE_INSTANCE_METHOD(Il2CppString*, get_mpexVersion);
+    DECLARE_INSTANCE_FIELD(StringW, mpexVersion);
+    DECLARE_INSTANCE_METHOD(StringW, get_mpexVersion);
 
     /// <summary>
     /// Player's color set in the plugin config.
     /// </summary>
     DECLARE_INSTANCE_FIELD(UnityEngine::Color, playerColor);
 
-    DECLARE_INSTANCE_FIELD(Il2CppString*, isPartyOwner);
-    DECLARE_INSTANCE_FIELD(Il2CppString*, hasRecommendBeatmapPermission);
-    DECLARE_INSTANCE_FIELD(Il2CppString*, hasRecommendModifiersPermission);
-    DECLARE_INSTANCE_FIELD(Il2CppString*, hasKickVotePermission);
+    DECLARE_INSTANCE_FIELD(StringW, isPartyOwner);
+    DECLARE_INSTANCE_FIELD(StringW, hasRecommendBeatmapPermission);
+    DECLARE_INSTANCE_FIELD(StringW, hasRecommendModifiersPermission);
+    DECLARE_INSTANCE_FIELD(StringW, hasKickVotePermission);
 
     DECLARE_CTOR(ExtendedPlayer_ctor, GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, int platform, UnityEngine::Color playerColor, Il2CppString* mpexVersion);
 
     DECLARE_INSTANCE_METHOD(bool, get_isMe);
-    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userId);
-    DECLARE_INSTANCE_METHOD(Il2CppString*, get_userName);
+    DECLARE_INSTANCE_METHOD(StringW, get_userId);
+    DECLARE_INSTANCE_METHOD(StringW, get_userName);
     DECLARE_INSTANCE_METHOD(float, get_currentLatency);
     DECLARE_INSTANCE_METHOD(bool, get_isConnected);
     DECLARE_INSTANCE_METHOD(bool, get_isConnectionOwner);
@@ -67,7 +67,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     DECLARE_INSTANCE_METHOD(bool, get_isKicked);
     DECLARE_INSTANCE_METHOD(GlobalNamespace::MultiplayerAvatarData, get_multiplayerAvatarData);
     DECLARE_INSTANCE_METHOD(GlobalNamespace::DisconnectedReason, get_disconnectedReason);
-    DECLARE_INSTANCE_METHOD(bool, HasState, Il2CppString* state);
+    DECLARE_INSTANCE_METHOD(bool, HasState, StringW state);
 
 public:
     static const constexpr UnityEngine::Color DefaultColor{ 0.031f, 0.752f, 1.0f, 1.0f };
@@ -79,8 +79,8 @@ public:
         Platform get_platform();
 
     static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player);
-    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
-    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, Il2CppString* mpexVersion, UnityEngine::Color playerColor);
+    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, StringW platformID, Platform platform, UnityEngine::Color playerColor);
+    static ExtendedPlayer* CS_ctor(GlobalNamespace::IConnectedPlayer* player, StringW platformID, Platform platform, StringW mpexVersion, UnityEngine::Color playerColor);
 
     constexpr const UnityEngine::Color& get_playerColor() const {
         return playerColor;
@@ -104,8 +104,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     DECLARE_CTOR(New);
 
     // Player and platform information
-    DECLARE_INSTANCE_FIELD(Il2CppString*, platformID);
-    DECLARE_INSTANCE_FIELD(Il2CppString*, mpexVersion);
+    DECLARE_INSTANCE_FIELD(StringW, platformID);
+    DECLARE_INSTANCE_FIELD(StringW, mpexVersion);
     DECLARE_INSTANCE_FIELD(UnityEngine::Color, playerColor);
 
     DECLARE_OVERRIDE_METHOD(void, Serialize, il2cpp_utils::FindMethodUnsafe(classof(LiteNetLib::Utils::INetSerializable*), "Serialize", 1), LiteNetLib::Utils::NetDataWriter* writer);
@@ -115,6 +115,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(MultiQuestensions::Extensions, ExtendedPlaye
     public:
         Platform platform;
 
-        static ExtendedPlayerPacket* Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor);
+        static ExtendedPlayerPacket* Init(StringW platformID, Platform platform, UnityEngine::Color playerColor);
 )
 #undef EPPInterfaces

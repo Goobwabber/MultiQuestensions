@@ -7,8 +7,9 @@
 #include "GlobalNamespace/MasterServerQuickPlaySetupData_QuickPlaySongPacksOverride_LocalizedCustomPackName.hpp"
 #include "GlobalNamespace/MasterServerQuickPlaySetupData_QuickPlaySongPacksOverride.hpp"
 #include "GlobalNamespace/MasterServerQuickPlaySetupData.hpp"
+#include "GlobalNamespace/BloomFilterUtil.hpp"
 
-#include "CodegenExtensions/TempBloomFilterUtil.hpp"
+//#include "CodegenExtensions/TempBloomFilterUtil.hpp"
 
 //#include "GlobalNamespace/MasterServerQuickPlaySetupModel.hpp"
 #include "GlobalNamespace/SongPackMaskModelSO.hpp"
@@ -42,7 +43,7 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_HandleJoinQuickPlayViewControllerDidFinish, &MultiplayerModeSelectionFlowCoordinator::HandleJoinQuickPlayViewControllerDidFinish, void, MultiplayerModeSelectionFlowCoordinator* self, bool success) {
-        Il2CppString* levelPackName = self->dyn__joinQuickPlayViewController()->dyn__multiplayerModeSettings()->dyn_quickPlaySongPackMaskSerializedName();
+        StringW levelPackName = self->dyn__joinQuickPlayViewController()->dyn__multiplayerModeSettings()->dyn_quickPlaySongPackMaskSerializedName();
         if (success && 
             self->dyn__songPackMaskModel()->ToSongPackMask(
                 levelPackName
@@ -50,10 +51,10 @@ namespace MultiQuestensions {
                 BloomFilterUtil::ToBloomFilter<BitMask128>(getCustomLevelSongPackMaskStr(), 2, 13))
             ) {
             self->dyn__simpleDialogPromptViewController()->Init(
-                il2cpp_utils::newcsstr("Custom Song Quickplay"),
-                il2cpp_utils::newcsstr("<color=#EB4949>This category includes songs of varying difficulty.\nIt may be more enjoyable to play in a private lobby with friends."),
-                il2cpp_utils::newcsstr("Continue"),
-                il2cpp_utils::newcsstr("Cancel"),
+                "Custom Song Quickplay",
+                "<color=#EB4949>This category includes songs of varying difficulty.\nIt may be more enjoyable to play in a private lobby with friends.",
+                "Continue",
+                "Cancel",
                 il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), (std::function<void(int)>)[self, success](int btnId) {
                     switch (btnId)
                     {

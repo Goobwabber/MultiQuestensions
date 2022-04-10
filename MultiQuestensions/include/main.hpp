@@ -40,7 +40,7 @@ Configuration& getConfig();
 Logger& getLogger();
 
 // Utilities
-Il2CppString* LevelIdToHash(Il2CppString*);
+StringW LevelIdToHash(StringW);
 
 extern std::string GetHash(const std::string& levelId);
 

@@ -23,7 +23,7 @@ using namespace GlobalNamespace;
 
 // Handles a PreviewBeatmapPacket used to transmit data about a custom song.
 static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
-    getLogger().debug("'%s' selected song '%s'", to_utf8(csstrtostr(player->get_userId())).c_str(), to_utf8(csstrtostr(packet->levelHash)).c_str());
+    getLogger().debug("'%s' selected song '%s'", std::string(player->get_userId()).c_str(), std::string(packet->levelHash).c_str());
     IPreviewBeatmapLevel* localPreview = lobbyPlayersDataModel->dyn__beatmapLevelsModel()->GetLevelPreviewForLevelId(packet->levelId);
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview;
     try {
@@ -109,14 +109,14 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
     }
     else {
         getLogger().info("Received 'ExtendedPlayerPacket' from '%s' with platformID: '%s'  mpexVersion: '%s'",
-            to_utf8(csstrtostr(player->get_userId())).c_str(),
-            to_utf8(csstrtostr(packet->platformID)).c_str(),
-            to_utf8(csstrtostr(packet->mpexVersion)).c_str()
+            std::string(player->get_userId()).c_str(),
+            std::string(packet->platformID).c_str(),
+            std::string(packet->mpexVersion).c_str()
         );
         Extensions::ExtendedPlayer* extendedPlayer;
         try {
             extendedPlayer = Extensions::ExtendedPlayer::CS_ctor(player, packet->platformID, packet->platform, packet->mpexVersion, packet->playerColor);
-            if (to_utf8(csstrtostr(extendedPlayer->mpexVersion)) != MPEX_PROTOCOL)
+            if (std::string(extendedPlayer->mpexVersion) != MPEX_PROTOCOL)
             {
                 getLogger().warning(
                     "###################################################################\r\n"
@@ -124,8 +124,8 @@ static void HandleExtendedPlayerPacket(MultiQuestensions::Extensions::ExtendedPl
                     "The player '%s' is using MpEx protocol version %s while you are using MpEx protocol " MPEX_PROTOCOL "\r\n"
                     "For best compatibility all players should use a compatible version of MultiplayerExtensions/MultiQuestensions.\r\n"
                     "###################################################################",
-                    to_utf8(csstrtostr(player->get_userName())).c_str(),
-                    to_utf8(csstrtostr(extendedPlayer->mpexVersion)).c_str()
+                    std::string(player->get_userName()).c_str(),
+                    std::string(extendedPlayer->mpexVersion).c_str()
                 );
             }
         }
@@ -153,7 +153,7 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
     try {
         getLogger().debug("HandlePlayerConnected");
         if (player) {
-            const std::string userId = to_utf8(csstrtostr(player->get_userId()));
+            const std::string userId = player->get_userId();
             getLogger().info("Player '%s' joined", userId.c_str());
             getLogger().debug("Sending ExtendedPlayerPacket");
             if (localExtendedPlayer->get_platformID() != nullptr)
@@ -173,10 +173,10 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
 }
 
 void HandlePlayerDisconnected(IConnectedPlayer* player) {
-    getLogger().info("Player '%s' left", to_utf8(csstrtostr(player->get_userId())).c_str());
+    getLogger().info("Player '%s' left", std::string(player->get_userId()).c_str());
     getLogger().debug("Reseting platform lights");
     SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
-    _extendedPlayers.erase(to_utf8(csstrtostr(player->get_userId())).c_str());
+    _extendedPlayers.erase(std::string(player->get_userId()).c_str());
 }
 
 //void HandleDisconnect(DisconnectedReason* reason) {

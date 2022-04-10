@@ -11,7 +11,7 @@ DEFINE_TYPE(MultiQuestensions::Beatmaps, PreviewBeatmapStub);
 
 namespace MultiQuestensions::Beatmaps {
 
-	void PreviewBeatmapStub::FromPreviewPacket(Il2CppString* levelhash, GlobalNamespace::IPreviewBeatmapLevel* level, PreviewBeatmapPacket* lvl) {
+	void PreviewBeatmapStub::FromPreviewPacket(StringW levelhash, GlobalNamespace::IPreviewBeatmapLevel* level, PreviewBeatmapPacket* lvl) {
 		if (levelhash && level) {
 			getLogger().debug("PreviewBeatmapStub::FromPreview");
 
@@ -89,7 +89,7 @@ namespace MultiQuestensions::Beatmaps {
 	//	}
 	//}
 
-	MultiQuestensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(Il2CppString* characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
+	MultiQuestensions::Beatmaps::PreviewBeatmapPacket* PreviewBeatmapStub::GetPacket(StringW characteristic, GlobalNamespace::BeatmapDifficulty difficulty) {
 		getLogger().debug("Start PreviewBeatmapStub::GetPacket");
 		MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapPacket*>());
 
@@ -111,23 +111,23 @@ namespace MultiQuestensions::Beatmaps {
 
 #pragma region All the pain in form of getter functions
 
-	Il2CppString* PreviewBeatmapStub::get_levelID() {
+	StringW PreviewBeatmapStub::get_levelID() {
 		return levelID;
 	}
 
-	Il2CppString* PreviewBeatmapStub::get_songName() {
+	StringW PreviewBeatmapStub::get_songName() {
 		return songName;
 	}
 
-	Il2CppString* PreviewBeatmapStub::get_songSubName() {
+	StringW PreviewBeatmapStub::get_songSubName() {
 		return songSubName;
 	}
 
-	Il2CppString* PreviewBeatmapStub::get_songAuthorName() {
+	StringW PreviewBeatmapStub::get_songAuthorName() {
 		return songAuthorName;
 	}
 
-	Il2CppString* PreviewBeatmapStub::get_levelAuthorName() {
+	StringW PreviewBeatmapStub::get_levelAuthorName() {
 		return levelAuthorName;
 	}
 

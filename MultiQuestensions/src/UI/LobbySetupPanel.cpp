@@ -60,7 +60,7 @@ namespace MultiQuestensions::UI {
 				{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
 			getLogger().warning("Chroma outdated");
 		}
-		else getLogger().debug("Chroma not installed or version compatible");
+		else getLogger().debug("Chroma not installed or version incompatible");
 
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>

@@ -34,15 +34,15 @@ namespace MultiQuestensions::UI {
         if (cover && level) {
             // "<size=80%><noparse>" + map.GetMetadata().GetSongAuthorName() + "</noparse>" + " <size=90%>[<color=#67c16f><noparse>" + map.GetMetadata().GetLevelAuthorName() + "</noparse></color>]"
             list->data.emplace_back(CustomListTableData::CustomCellInfo{
-                level->get_songName() ? to_utf8(csstrtostr(level->get_songName())) : "Error: songName null",
-                (level->get_songAuthorName() ? to_utf8(csstrtostr(level->get_songAuthorName())) : std::string()) + " [" + (level->get_levelAuthorName() ? to_utf8(csstrtostr(level->get_levelAuthorName())) : std::string()) + "]",
+                level->get_songName() ? std::string(level->get_songName()) : "Error: songName null",
+                (level->get_songAuthorName() ? std::string(level->get_songAuthorName()) : std::string()) + " [" + (level->get_levelAuthorName() ? std::string(level->get_levelAuthorName()) : std::string()) + "]",
                 cover
                 });
         }
         else if (level) {
             list->data.emplace_back(CustomListTableData::CustomCellInfo{
-            level->get_songName() ? to_utf8(csstrtostr(level->get_songName())) : "Error: songName null",
-            (level->get_songAuthorName() ? to_utf8(csstrtostr(level->get_songAuthorName())) : std::string()) + " [" + (level->get_levelAuthorName() ? to_utf8(csstrtostr(level->get_levelAuthorName())) : std::string()) + "]",
+            level->get_songName() ? std::string(level->get_songName()) : "Error: songName null",
+            (level->get_songAuthorName() ? std::string(level->get_songAuthorName()) : std::string()) + " [" + (level->get_levelAuthorName() ? std::string(level->get_levelAuthorName()) : std::string()) + "]",
             level->get_defaultCoverImage()
                 });
         } else getLogger().error("Nullptr in UI: cover '%p', level '%p'", cover, level);

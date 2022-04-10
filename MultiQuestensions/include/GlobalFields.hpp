@@ -14,7 +14,7 @@ namespace MultiQuestensions {
     extern GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
     extern GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 
-    extern Il2CppString* getCustomLevelSongPackMaskStr();
+    extern StringW getCustomLevelSongPackMaskStr();
 }
 
 //extern System::Collections::Generic::Dictionary_2<std::string, MultiQuestensions::Extensions::ExtendedPlayer*> extendedPlayers;

@@ -29,22 +29,22 @@ namespace MultiQuestensions::Extensions {
     ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player) {
         return THROW_UNLESS(il2cpp_utils::New<ExtendedPlayer*>(player, static_cast<Il2CppString*>(nullptr), 3, DefaultColor, static_cast<Il2CppString*>(nullptr)));
     }
-    ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor) {
+    ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player, StringW platformID, Platform platform, UnityEngine::Color playerColor) {
         return THROW_UNLESS(il2cpp_utils::New<ExtendedPlayer*>(player, platformID, (int)platform, playerColor, static_cast<Il2CppString*>(nullptr)));
     }
-    ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player, Il2CppString* platformID, Platform platform, Il2CppString* mpexVersion, UnityEngine::Color playerColor) {
+    ExtendedPlayer* ExtendedPlayer::CS_ctor(GlobalNamespace::IConnectedPlayer* player, StringW platformID, Platform platform, StringW mpexVersion, UnityEngine::Color playerColor) {
         return THROW_UNLESS(il2cpp_utils::New<ExtendedPlayer*>(player, platformID, (int)platform, playerColor, mpexVersion));
     }
 #pragma endregion
 
 #pragma region Getters
-    Il2CppString* ExtendedPlayer::get_platformID() {
+    StringW ExtendedPlayer::get_platformID() {
         return platformID;
     }
     Platform ExtendedPlayer::get_platform() {
         return platform;
     }
-    Il2CppString* ExtendedPlayer::get_mpexVersion() {
+    StringW ExtendedPlayer::get_mpexVersion() {
         return mpexVersion;
     }
 
@@ -52,11 +52,11 @@ namespace MultiQuestensions::Extensions {
         return _connectedPlayer->get_isMe();
     }
 
-    Il2CppString* ExtendedPlayer::get_userId() {
+    StringW ExtendedPlayer::get_userId() {
         return _connectedPlayer->get_userId();
     }
 
-    Il2CppString* ExtendedPlayer::get_userName() {
+    StringW ExtendedPlayer::get_userName() {
         return _connectedPlayer->get_userName();
     }
 
@@ -92,7 +92,7 @@ namespace MultiQuestensions::Extensions {
         return _connectedPlayer->get_disconnectedReason();
     }
 
-    bool ExtendedPlayer::HasState(Il2CppString* state) {
+    bool ExtendedPlayer::HasState(StringW state) {
         return _connectedPlayer->HasState(state);
     }
 #pragma endregion
@@ -130,7 +130,7 @@ namespace MultiQuestensions::Extensions {
         getLogger().debug("Deserialize ExtendedPlayerPacket done");
     }
 
-    ExtendedPlayerPacket* ExtendedPlayerPacket::Init(Il2CppString* platformID, Platform platform, UnityEngine::Color playerColor)
+    ExtendedPlayerPacket* ExtendedPlayerPacket::Init(StringW platformID, Platform platform, UnityEngine::Color playerColor)
     {
         auto extendedPlayer = THROW_UNLESS(il2cpp_utils::New<ExtendedPlayerPacket*>());
         

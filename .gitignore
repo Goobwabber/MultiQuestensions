@@ -347,3 +347,4 @@ ARM64/
 ndkbuild.props
 /MultiQuestensions/log_timestamp
 *.qmod
+*.cmake

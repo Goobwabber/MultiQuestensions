@@ -54,8 +54,8 @@ namespace MultiQuestensions::UI{
         getLogger().info("CenterScreenLoading::ShowLoading, players ready (%d of %d)", 
             readyPlayers, maxPlayers);
         if (loadingControl) {
-            loadingControl->ShowLoading(il2cpp_utils::newcsstr(string_format("%d of %d players ready...",
-                readyPlayers, maxPlayers)));
+            loadingControl->ShowLoading(string_format("%d of %d players ready...",
+                readyPlayers, maxPlayers).c_str());
         }
     }
 
@@ -84,8 +84,8 @@ namespace MultiQuestensions::UI{
         else if (screenController->get_countdownShown() && gameStateController && sessionManager->get_syncTime() >= gameStateController->get_startTime() && gameStateController->get_levelStartInitiated())
         {
             if (loadingControl)
-                loadingControl->ShowLoading(il2cpp_utils::newcsstr(string_format("%d of %d players ready...",
-                    playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1)));
+                loadingControl->ShowLoading(string_format("%d of %d players ready...",
+                    playersReady + 1, sessionManager ? sessionManager->get_connectedPlayerCount() + 1 : 1).c_str());
         }
         else
         {

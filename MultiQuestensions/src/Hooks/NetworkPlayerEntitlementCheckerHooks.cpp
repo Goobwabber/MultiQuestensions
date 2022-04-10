@@ -39,9 +39,9 @@ namespace MultiQuestensions {
     }
 
     // Subscribe this method to 'menuRpcManager.setIsEntitledToLevelEvent' when on NetworkPlayerEntitlementChecker.Start, unsub on destroy
-    static void HandleEntitlementReceived(Il2CppString* userId, Il2CppString* levelId, EntitlementsStatus entitlement) {
-        std::string cUserId = to_utf8(csstrtostr(userId));
-        std::string cLevelId = to_utf8(csstrtostr(levelId));
+    static void HandleEntitlementReceived(StringW userId, StringW levelId, EntitlementsStatus entitlement) {
+        std::string cUserId = userId;
+        std::string cLevelId = levelId;
 
         getLogger().debug("[HandleEntitlementReceived] Received Entitlement from user '%s' for level '%s' with status '%s'",
             cUserId.c_str(),
@@ -85,9 +85,9 @@ namespace MultiQuestensions {
     }
 
 #pragma region Hooks
-    MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPlayerEntitlementChecker::GetEntitlementStatus, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, Il2CppString* levelIdCS) {
+    MAKE_HOOK_MATCH(NetworkPlayerEntitlementChecker_GetEntitlementStatus, &NetworkPlayerEntitlementChecker::GetEntitlementStatus, Task_1<EntitlementsStatus>*, NetworkPlayerEntitlementChecker* self, StringW levelIdCS) {
         missingLevelText.clear();
-        std::string levelId = to_utf8(csstrtostr(levelIdCS));
+        std::string levelId = levelIdCS;
         getLogger().info("NetworkPlayerEntitlementChecker_GetEntitlementStatus: %s", levelId.c_str());
         if (IsCustomLevel(levelId)) {
             if (HasSong(levelId)) {
@@ -161,7 +161,7 @@ namespace MultiQuestensions {
         //    });
         //self->rpcManager->add_setIsEntitledToLevelEvent(entitlementAction);
         self->dyn__rpcManager()->add_setIsEntitledToLevelEvent(
-        il2cpp_utils::MakeDelegate<System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*>(classof(System::Action_3<::Il2CppString*, ::Il2CppString*, EntitlementsStatus>*), (std::function<void(Il2CppString*, Il2CppString*, EntitlementsStatus)>) [&](Il2CppString* userId, Il2CppString* beatmapId, EntitlementsStatus status) {
+        il2cpp_utils::MakeDelegate<System::Action_3<::StringW, ::StringW, EntitlementsStatus>*>(classof(System::Action_3<::StringW, ::StringW, EntitlementsStatus>*), (std::function<void(StringW, StringW, EntitlementsStatus)>) [&](StringW userId, StringW beatmapId, EntitlementsStatus status) {
             HandleEntitlementReceived(userId, beatmapId, status);
             }));
         NetworkPlayerEntitlementChecker_Start(self);

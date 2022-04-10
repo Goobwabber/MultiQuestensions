@@ -14,6 +14,9 @@
 #include "GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/CenterStageScreenController.hpp"
 
+// For Hooking Debug Loggers
+#include "GlobalNamespace/BGNetDebug.hpp"
+
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "custom-types/shared/register.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -52,16 +55,16 @@ Logger& getLogger() {
 
 
 // Converts a levelId to a levelHash
-Il2CppString* LevelIdToHash(Il2CppString* levelId) {
+StringW LevelIdToHash(StringW levelId) {
     if (Il2CppString::IsNullOrWhiteSpace(levelId)) {
         return nullptr;
     }
-    ArrayW<Il2CppString*> ary = levelId->Split(reinterpret_cast<void*>('_'), ' ');
-    Il2CppString* hash = nullptr;
+    ArrayW<StringW> ary = levelId->Split(std::initializer_list<Il2CppChar>{ '_' }, ' ');
+    StringW hash = nullptr;
     if (ary.Length() > 2) {
         hash = ary[2];
     }
-    return (hash != nullptr && hash->get_Length() == 40) ? hash : nullptr;
+    return (hash != nullptr && hash->get_Length() == 40) ? hash : StringW();
 }
 
 
@@ -77,28 +80,28 @@ namespace MultiQuestensions {
 
     std::string moddedState = "modded";
 
-    Il2CppString* getCustomLevelSongPackMaskStr() {
-        static Il2CppString* songPackMaskStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_levelpack_CustomLevels");
+    StringW getCustomLevelSongPackMaskStr() {
+        static StringW songPackMaskStr("custom_levelpack_CustomLevels");
         return songPackMaskStr;
     }
 
-    Il2CppString* getModdedStateStr() {
-        static Il2CppString* moddedStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("modded");
+    StringW getModdedStateStr() {
+        static StringW moddedStateStr("modded");
         return moddedStateStr;
     }
 
-    Il2CppString* getMEStateStr() {
-        static Il2CppString* moddedStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ME_Installed");
+    StringW getMEStateStr() {
+        static StringW moddedStateStr("ME_Installed");
         return moddedStateStr;
     }
 
-    Il2CppString* getNEStateStr() {
-        static Il2CppString* moddedStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ME_Installed");
+    StringW getNEStateStr() {
+        static StringW moddedStateStr("ME_Installed");
         return moddedStateStr;
     }
 
-    Il2CppString* getChromaStateStr() {
-        static Il2CppString* moddedStateStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Chroma_Installed");
+    StringW getChromaStateStr() {
+        static StringW moddedStateStr("Chroma_Installed");
         return moddedStateStr;
     }
 
@@ -167,11 +170,11 @@ MAKE_HOOK_MATCH(LobbyPlayersActivate, &LobbyPlayersDataModel::Activate, void, Lo
 }
 
 // LobbyPlayersDataModel SetLocalPlayerBeatmapLevel
-MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, LobbyPlayersDataModel* self, Il2CppString* levelId, BeatmapDifficulty beatmapDifficulty, BeatmapCharacteristicSO* characteristic) {
+MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, LobbyPlayersDataModel* self, StringW levelId, BeatmapDifficulty beatmapDifficulty, BeatmapCharacteristicSO* characteristic) {
     
-    Il2CppString* hash = LevelIdToHash(levelId);
-    if (hash != nullptr) {
-        getLogger().info("Local user selected song '%s'.", to_utf8(csstrtostr(hash)).c_str());
+    StringW hash = LevelIdToHash(levelId);
+    if (hash.convert() != nullptr) {
+        getLogger().info("Local user selected song '%s'.", std::string(hash).c_str());
         MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = GetExistingPreview(levelId);
         if (preview != nullptr) {
             self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(preview), beatmapDifficulty, characteristic);
@@ -185,7 +188,7 @@ MAKE_HOOK_MATCH(LobbyPlayersSetLocalBeatmap, &LobbyPlayersDataModel::SetLocalPla
                     using namespace MultiQuestensions::Beatmaps;
                     PreviewBeatmapStub* previewStub = THROW_UNLESS(il2cpp_utils::New<MultiQuestensions::Beatmaps::PreviewBeatmapStub*>(hash, localIPreview, static_cast<PreviewBeatmapPacket*>(nullptr)));
                     //MultiQuestensions::Beatmaps::PreviewBeatmapStub* previewStub = MultiQuestensions::Beatmaps::PreviewBeatmapStub::New_ctor(hash, localIPreview);
-                    getLogger().debug("Check 'LobbyPlayersSetLocalBeatmap' levelID: %s", to_utf8(csstrtostr(reinterpret_cast<IPreviewBeatmapLevel*>(previewStub)->get_levelID())).c_str());
+                    getLogger().debug("Check 'LobbyPlayersSetLocalBeatmap' levelID: %s", std::string(reinterpret_cast<IPreviewBeatmapLevel*>(previewStub)->get_levelID()).c_str());
                     self->SetPlayerBeatmapLevel(self->get_localUserId(), reinterpret_cast<IPreviewBeatmapLevel*>(previewStub), beatmapDifficulty, characteristic);
                     PreviewBeatmapPacket* packet = previewStub->GetPacket(characteristic->get_serializedName(), beatmapDifficulty);
                     self->dyn__menuRpcManager()->RecommendBeatmap(BeatmapIdentifierNetSerializable::New_ctor(levelId, characteristic->get_serializedName(), beatmapDifficulty));
@@ -206,8 +209,8 @@ std::string GetHash(const std::string& levelId) {
 }
 
 // LobbyPlayersDataModel HandleMenuRpcManagerSelectedBeatmap (DONT REMOVE THIS, without it a player's selected map will be cleared)
-MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuRpcManagerRecommendBeatmap, void, LobbyPlayersDataModel* self, Il2CppString* userId, BeatmapIdentifierNetSerializable* beatmapId) {
-    getLogger().debug("HandleMenuRpcManagerRecommendBeatmap: LevelID: %s", to_utf8(csstrtostr(beatmapId->get_levelID())).c_str());
+MAKE_HOOK_MATCH(LobbyPlayersSelectedBeatmap, &LobbyPlayersDataModel::HandleMenuRpcManagerRecommendBeatmap, void, LobbyPlayersDataModel* self, StringW userId, BeatmapIdentifierNetSerializable* beatmapId) {
+    getLogger().debug("HandleMenuRpcManagerRecommendBeatmap: LevelID: %s", std::string(beatmapId->get_levelID()).c_str());
     MultiQuestensions::Beatmaps::PreviewBeatmapStub* preview = GetExistingPreview(beatmapId->get_levelID());
     if (preview != nullptr) {
         getLogger().debug("HandleMenuRpcManagerRecommendBeatmap: Preview exists, SetPlayerBeatmapLevel");
@@ -283,7 +286,7 @@ MAKE_HOOK_MATCH(MultiplayerLobbyConnectionController_CreateParty, &MultiplayerLo
 // Show the custom levels tab in multiplayer
 MAKE_HOOK_MATCH(LevelSelectionNavigationController_Setup, &LevelSelectionNavigationController::Setup, void, LevelSelectionNavigationController* self,
     SongPackMask songPackMask, BeatmapDifficultyMask allowedBeatmapDifficultyMask, ::ArrayW<BeatmapCharacteristicSO*> notAllowedCharacteristics, 
-    bool hidePacksIfOneOrNone, bool hidePracticeButton, ::Il2CppString* actionButtonText, IBeatmapLevelPack* levelPackToBeSelectedAfterPresent, 
+    bool hidePacksIfOneOrNone, bool hidePracticeButton, ::StringW actionButtonText, IBeatmapLevelPack* levelPackToBeSelectedAfterPresent, 
     SelectLevelCategoryViewController::LevelCategory startLevelCategory, IPreviewBeatmapLevel* beatmapLevelToBeSelectedAfterPresent, bool enableCustomLevels) {
     getLogger().info("LevelSelectionNavigationController_Setup setting custom songs . . .");
     LevelSelectionNavigationController_Setup(self, songPackMask, allowedBeatmapDifficultyMask, notAllowedCharacteristics, hidePacksIfOneOrNone, hidePracticeButton,
@@ -294,7 +297,7 @@ static bool isMissingLevel = false;
 
 // This hook makes sure to grey-out the play button so that players can't start a level that someone doesn't have.
 // This prevents crashes.
-MAKE_HOOK_MATCH(LobbySetupViewController_SetPlayersMissingLevelText , &LobbySetupViewController::SetPlayersMissingLevelText, void, LobbySetupViewController* self, Il2CppString* playersMissingLevelText) {
+MAKE_HOOK_MATCH(LobbySetupViewController_SetPlayersMissingLevelText , &LobbySetupViewController::SetPlayersMissingLevelText, void, LobbySetupViewController* self, StringW playersMissingLevelText) {
     getLogger().info("LobbySetupViewController_SetPlayersMissingLevelText");
     if (!missingLevelText.empty()) {
         getLogger().info("Disabling start game as entitlements missing level text exists . . .");
@@ -460,7 +463,7 @@ MAKE_HOOK_MATCH(LobbyGameStateController_HandleMultiplayerLevelLoaderCountdownFi
     // Checks each player, to see if they're in the lobby, and if they are, checks their entitlement status.
     MultiQuestensions::UI::CenterScreenLoading::playersReady = 0;
     for (int i = 0; i < sessionManager->dyn__connectedPlayers()->get_Count(); i++) {
-        Il2CppString* csUserID = sessionManager->dyn__connectedPlayers()->get_Item(i)->get_userId();
+        StringW csUserID = sessionManager->dyn__connectedPlayers()->get_Item(i)->get_userId();
         std::string UserID =  to_utf8(csstrtostr(csUserID));
         if (self->dyn__lobbyPlayersDataModel()->GetPlayerIsInLobby(csUserID)) {
             if (entitlementDictionary[UserID][LevelID] != EntitlementsStatus::Ok) entitlementStatusOK = false;
@@ -577,6 +580,21 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
+MAKE_HOOK_MATCH(BGNetDebug_Log, &GlobalNamespace::BGNetDebug::Log, void, StringW message) {
+    getLogger().WithContext("BGNetDebug::Log").debug("%s", std::string(message).c_str());
+    BGNetDebug_Log(message);
+}
+
+MAKE_HOOK_MATCH(BGNetDebug_LogError, &GlobalNamespace::BGNetDebug::LogError, void, StringW message) {
+    getLogger().WithContext("BGNetDebug::LogError").error("%s", std::string(message).c_str());
+    BGNetDebug_LogError(message);
+}
+
+MAKE_HOOK_MATCH(BGNetDebug_LogWarning, &GlobalNamespace::BGNetDebug::LogWarning, void, StringW message) {
+    getLogger().WithContext("BGNetDebug::LogWarning").warning("%s", std::string(message).c_str());
+    BGNetDebug_LogWarning(message);
+}
+
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
@@ -615,6 +633,10 @@ extern "C" void load() {
     //INSTALL_HOOK(getLogger(), MenuRpcManager_InvokeStartLevel);
     //INSTALL_HOOK(getLogger(), LobbyGameStateController_HandleMenuRpcManagerSetCountdownEndTime);
     //INSTALL_HOOK(getLogger(), ConnectedPlayerManager_HandleSyncTimePacket);
+
+    INSTALL_HOOK(getLogger(), BGNetDebug_Log);
+    INSTALL_HOOK(getLogger(), BGNetDebug_LogError);
+    INSTALL_HOOK(getLogger(), BGNetDebug_LogWarning);
 #pragma endregion
 
 

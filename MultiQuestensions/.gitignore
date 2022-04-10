@@ -48,6 +48,7 @@ out/
 [Ll]ibs/
 [Oo]bj/
 [Oo]bjs/
+[Bb]uild/
 *.zip
 *.txt
 extern/
