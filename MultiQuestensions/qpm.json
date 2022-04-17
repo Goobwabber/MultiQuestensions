@@ -4,7 +4,7 @@
   "info": {
     "name": "MultiQuestensions",
     "id": "MultiQuestensions",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "url": "",
     "additionalData": {
       "overrideSoName": "libMultiQuestensions.so"

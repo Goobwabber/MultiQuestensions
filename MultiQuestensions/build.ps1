@@ -8,7 +8,7 @@ if ($env:VERSION) {
 $Version = $env:VERSION
 }
 if (!($Version)) {
-$Version = "0.2.0"
+$Version = "1.0.0"
 }
 if ($env:MPEX_PROTOCOL) {
 $MpEx_Protocol = $env:MPEX_PROTOCOL
