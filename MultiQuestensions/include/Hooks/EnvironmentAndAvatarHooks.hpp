@@ -4,5 +4,6 @@
 
 namespace MultiQuestensions {
     extern void SetPlayerPlaceColor(GlobalNamespace::IConnectedPlayer* player, const UnityEngine::Color& color, bool priority);
-    extern void CreateOrUpdateNameTag(GlobalNamespace::IConnectedPlayer* player);
+    // extern void CreateOrUpdateNameTag(GlobalNamespace::IConnectedPlayer* player);
+    // extern void SetPlatformData(MultiplayerCore::Players::MpPlayerData* data);
 }
