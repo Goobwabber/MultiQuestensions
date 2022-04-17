@@ -64,6 +64,7 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
     }
 
     SetPlayerPlaceColor(player, packet->Color, true);
+    getLogger().info("Calling event 'PlayerConnected'");
     MultiQuestensions::Players::MpexPlayerManager::PlayerConnected(player, packet);
     // CreateOrUpdateNameTag(player);
     
