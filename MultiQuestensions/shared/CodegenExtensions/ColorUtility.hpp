@@ -1,16 +1,12 @@
 #pragma once
 #include "main.hpp"
 #include "beatsaber-hook/shared/utils/byref.hpp"
-#include "UnityEngine/UnityString.hpp"
 #include "UnityEngine/Color32.hpp"
+#include "UnityEngine/Color.hpp"
 
 namespace UnityEngine {
     // Forward declaration of UnityEngine.Color
-    class Color;
-    //// Forward declaration of UnityEngine.Color32
-    //class Color32;
-    //// Forward declaration of UnityEngine.UnityString
-    //class UnityString;
+    // class Color;
 
     class ColorUtility {
         ColorUtility() = delete;
