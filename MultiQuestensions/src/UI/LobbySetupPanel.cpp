@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "UI/LobbySetupPanel.hpp"
+#include "Config.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "UnityEngine/UI/ContentSizeFitter.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
@@ -9,10 +10,10 @@
 #include "GlobalFields.hpp"
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
-#include "songloader/shared/API.hpp"
-#include "UI/DownloadedSongsGSM.hpp"
-#include "Utils/SemVerChecker.hpp"
+
+#include "MultiplayerCore/shared/Networking/MpPacketSerializer.hpp"
 using namespace UnityEngine::UI;
+using namespace MultiQuestensions;
 
 namespace MultiQuestensions::UI {
 
@@ -20,6 +21,7 @@ namespace MultiQuestensions::UI {
 	bool LobbySetupPanel::needRefresh;
 
 	void SetLagReducer(bool value) {
+
 		getConfig().config["LagReducer"].SetBool(value);
 		getConfig().Write();
 	}
@@ -47,20 +49,20 @@ namespace MultiQuestensions::UI {
 		vertical4->get_gameObject()->AddComponent<LayoutElement*>()
 			->set_minWidth(45);
 
-		using namespace MultiQuestensions::Utils;
-		if (IsInstalled(ChromaID) && !MatchesVersion(ChromaID, ChromaVersionRange)) {
-			//HMUI::ModalView* modal = QuestUI::BeatSaberUI::CreateModal(parent, { 55, 25 }, std::nullptr_t());
-			//auto wrapper = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(modal->get_transform());
-			//auto container = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(wrapper->get_transform());
-			//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
-			//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
-			//modal->Show(true, true, nullptr);
-			QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(),
-				"Chroma outdated!\r\nPlease update to the latest version of Chroma.",
-				{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
-			getLogger().warning("Chroma outdated");
-		}
-		else getLogger().debug("Chroma not installed or version incompatible");
+		// using namespace MultiQuestensions::Utils;
+		// if (IsInstalled(ChromaID) && !MatchesVersion(ChromaID, ChromaVersionRange)) {
+		// 	//HMUI::ModalView* modal = QuestUI::BeatSaberUI::CreateModal(parent, { 55, 25 }, std::nullptr_t());
+		// 	//auto wrapper = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(modal->get_transform());
+		// 	//auto container = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(wrapper->get_transform());
+		// 	//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
+		// 	//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
+		// 	//modal->Show(true, true, nullptr);
+		// 	QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(),
+		// 		"Chroma outdated!\r\nPlease update to the latest version of Chroma.",
+		// 		{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
+		// 	getLogger().warning("Chroma outdated");
+		// }
+		// else getLogger().debug("Chroma not installed or version incompatible");
 
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>
@@ -68,26 +70,29 @@ namespace MultiQuestensions::UI {
 		//QuestUI::BeatSaberUI::CreateText(vertical4->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
 
 		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", getConfig().config["LagReducer"].GetBool(), SetLagReducer);
-		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
+		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes Multiplayer easier for the Quest to handle.");
 
-		UnityEngine::Color playerColor;
-		UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
+		UnityEngine::Color playerColor = config.PlayerColor;
+		// UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
 
 		//QuestUI::BeatSaberUI::CreateColorPickerModal(parent->get_transform(), "Player Color Selection", playerColor);
 
 		auto colorPicker = QuestUI::BeatSaberUI::CreateColorPickerModal(parent, "Player Color Selection", playerColor,
 			[&playerColor, sessionManager](UnityEngine::Color value) {
 				playerColor = value;
-				getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
-				getConfig().Write();
-				localExtendedPlayer->playerColor = value;
+				config.PlayerColor = value;
+				// getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
+				// getConfig().Write();
+				// localExtendedPlayer->playerColor = value;
+				localMpexPlayerData->Color = value;
 				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
-				Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
-				getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
-				packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				// Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+				getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localMpexPlayerData->Color.r, localMpexPlayerData->Color.g, localMpexPlayerData->Color.b);
+				// packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData);
 			},
 			[sessionManager] {
-				SetPlayerPlaceColor(sessionManager->get_localPlayer(), localExtendedPlayer->get_playerColor(), true);
+				SetPlayerPlaceColor(sessionManager->get_localPlayer(), localMpexPlayerData->Color, true);
 				//Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
 				//getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
 				//packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
@@ -107,11 +112,11 @@ namespace MultiQuestensions::UI {
 			}
 		);
 
-		auto autoDelete = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Auto-Delete Songs", getConfig().config["autoDelete"].GetBool(), [](bool value) {
-			getConfig().config["autoDelete"].SetBool(value);
-			getConfig().Write();
-			});
-		QuestUI::BeatSaberUI::AddHoverHint(autoDelete->get_gameObject(), "Automatically deletes downloaded songs after playing them.");
+		// auto autoDelete = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Auto-Delete Songs", getConfig().config["autoDelete"].GetBool(), [](bool value) {
+		// 	getConfig().config["autoDelete"].SetBool(value);
+		// 	getConfig().Write();
+		// 	});
+		// QuestUI::BeatSaberUI::AddHoverHint(autoDelete->get_gameObject(), "Automatically deletes downloaded songs after playing them.");
 
 		//auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
 		//	using namespace RuntimeSongLoader::API;
