@@ -115,7 +115,6 @@ namespace MultiQuestensions::Environments {
         RemoveIcon(PlayerIconSlot::Platform);
         
         MultiplayerCore::Players::MpPlayerData* data;
-        std::string userId = static_cast<std::string>(player->get_userId());
         if (MultiplayerCore::Players::MpPlayerManager::TryGetPlayer(userId, data))
             SetPlatformData(data);
         // if (il2cpp_utils::AssignableFrom<MultiQuestensions::Extensions::ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
