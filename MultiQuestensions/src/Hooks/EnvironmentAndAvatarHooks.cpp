@@ -86,20 +86,20 @@ namespace MultiQuestensions {
         if (place == nullptr)
             return;
 
-        getLogger().debug("SetPlayerPlaceColor player %s userId %s", static_cast<std::string>(player->get_userName()).c_str(), static_cast<std::string>(player->get_userId()).c_str());
+        // getLogger().debug("SetPlayerPlaceColor player %s userId %s", static_cast<std::string>(player->get_userName()).c_str(), static_cast<std::string>(player->get_userId()).c_str());
 
-        getLogger().debug("SetPlayerPlaceColor new TargetColor %f, %f, %f, %f", color.r, color.g, color.b, color.a);
+        // getLogger().debug("SetPlayerPlaceColor new TargetColor %f, %f, %f, %f", color.r, color.g, color.b, color.a);
 
-        getLogger().debug("SetPlayerPlaceColor current TargetColor %f, %f, %f, %f", place->targetColor.r, place->targetColor.g, place->targetColor.b, place->targetColor.a);
+        // getLogger().debug("SetPlayerPlaceColor current TargetColor %f, %f, %f, %f", place->targetColor.r, place->targetColor.g, place->targetColor.b, place->targetColor.a);
 
         if (!priority && place->targetColor != Color::get_black() && place->targetColor != Config::DefaultPlayerColor) {
-            getLogger().debug("SetPlayerPlaceColor not priority and TargetColor check is priority '%s' check is black '%s', check is DefaultPlayerColor '%s' check full eval '%s'", !priority ?  "true" : "false", place->targetColor != Color::get_black() ? "true" : "false", place->targetColor != Config::DefaultPlayerColor ? "true" : "false", (!priority && place->targetColor != Color::get_black() && place->targetColor != Config::DefaultPlayerColor) ? "true" : "false");
+            // getLogger().debug("SetPlayerPlaceColor not priority and TargetColor check is priority '%s' check is black '%s', check is DefaultPlayerColor '%s' check full eval '%s'", !priority ?  "true" : "false", place->targetColor != Color::get_black() ? "true" : "false", place->targetColor != Config::DefaultPlayerColor ? "true" : "false", (!priority && place->targetColor != Color::get_black() && place->targetColor != Config::DefaultPlayerColor) ? "true" : "false");
             
-            getLogger().debug("SetPlayerPlaceColor TargetColor %f, %f, %f, %f", place->targetColor.r, place->targetColor.g, place->targetColor.b, place->targetColor.a);
+            // getLogger().debug("SetPlayerPlaceColor TargetColor %f, %f, %f, %f", place->targetColor.r, place->targetColor.g, place->targetColor.b, place->targetColor.a);
             
-            getLogger().debug("SetPlayerPlaceColor black %f, %f, %f, %f", Color::get_black().r, Color::get_black().g, Color::get_black().b, Color::get_black().a);
+            // getLogger().debug("SetPlayerPlaceColor black %f, %f, %f, %f", Color::get_black().r, Color::get_black().g, Color::get_black().b, Color::get_black().a);
             
-            getLogger().debug("SetPlayerPlaceColor DefaultPlayerColor %f, %f, %f, %f", Config::DefaultPlayerColor.r, Config::DefaultPlayerColor.g, Config::DefaultPlayerColor.b, Config::DefaultPlayerColor.a);
+            // getLogger().debug("SetPlayerPlaceColor DefaultPlayerColor %f, %f, %f, %f", Config::DefaultPlayerColor.r, Config::DefaultPlayerColor.g, Config::DefaultPlayerColor.b, Config::DefaultPlayerColor.a);
             // Priority colors are always set; non-priority colors can only override default black/blue
             return;
         }
@@ -261,7 +261,7 @@ namespace MultiQuestensions {
             //getLogger().debug("Adding new LobbyAvatarNameTag Component");
             nameTag = objAvatarCaption->AddComponent<MQEAvatarNameTag*>();
         }
-        nameTag->_playerInfo = player;
+        nameTag->SetPlayerInfo(player);
 
         //const std::string userId = player->get_userId();
         // if (_extendedPlayers.contains(player->get_userId()))
