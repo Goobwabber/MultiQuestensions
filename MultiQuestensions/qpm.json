@@ -3,7 +3,7 @@
   "dependenciesDir": "extern",
   "info": {
     "name": "MultiQuestensions",
-    "id": "multiquestensions",
+    "id": "MultiQuestensions",
     "version": "0.2.0",
     "url": "",
     "additionalData": {
@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.6.7",
+      "versionRange": "=3.7.4",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -22,17 +22,12 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.19.3",
+      "versionRange": "^0.22.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.6",
-      "additionalData": {}
-    },
-    {
-      "id": "songloader",
-      "versionRange": "^0.8.3",
+      "versionRange": "^0.15.9",
       "additionalData": {}
     },
     {
@@ -43,11 +38,6 @@
     {
       "id": "libil2cpp",
       "versionRange": "^0.2.3",
-      "additionalData": {}
-    },
-    {
-      "id": "cpp-semver",
-      "versionRange": "*",
       "additionalData": {}
     },
     {
