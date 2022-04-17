@@ -5,7 +5,7 @@
 #include "GlobalNamespace/LobbyGameStateController.hpp"
 
 // MQE Includes
-#include "Packets/PacketManager.hpp"
+// #include "Packets/PacketManager.hpp"
 
 //#include "System/Collections/Generic/Dictionary_2.hpp"
 namespace MultiQuestensions {
@@ -13,8 +13,6 @@ namespace MultiQuestensions {
     extern GlobalNamespace::MultiplayerSessionManager* sessionManager;
     extern GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
     extern GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
-
-    extern StringW getCustomLevelSongPackMaskStr();
 }
 
 //extern System::Collections::Generic::Dictionary_2<std::string, MultiQuestensions::Extensions::ExtendedPlayer*> extendedPlayers;
