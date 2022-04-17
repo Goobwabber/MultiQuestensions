@@ -69,13 +69,11 @@ namespace MultiQuestensions::Environments {
         // Create Event handlers
         _platformDataEventHandler = MultiplayerCore::event_handler<IConnectedPlayer*, MultiplayerCore::Players::MpPlayerData*>(
             [this](GlobalNamespace::IConnectedPlayer* player, MultiplayerCore::Players::MpPlayerData* data) {
-            if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
-                SetPlatformData(data);
+                HandlePlatformData(player, data);
         });
         _mpexPlayerDataEventHandler = MultiplayerCore::event_handler<IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*>(
             [this](GlobalNamespace::IConnectedPlayer* player, MultiQuestensions::Players::MpexPlayerData* data) {
-            if (_nameText && data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
-                _nameText->set_color(data->Color);
+                HandleMpexData(player, data);
         });
     }
 
@@ -110,9 +108,9 @@ namespace MultiQuestensions::Environments {
             return;
 
         _nameText->set_text(player->get_userName());
-        std::string userName = static_cast<std::string>(player->get_userName());
-        if (_mpexPlayerData.contains(userName))
-            _nameText->set_color(_mpexPlayerData.at(userName)->Color);
+        std::string userId = static_cast<std::string>(player->get_userId());
+        if (_mpexPlayerData.contains(userId))
+            _nameText->set_color(_mpexPlayerData.at(userId)->Color);
 
         RemoveIcon(PlayerIconSlot::Platform);
         
@@ -179,21 +177,24 @@ namespace MultiQuestensions::Environments {
 
         if (!_enabled)
             return;
+        
+        SetPlayerInfo(simplePlayer);
+        // _nameText->set_text(simplePlayer->get_userName());
+        // _nameText->set_color(Color::get_white());
 
-        _nameText->set_text(simplePlayer->get_userName());
-        _nameText->set_color(Color::get_white());
-
-        RemoveIcon(PlayerIconSlot::Platform);
+        // RemoveIcon(PlayerIconSlot::Platform);
     }
 
     using MultiplayerCore::Players::MpPlayerData;
    void MQEAvatarNameTag::HandlePlatformData(IConnectedPlayer* player, MpPlayerData* data) {
+       getLogger().debug("HandlePlatformData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             SetPlatformData(data);
     }
 
     using MultiQuestensions::Players::MpexPlayerData;
     void MQEAvatarNameTag::HandleMpexData(IConnectedPlayer* player, MpexPlayerData* data) {
+        getLogger().debug("HandleMpexData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             _nameText->set_color(data->Color);
     }
