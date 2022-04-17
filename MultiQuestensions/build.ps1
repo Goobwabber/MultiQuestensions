@@ -31,7 +31,7 @@ if ((Test-Path "./extern/includes/beatsaber-hook/src/inline-hook/And64InlineHook
     exit 1;
 }
 
-echo "Building MultiQuestensions Version: $Version with MpEx Protocol Version: $MpEx_Protocol"
+Write-Output "Building MultiQuestensions Version: $Version with MpEx Protocol Version: $MpEx_Protocol"
 
 if ($clean.IsPresent)
 {
@@ -41,18 +41,16 @@ if ($clean.IsPresent)
     }
 }
 
-$NDKPath = Get-Content $PSScriptRoot/ndkpath.txt
-
 if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
 {
-    $out = new-item -Path build -ItemType Directory
+    (new-item -Path build -ItemType Directory) | Out-Null
 }
 
 & qpm-rust package edit --version $Version
 
-cd build
+Set-Location build
 & cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DMPEX_PROTOCOL="$MpEx_Protocol" ../
 & cmake --build . -j 6
 $ExitCode = $LastExitCode
-cd ..
+Set-Location ..
 exit $ExitCode
