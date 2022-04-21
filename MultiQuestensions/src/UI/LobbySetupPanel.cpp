@@ -20,10 +20,9 @@ namespace MultiQuestensions::UI {
 	UnityEngine::UI::Toggle* LobbySetupPanel::lagReducerToggle;
 	bool LobbySetupPanel::needRefresh;
 
-	void SetLagReducer(bool value) {
-
-		getConfig().config["LagReducer"].SetBool(value);
-		getConfig().Write();
+	void SetNoMetaZone(bool value) {
+		config.setNoMetaZone(value);
+		UpdateNameTagIcons();
 	}
 
 	void LobbySetupPanel::AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager) {
@@ -69,10 +68,16 @@ namespace MultiQuestensions::UI {
 
 		//QuestUI::BeatSaberUI::CreateText(vertical4->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
 
-		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", getConfig().config["LagReducer"].GetBool(), SetLagReducer);
+		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", config.getLagReducer(), [](bool value) { config.setLagReducer(value); });
 		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes Multiplayer easier for the Quest to handle.");
+		// lagReducerToggle->set_interactable(false);
+		// QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Currently Broken.");
 
-		UnityEngine::Color playerColor = config.PlayerColor;
+		auto noMetaToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "No Meta Icons", config.getNoMetaZone(), SetNoMetaZone);
+		QuestUI::BeatSaberUI::AddHoverHint(noMetaToggle->get_gameObject(), "Shows the Oculus Icon for Quest Players instead.");
+
+
+		UnityEngine::Color playerColor = config.getPlayerColor();
 		// UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
 
 		//QuestUI::BeatSaberUI::CreateColorPickerModal(parent->get_transform(), "Player Color Selection", playerColor);
@@ -80,8 +85,9 @@ namespace MultiQuestensions::UI {
 		auto colorPicker = QuestUI::BeatSaberUI::CreateColorPickerModal(parent, "Player Color Selection", playerColor,
 			[&playerColor, sessionManager](UnityEngine::Color value) {
 				playerColor = value;
-				config.PlayerColor = value;
-				// getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
+				config.setPlayerColor(value);
+				// config.PlayerColor = value;
+				// getConfig().config["PlayerColor"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
 				// getConfig().Write();
 				// localExtendedPlayer->playerColor = value;
 				localMpexPlayerData->Color = value;

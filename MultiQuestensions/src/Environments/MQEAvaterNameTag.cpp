@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "Config.hpp"
 #include "Environments/MQEAvatarNameTag.hpp"
 #include "Assets/Sprites.hpp"
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
@@ -131,8 +132,10 @@ namespace MultiQuestensions::Environments {
                 SetIcon(PlayerIconSlot::Platform, Sprites::IconSteam64());
                 break;
             case Platform::OculusQuest:
-                SetIcon(PlayerIconSlot::Platform, Sprites::IconMeta64());
-                break;
+                if (!config.getNoMetaZone()) {
+                    SetIcon(PlayerIconSlot::Platform, Sprites::IconMeta64());
+                    break;
+                }
             case Platform::OculusPC:
                 SetIcon(PlayerIconSlot::Platform, Sprites::IconOculus64());
                 break;
