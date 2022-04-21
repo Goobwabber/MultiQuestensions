@@ -34,18 +34,20 @@ using UnityEngine::ColorUtility;
 
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
-// Loads the config from disk using our modInfo, then returns it for use
-Configuration& getConfig() {
-    static Configuration config(modInfo);
-    config.Load();
-    return config;
-}
+namespace MultiQuestensions {
+    // Loads the config from disk using our modInfo, then returns it for use
+    Configuration& getConfig() {
+        static Configuration config(modInfo);
+        config.Load();
+        return config;
+    }
 
-// Loads the old config from disk using our modInfo, then returns it for use
-Configuration& getLegacyConfig() {
-    static Configuration config({"multiquestensions", modInfo.version});
-    config.Load();
-    return config;
+    // Loads the old config from disk using our modInfo, then returns it for use
+    Configuration& getLegacyConfig() {
+        static Configuration config({"multiquestensions", modInfo.version});
+        config.Load();
+        return config;
+    }
 }
 
 // Returns a logger, useful for printing debug messages
@@ -92,70 +94,6 @@ MAKE_HOOK_MATCH(LobbyGameStateController_Activate, &LobbyGameStateController::Ac
     LobbyGameStateController_Activate(self);
 }
 
-void saveDefaultConfig() {
-    getLogger().info("Creating config file...");
-    ConfigDocument& configDoc = getConfig().config;
-
-    configDoc.RemoveAllMembers();
-    if (!configDoc.IsObject())
-        configDoc.SetObject();
-    auto& allocator = configDoc.GetAllocator();
-
-    configDoc.AddMember("Hologram", config.Hologram, allocator);
-    configDoc.AddMember("LagReducer", config.LagReducer, allocator);
-    configDoc.AddMember("MissLighting", config.MissLighting, allocator);
-    configDoc.AddMember("PlayerColor", ColorUtility::ToHtmlStringRGB_CPP(config.PlayerColor), allocator);
-    configDoc.AddMember("MissColor", ColorUtility::ToHtmlStringRGB_CPP(config.MissColor), allocator);
-
-    getConfig().Write();
-    getLogger().info("Config file created.");
-}
-
-bool readConfig() {
-    getLogger().info("Checking for legacy config file...");
-    // Checking legacy config file
-    ConfigDocument& legacyConfig = getLegacyConfig().config;
-    if (legacyConfig.IsObject() && !legacyConfig.HasMember("Converted")) {
-        // Legacy Conversion
-        getLogger().info("Legacy config file found. Converting...");
-        if (legacyConfig.HasMember("LagReducer") && legacyConfig["LagReducer"].IsBool()) {
-            config.LagReducer = legacyConfig["LagReducer"].GetBool();
-        }
-        if (legacyConfig.HasMember("color") && legacyConfig["color"].IsString()) {
-            ColorUtility::TryParseHtmlString(legacyConfig["color"].GetString(), config.PlayerColor);
-        }
-        legacyConfig.AddMember("Converted", true, legacyConfig.GetAllocator());
-    } 
-    // TODO: Delete config on a later version
-    /*
-    else if (legacyConfig.IsObject() && legacyConfig.HasMember("Converted")) {
-        remove(Configuration::getConfigFilePath({"multiquestensions", modInfo.version}).c_str());
-    }
-    */
-
-    getLogger().info("Reading config file...");
-    ConfigDocument& configDoc = getConfig().config;
-    bool parseError = false;
-    if (configDoc.IsObject()) {
-
-
-
-        (configDoc.HasMember("Hologram") && configDoc["Hologram"].IsBool()) ? (config.Hologram  = configDoc["Hologram"].GetBool()) : parseError = true;
-        (configDoc.HasMember("LagReducer") && configDoc["LagReducer"].IsBool()) ? (config.LagReducer = configDoc["LagReducer"].GetBool()) : parseError = true;
-        (configDoc.HasMember("MissLighting") && configDoc["MissLighting"].IsBool()) ? (config.LagReducer = configDoc["MissLighting"].GetBool()) : parseError = true;
-        if (!(configDoc.HasMember("PlayerColor") && configDoc["PlayerColor"].IsString() &&
-            ColorUtility::TryParseHtmlString(configDoc["PlayerColor"].GetString(), config.PlayerColor))) {
-            parseError = true;
-        }
-        if (!(configDoc.HasMember("MissColor") && configDoc["MissColor"].IsString() &&
-            ColorUtility::TryParseHtmlString(configDoc["MissColor"].GetString(), config.MissColor))) {
-            parseError = true;
-        }
-    } else parseError = true;
-
-    return parseError;
-}
-
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
     info.id = ID;
@@ -169,10 +107,13 @@ extern "C" void setup(ModInfo& info) {
 extern "C" void load() {
     il2cpp_functions::Init();
 
-    if (readConfig()) {
-        getLogger().error("Config file is invalid.");
-        saveDefaultConfig();
-    }
+    // Initialize Config
+    config.Initialize();
+
+    // if (readConfig()) {
+    //     getLogger().error("Config file is invalid.");
+    //     saveDefaultConfig();
+    // }
 
     custom_types::Register::AutoRegister();
 
