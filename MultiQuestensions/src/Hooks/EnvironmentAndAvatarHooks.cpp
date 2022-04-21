@@ -120,7 +120,7 @@ namespace MultiQuestensions {
     {
         SetAllPlayerPlaceColors(Color::get_black(), true);
         getLogger().debug("SetDefaultPlayerPlaceColors set local player color");
-        SetPlayerPlaceColor(sessionManager->get_localPlayer(), config.PlayerColor, true);
+        SetPlayerPlaceColor(sessionManager->get_localPlayer(), config.getPlayerColor(), true);
         using System::Collections::Generic::List_1;
         for (int i = 0; i < reinterpret_cast<List_1<IConnectedPlayer*>*>(sessionManager->get_connectedPlayers())->get_Count(); i++) {
             auto player = sessionManager->get_connectedPlayers()->get_Item(i);
@@ -211,45 +211,6 @@ namespace MultiQuestensions {
         else return nullptr;
     }
 
-    // void CreateOrUpdateNameTag(IConnectedPlayer* player)
-    // {
-    //     try {
-    //         //getLogger().debug("Start CreateOrUpdateNameTag: GetAvatarCaptionObject");
-    //         //Il2CppString* userId;
-    //         //if (il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
-    //         //    getLogger().debug("CreateOrUpdateNameTag ExtendedPlayer");
-
-    //         //else if (il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass)) getLogger().debug("CreateOrUpdateNameTag SimplePlayer");
-    //         //else {
-    //         //    getLogger().debug("CreateOrUpdateNameTag unknown type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
-    //         //    return;
-    //         //}
-    //         //getLogger().debug("CreateOrUpdateNameTag player type: %s", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
-
-    //         // if (!(il2cpp_utils::AssignableFrom<ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass) || il2cpp_utils::AssignableFrom<ConnectedPlayerManager::ConnectedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))) {
-    //         //     getLogger().error("REPORT TO ENDER: CreateOrUpdateNameTag unknown type: %s, this shouldn't happen!!!", il2cpp_utils::ClassStandardName(reinterpret_cast<Il2CppObject*>(player)->klass).c_str());
-    //         //     return;
-    //         // }
-
-    //         auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId()/*userId*/);
-    //         if (objAvatarCaption == nullptr)
-    //             return;
-
-    //         //getLogger().debug("Found GetAvatarCaptionObject");
-    //         LobbyAvatarNameTag* nameTag;
-    //         if (!objAvatarCaption->TryGetComponent<LobbyAvatarNameTag*>(byref(nameTag))) {
-    //             //getLogger().debug("Adding new LobbyAvatarNameTag Component");
-    //             nameTag = objAvatarCaption->AddComponent<LobbyAvatarNameTag*>();
-    //         }
-
-    //         //getLogger().debug("SetPlayerInfo");
-    //         nameTag->SetPlayerInfo(player);
-    //     }
-    //     catch (const std::runtime_error& e) {
-    //         getLogger().error("REPORT TO ENDER: CreateOrUpdateNameTag Failed: %s", e.what());
-    //     }
-    // }
-
     void HandleLobbyAvatarCreated(IConnectedPlayer* player) {
         auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
         if (objAvatarCaption == nullptr)
@@ -262,11 +223,29 @@ namespace MultiQuestensions {
             nameTag = objAvatarCaption->AddComponent<MQEAvatarNameTag*>();
         }
         nameTag->SetPlayerInfo(player);
+    }
 
-        //const std::string userId = player->get_userId();
-        // if (_extendedPlayers.contains(player->get_userId()))
-        //     player = reinterpret_cast<IConnectedPlayer*>(_extendedPlayers.at(player->get_userId())->get_self());
-        // CreateOrUpdateNameTag(player);
+    void UpdateNameTagIcons() {
+        getLogger().debug("Start UpdateNameTagIcons");
+        for (int i = 0; i < MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Count(); i++) {
+            auto player = MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Item(i);
+            auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
+            if (objAvatarCaption == nullptr) {
+                getLogger().debug("UpdateNameTagIcons: objAvatarCaption is nullptr");
+                continue;
+            }
+
+            //getLogger().debug("Found GetAvatarCaptionObject");
+            MQEAvatarNameTag* nameTag;
+            if (objAvatarCaption->TryGetComponent<MQEAvatarNameTag*>(byref(nameTag))) {
+                MultiplayerCore::Players::MpPlayerData* mpPlayerData;
+                if (MultiplayerCore::Players::MpPlayerManager::TryGetPlayer(player->get_userId(), mpPlayerData)) {
+                    nameTag->SetPlatformData(mpPlayerData);
+                } else {
+                    getLogger().debug("UpdateNameTagIcons: mpPlayerData is nullptr");
+                }
+            }
+        }
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyAvatarManager_AddPlayer, &MultiplayerLobbyAvatarManager::AddPlayer, void, MultiplayerLobbyAvatarManager* self, IConnectedPlayer* connectedPlayer) {

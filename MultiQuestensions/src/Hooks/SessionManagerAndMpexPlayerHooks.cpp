@@ -66,62 +66,6 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
     SetPlayerPlaceColor(player, packet->Color, true);
     getLogger().info("Calling event 'PlayerConnected'");
     MultiQuestensions::Players::MpexPlayerManager::PlayerConnected(player, packet);
-    // CreateOrUpdateNameTag(player);
-    
-    //if (extendedPlayers->ContainsKey(player->get_userId())) {
-    // if (_mpexPlayerData.contains(userId)) {
-    //     SafePtr<Players::MpexPlayerData> extendedPlayer = _mpexPlayerData.at(userId);
-    //     //Extensions::ExtendedPlayer* extendedPlayer = extendedPlayers->get_Item(player->get_userId());
-    //     // extendedPlayer->_connectedPlayer = player;
-    //     // extendedPlayer->platformID = packet->platformID;
-    //     // extendedPlayer->platform = packet->platform;
-    //     // extendedPlayer->playerColor = packet->playerColor;
-    //     // extendedPlayer->mpexVersion = packet->mpexVersion;
-
-    //     // Updates Color and NameTag
-    //     SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
-    //     CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()));
-    // }
-    // else {
-    //     getLogger().info("Received 'ExtendedPlayerPacket' from '%s' with platformID: '%s'  mpexVersion: '%s'",
-    //         std::string(player->get_userId()).c_str(),
-    //         std::string(packet->platformID).c_str(),
-    //         std::string(packet->mpexVersion).c_str()
-    //     );
-    //     Extensions::ExtendedPlayer* extendedPlayer;
-    //     try {
-    //         extendedPlayer = Extensions::ExtendedPlayer::CS_ctor(player, packet->platformID, packet->platform, packet->mpexVersion, packet->playerColor);
-    //         if (std::string(extendedPlayer->mpexVersion) != MPEX_PROTOCOL)
-    //         {
-    //             getLogger().warning(
-    //                 "###################################################################\r\n"
-    //                 "Different MultiplayerExtensions protocol detected!\r\n"
-    //                 "The player '%s' is using MpEx protocol version %s while you are using MpEx protocol " MPEX_PROTOCOL "\r\n"
-    //                 "For best compatibility all players should use a compatible version of MultiplayerExtensions/MultiQuestensions.\r\n"
-    //                 "###################################################################",
-    //                 std::string(player->get_userName()).c_str(),
-    //                 std::string(extendedPlayer->mpexVersion).c_str()
-    //             );
-    //         }
-    //     }
-    //     catch (const std::runtime_error& e) {
-    //         getLogger().error("REPORT TO ENDER: Exception while trying to create ExtendedPlayer: %s", e.what());
-    //     }
-    //     if (extendedPlayer) {
-    //         _extendedPlayers.emplace(userId, extendedPlayer);
-    //         //extendedPlayers->Add(player->get_userId(), extendedPlayer);
-    //         //if (!extendedPlayersSPTR) extendedPlayersSPTR = extendedPlayers;
-
-    //         //getLogger().debug("SetPlayerPlaceColor");
-    //         SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
-    //         //getLogger().debug("CreateOrUpdateNameTag");
-    //         // This packet is usually received before the avatar is actually created
-    //         CreateOrUpdateNameTag(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()));
-    //         getLogger().debug("ExtendedPlayerPacket done");
-
-    //         //extendedPlayerConnectedEvent::Invoke(extendedPlayer);
-    //     }
-    // }
 }
 
 void HandlePlayerConnected(IConnectedPlayer* player) {
@@ -169,7 +113,7 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
         // localExtendedPlayer = Extensions::ExtendedPlayer::CS_ctor(self->get_localPlayer());
         //localExtendedPlayerSPTR = localExtendedPlayer;
 
-        localMpexPlayerData->Color = config.PlayerColor;
+        localMpexPlayerData->Color = config.getPlayerColor();
         // if (!UnityEngine::ColorUtility::TryParseHtmlString(il2cpp_utils::newcsstr(getConfig().config["color"].GetString()), localExtendedPlayer->playerColor))
         //     localExtendedPlayer->playerColor = UnityEngine::Color(0.031f, 0.752f, 1.0f, 1.0f);
 
