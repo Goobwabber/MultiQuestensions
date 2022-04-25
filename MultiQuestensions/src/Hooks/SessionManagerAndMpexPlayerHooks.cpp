@@ -92,10 +92,10 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
 void HandlePlayerDisconnected(IConnectedPlayer* player) {
     getLogger().info("Reseting platform lights for Player '%s'", std::string(player->get_userId()).c_str());
     SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
-    _mpexPlayerData.erase(std::string(player->get_userId()).c_str());
+    _mpexPlayerData.erase(static_cast<std::string>(player->get_userId()).c_str());
 }
 
-// void HandleDisconnect(DisconnectedReason* reason) {
+// void HandleDisconnect(DisconnectedReason reason) {
 
 // }
 
@@ -129,8 +129,6 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
         //     }
         // );
         // reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
-
-        self->SetLocalPlayerState("modded", true);
       
         //}
     //catch (const std::runtime_error& e) {
@@ -139,8 +137,12 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
 
     MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
 
-    self->add_playerConnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerConnected));
-    self->add_playerDisconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerDisconnected));
+    MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent += HandlePlayerConnected;
+    MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent += HandlePlayerDisconnected;
+    // MultiplayerCore::Players::MpPlayerManager::disconnectedEvent += HandleDisconnect;
+
+    // self->add_playerConnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerConnected));
+    // self->add_playerDisconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), static_cast<Il2CppObject*>(nullptr), HandlePlayerDisconnected));
     // self->add_disconnectedEvent(il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>*>(classof(System::Action_1<GlobalNamespace::DisconnectedReason>*>*), static_cast<Il2CppObject*>(nullptr), HandleDisconnect));
 }
 
