@@ -55,7 +55,7 @@ namespace MultiQuestensions::Environments {
             hLayout->set_childForceExpandHeight(false);
             hLayout->set_childScaleWidth(false);
             hLayout->set_childScaleHeight(false);
-            hLayout->set_spacing(4);
+            hLayout->set_spacing(8);
         }
 
         // Re-nest name onto bg
@@ -63,7 +63,7 @@ namespace MultiQuestensions::Environments {
 
         // Take control of name tag
         ConnectedPlayerName* nativeNameScript;
-        if (_nameText->TryGetComponent<ConnectedPlayerName*>(ByRef(nativeNameScript)))
+        if (_nameText->TryGetComponent<ConnectedPlayerName*>(byref(nativeNameScript)))
             Object::Destroy(nativeNameScript);
         _nameText->set_text(Player());
 
