@@ -25,7 +25,7 @@ namespace MultiQuestensions::UI {
 		UpdateNameTagIcons();
 	}
 
-	void LobbySetupPanel::AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager) {
+	void LobbySetupPanel::AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager, GlobalNamespace::LobbySetupViewController* lobbySetupViewController) {
 		auto vertical = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
 
 		auto horizontal = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
@@ -153,6 +153,8 @@ namespace MultiQuestensions::UI {
 		);
 		QuestUI::BeatSaberUI::AddHoverHint(colorPickerButton->get_gameObject(), "Lets you pick your own personal platform and Name Tag color for everyone to see.");
 
+		lobbySetupViewController->dyn__spectatorWarningTextWrapper()->get_transform()->SetParent(parent->get_transform());
+		lobbySetupViewController->dyn__spectatorWarningTextWrapper()->get_transform()->set_localPosition({ 0, -20, 0 });
 		//customSongsToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Custom Songs", getConfig().config["customsongs"].GetBool(), SetCustomSongs);
 		//QuestUI::BeatSaberUI::AddHoverHint(customSongsToggle->get_gameObject(), "Toggles custom songs for all players");
 	}

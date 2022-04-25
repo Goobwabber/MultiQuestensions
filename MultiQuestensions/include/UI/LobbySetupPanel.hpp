@@ -3,6 +3,7 @@
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "UnityEngine/UI/Toggle.hpp"
 #include "UnityEngine/RectTransform.hpp"
+#include "GlobalNamespace/LobbySetupViewController.hpp"
 
 namespace MultiQuestensions::UI {
 	class LobbySetupPanel {
@@ -14,7 +15,7 @@ namespace MultiQuestensions::UI {
 		static bool needRefresh;
 
 	public:
-		static void AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager);
+		static void AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager, GlobalNamespace::LobbySetupViewController* lobbySetupViewController);
 	};
 	//void SetCustomSongs(bool value);
 }

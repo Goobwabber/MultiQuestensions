@@ -85,7 +85,7 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
     lobbySetupView = self;
     LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     if (firstActivation) {
-        MultiQuestensions::UI::LobbySetupPanel::AddSetupPanel(self->get_rectTransform(), sessionManager);
+        MultiQuestensions::UI::LobbySetupPanel::AddSetupPanel(self->get_rectTransform(), sessionManager, self);
     }
 }
 
