@@ -68,6 +68,7 @@ namespace MultiQuestensions {
     LobbySetupViewController* lobbySetupView;
 
     bool AllPlayersModded() {
+        getLogger().debug("MQE AllPlayersModded");
         for (int i = 0; i < sessionManager->dyn__connectedPlayers()->get_Count(); i++) {
             if (!sessionManager->dyn__connectedPlayers()->get_Item(i)->HasState("modded")) return false;
         }
@@ -77,11 +78,13 @@ namespace MultiQuestensions {
 
 // LobbyPlayersDataModel Activate
 MAKE_HOOK_MATCH(LobbyPlayersActivate, &LobbyPlayersDataModel::Activate, void, LobbyPlayersDataModel* self) {
+    getLogger().debug("LobbyPlayersDataModel::Activate");
     lobbyPlayersDataModel = self;
     LobbyPlayersActivate(lobbyPlayersDataModel);
 }
 
 MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    getLogger().debug("LobbySetupViewController::DidActivate");
     lobbySetupView = self;
     LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     if (firstActivation) {
@@ -90,6 +93,7 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
 }
 
 MAKE_HOOK_MATCH(LobbyGameStateController_Activate, &LobbyGameStateController::Activate, void, LobbyGameStateController* self) {
+    getLogger().debug("LobbyGameStateController::Activate");
     lobbyGameStateController = self;
     LobbyGameStateController_Activate(self);
 }

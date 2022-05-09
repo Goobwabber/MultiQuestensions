@@ -79,8 +79,6 @@ namespace MultiQuestensions {
     {
         if (!initialized) return;
 
-        //getLogger().debug("SetPlayerPlaceColor");
-
         MQEAvatarPlaceLighting* place = GetConnectedPlayerPlace(player);
 
         if (place == nullptr)
@@ -110,6 +108,7 @@ namespace MultiQuestensions {
 
     void SetAllPlayerPlaceColors(Color color, bool immediate = false)
     {
+        getLogger().debug("Setting all base colors");
         for (MQEAvatarPlaceLighting* place : avatarPlaces)
         {
             place->SetColor(color, immediate);
@@ -143,7 +142,7 @@ namespace MultiQuestensions {
 
     void HandleLobbyEnvironmentLoaded() {
         initialized = false;
-        //getLogger().debug("HandleLobbyEnvironmentLoaded Started");
+        getLogger().debug("HandleLobbyEnvironmentLoaded Started");
         auto nativeAvatarPlaces = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace*>();
         for (int i = 0; i < nativeAvatarPlaces.Length(); i++)
         {
@@ -164,7 +163,7 @@ namespace MultiQuestensions {
 
         initialized = true;
         SetDefaultPlayerPlaceColors();
-        //getLogger().debug("HandleLobbyEnvironmentLoaded Finished");
+        getLogger().debug("HandleLobbyEnvironmentLoaded Finished");
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyController_ActivateMultiplayerLobby, &MultiplayerLobbyController::ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
@@ -179,6 +178,7 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(LightWithIdMonoBehaviour_RegisterLight, &LightWithIdMonoBehaviour::RegisterLight, void, LightWithIdMonoBehaviour* self) {
+        getLogger().debug("MQE registering light");
         if (!(self && self->get_transform() && self->get_transform()->get_parent() && self->get_transform()->get_parent()->get_name()->Contains("LobbyAvatarPlace"))) 
             LightWithIdMonoBehaviour_RegisterLight(self);
     }
@@ -195,7 +195,7 @@ namespace MultiQuestensions {
 
         if (_refPlayerIdToAvatarMap != nullptr) {
             MultiplayerLobbyAvatarController* value;
-            //getLogger().debug("Start GetAvatarController return MultiplayerLobbyAvatarController");
+            getLogger().debug("Start GetAvatarController return MultiplayerLobbyAvatarController");
             return _refPlayerIdToAvatarMap->TryGetValue(userId, byref(value)) ? value : nullptr;
         }
 
@@ -213,6 +213,7 @@ namespace MultiQuestensions {
 
     void HandleLobbyAvatarCreated(IConnectedPlayer* player) {
         auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
+        //getLogger().debug("Finding GetAvatarCaptionObject");
         if (objAvatarCaption == nullptr)
             return;
 
@@ -230,8 +231,9 @@ namespace MultiQuestensions {
         for (int i = 0; i < MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Count(); i++) {
             auto player = MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Item(i);
             auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
+            //getLogger().debug("Finding GetAvatarCaptionObject");
             if (objAvatarCaption == nullptr) {
-                getLogger().debug("UpdateNameTagIcons: objAvatarCaption is nullptr");
+                //getLogger().debug("UpdateNameTagIcons: objAvatarCaption is nullptr");
                 continue;
             }
 
@@ -249,6 +251,7 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyAvatarManager_AddPlayer, &MultiplayerLobbyAvatarManager::AddPlayer, void, MultiplayerLobbyAvatarManager* self, IConnectedPlayer* connectedPlayer) {
+        getLogger().debug("MultiplayerLobbyAvatarManager::AddPlayer");
         MultiplayerLobbyAvatarManager_AddPlayer(self, connectedPlayer);
         _avatarManager = self;
         HandleLobbyAvatarCreated(connectedPlayer);

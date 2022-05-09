@@ -35,21 +35,26 @@ IPlatformUserModel* platformUserModel;
 MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::PlayerConnected;
 
 bool MultiQuestensions::Players::MpexPlayerManager::TryGetPlayer(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
+            //getLogger().debug("bool TryingToGetPlayer");
             if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
                 player = static_cast<MultiQuestensions::Players::MpexPlayerData*>(_mpexPlayerData.at(playerId));
                 return true;
             }
+            //getLogger().debug("bool player not found");
             return false;
         }
 
 MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetPlayer(std::string playerId) {
+            //getLogger().debug("MpexPlayerData GetPlayer");
             if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
                 return static_cast<MultiQuestensions::Players::MpexPlayerData*>(_mpexPlayerData.at(playerId));
             }
+            //getLogger().debug("player not found");
             return nullptr;
         }
 
 static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* player) {
+    getLogger().debug("HandleMpexData");
     const std::string userId = to_utf8(csstrtostr(player->get_userId()));
 
     if (_mpexPlayerData.contains(userId)) {
@@ -90,14 +95,11 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
 }
 
 void HandlePlayerDisconnected(IConnectedPlayer* player) {
+    //getLogger().debug("HandlePlayerDisconnected");
     getLogger().info("Reseting platform lights for Player '%s'", std::string(player->get_userId()).c_str());
     SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
     _mpexPlayerData.erase(static_cast<std::string>(player->get_userId()).c_str());
 }
-
-// void HandleDisconnect(DisconnectedReason reason) {
-
-// }
 
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 

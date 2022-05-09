@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "${workspaceFolder}/MultiQuestensions"
+    "cmake.sourceDirectory": "${workspaceFolder}/MultiQuestensions",
+    "cmake.configureOnOpen": false
 }

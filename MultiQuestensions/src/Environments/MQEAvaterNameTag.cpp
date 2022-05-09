@@ -35,12 +35,14 @@ namespace MultiQuestensions::Environments {
 
 
     void MQEAvatarNameTag::New() {
+        //getLogger().debug("MQEAvatarNameTag::New()");
         _enabled = false;
         _playerInfo = nullptr;
         _playerIcons.clear();
     }
 
     void MQEAvatarNameTag::Awake() {
+        //getLogger().debug("MQEAvatarNameTag::Awake()");
         // Get references
         _bg = get_transform()->Find(BG())->GetComponent<ImageView*>();
         _nameText = get_transform()->Find(Name())->GetComponent<CurvedTextMeshPro*>();
@@ -80,6 +82,7 @@ namespace MultiQuestensions::Environments {
 
     void MQEAvatarNameTag::OnEnable()
     {
+        //getLogger().debug("MQEAvatarNameTag::OnEnable()");
         _enabled = true;
 
         // Subscribe to events
@@ -93,6 +96,7 @@ namespace MultiQuestensions::Environments {
 
     void MQEAvatarNameTag::OnDisable()
     {
+        //getLogger().debug("MQEAvatarNameTag::OnDisable()");
         _enabled = false;
 
         // Unsubscribe from events
@@ -103,6 +107,7 @@ namespace MultiQuestensions::Environments {
     #pragma region Set Player Info
     void MQEAvatarNameTag::SetPlayerInfo(IConnectedPlayer* player)
     {
+        //getLogger().debug("MQEAvatarNameTag::SetPlayerInfo");
         _playerInfo = player;
 
         if (!_enabled)
@@ -125,6 +130,7 @@ namespace MultiQuestensions::Environments {
     }
 
     void MQEAvatarNameTag::SetPlatformData(MultiplayerCore::Players::MpPlayerData* data) {
+        //getLogger().debug("MQEAvatarNameTag::SetPlatformData");
         using MultiplayerCore::Players::Platform;
         switch (data->platform)
         {
@@ -175,6 +181,7 @@ namespace MultiQuestensions::Environments {
 
     void MQEAvatarNameTag::SetSimplePlayerInfo(IConnectedPlayer* simplePlayer)
     {
+        //getLogger().debug("SetSimplePlayerInfo");
         _playerInfo = simplePlayer;
 
         if (!_enabled)
@@ -189,14 +196,14 @@ namespace MultiQuestensions::Environments {
 
     using MultiplayerCore::Players::MpPlayerData;
    void MQEAvatarNameTag::HandlePlatformData(IConnectedPlayer* player, MpPlayerData* data) {
-       getLogger().debug("HandlePlatformData");
+       //getLogger().debug("HandlePlatformData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             SetPlatformData(data);
     }
 
     using MultiQuestensions::Players::MpexPlayerData;
     void MQEAvatarNameTag::HandleMpexData(IConnectedPlayer* player, MpexPlayerData* data) {
-        getLogger().debug("HandleMpexData");
+        //getLogger().debug("HandleMpexData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             _nameText->set_color(data->Color);
     }
@@ -205,7 +212,7 @@ namespace MultiQuestensions::Environments {
     #pragma region Set Icons
     void MQEAvatarNameTag::SetIcon(PlayerIconSlot slot, Sprite* sprite)
     {
-        getLogger().debug("SetIcon Sprite %p", sprite);
+        //getLogger().debug("SetIcon Sprite %p", sprite);
 
         if (!_enabled)
             return;
@@ -240,7 +247,7 @@ namespace MultiQuestensions::Environments {
 
     void MQEAvatarNameTag::RemoveIcon(PlayerIconSlot slot)
     {
-        //getLogger().debug("RemoveIcon");
+        //getLogger().debug("MQEAvatarNameTag::RemoveIcon");
 
         if (!_enabled)
             return;
