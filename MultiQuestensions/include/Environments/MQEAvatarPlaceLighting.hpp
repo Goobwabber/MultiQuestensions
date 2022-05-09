@@ -20,7 +20,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, MQEAvatarPlaceLighting, U
     // DECLARE_INSTANCE_METHOD(void, Awake);
     DECLARE_INSTANCE_METHOD(void, OnEnable);
     DECLARE_INSTANCE_METHOD(void, OnDisable);
-    DECLARE_INSTANCE_METHOD(void, Update);
+    DECLARE_INSTANCE_METHOD(void, FixedUpdate);
     DECLARE_INSTANCE_METHOD(UnityEngine::Color, GetColor);
     DECLARE_INSTANCE_METHOD(bool, IsColorVeryCloseToColor, UnityEngine::Color color0, UnityEngine::Color color1);
 
