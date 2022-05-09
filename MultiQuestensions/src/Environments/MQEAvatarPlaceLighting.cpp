@@ -56,7 +56,7 @@ namespace MultiQuestensions::Environments {
         return Color(a.r + (b.r - a.r) * t_clamp, a.g + (b.g - a.g) * t_clamp, a.b + (b.b - a.b) * t_clamp, a.a + (b.a - a.a) * t_clamp);
     }
 
-    void MQEAvatarPlaceLighting::Update() {
+    void MQEAvatarPlaceLighting::FixedUpdate() {
         Color current = GetColor();
 
         if (current == targetColor)
