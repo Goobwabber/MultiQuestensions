@@ -18,10 +18,6 @@ using namespace HMUI;
 DEFINE_TYPE(MultiQuestensions::Environments, MQEAvatarNameTag);
 
 namespace MultiQuestensions::Environments {
-
-    public MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*, MultiplayerCore::Players::MpPlayerData*> _platformDataEventHandler;
-
-
     static StringW BG() {
         static ConstString bg("BG");
         return bg;

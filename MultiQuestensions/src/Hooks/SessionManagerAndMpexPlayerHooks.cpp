@@ -40,9 +40,10 @@ SafePtr<Players::MpexPlayerData> localMpexPlayerData;
 IPlatformUserModel* platformUserModel;
 
 
-MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected(player));
-MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected(player));
-MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _DisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason*>(HandleDisconnect(reason));
+MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
+MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
+MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason> _DisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason>(HandleDisconnect);
+
 
 MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData;
 
@@ -113,7 +114,7 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
     }
 }
 
-void HandleDisconnect(DisconnectedReason reason) {
+void HandleDisconnect(DisconnectedReason reason ) {
     getLogger().info("Clearing MPEX player data");
     _mpexPlayerData.clear();
     MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent -= _PlayerConnectedHandler;
