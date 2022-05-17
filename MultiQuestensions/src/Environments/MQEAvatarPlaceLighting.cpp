@@ -15,7 +15,7 @@ namespace MultiQuestensions::Environments {
     }
 
     void MQEAvatarPlaceLighting::New() {
-        getLogger().debug("MQEAvatarPlaceLighting::New()");
+        //getLogger().debug("MQEAvatarPlaceLighting::New()");
         smoothTime = 2.0f;
         // if (targetColor != UnityEngine::Color::get_black())
             targetColor = UnityEngine::Color::get_black();
@@ -46,7 +46,7 @@ namespace MultiQuestensions::Environments {
     // }
 
     void MQEAvatarPlaceLighting::OnEnable() {
-        getLogger().debug("MQEAvatarPlaceLighting::OnEnable()");
+        //getLogger().debug("MQEAvatarPlaceLighting::OnEnable()");
         auto lightsArr = this->GetComponentsInChildren<TubeBloomPrePassLight*>();
         for (int i = 0; i < lightsArr.Length(); i++) {
             this->lights.emplace_back(lightsArr.get(i));
@@ -54,7 +54,7 @@ namespace MultiQuestensions::Environments {
     }
 
     void MQEAvatarPlaceLighting::OnDisable() {
-        getLogger().debug("MQEAvatarPlaceLighting::OnDisable()");
+        //getLogger().debug("MQEAvatarPlaceLighting::OnDisable()");
         lights.clear();
     }
 

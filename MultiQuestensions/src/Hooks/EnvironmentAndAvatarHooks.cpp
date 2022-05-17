@@ -60,7 +60,7 @@ namespace MultiQuestensions {
 #pragma region LobbyAvatarPlaceLigting
     MQEAvatarPlaceLighting* GetConnectedPlayerPlace(IConnectedPlayer* player)
     {
-        //getLogger().debug("GetConnectedPlayerPlace");
+        //getLogger().debug("GetConnectedPlayerPlace, lighting");
         int sortIndex = _lobbyStateDataModel->get_localPlayer()->get_sortIndex();
         //getLogger().debug("GetConnectedPlayerPlace sortIndex %d, angleBetweenPlayersWithEvenAdjustment %f", sortIndex, angleBetweenPlayersWithEvenAdjustment);
         //static auto* sortIndexMethod = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(IConnectedPlayer*), "get_sortIndex", 0));
@@ -71,18 +71,22 @@ namespace MultiQuestensions {
         for (auto* place : avatarPlaces) {
             if (place->get_transform()->get_position() == playerWorldPosition && place->get_isActiveAndEnabled()) return place;
         }
+        //getLogger().debug("GetConnectedPlayerPlace, lighting is NULLptr");
         return nullptr;
         //return Array::Find(_avatarPlaces, place => place.transform.position == playerWorldPosition && place.isActiveAndEnabled);
     }
 
     void SetPlayerPlaceColor(IConnectedPlayer* player, const Color& color, bool priority)
     {
+        //getLogger().debug("SetPlayerPlaceColor");
         if (!initialized) return;
 
         MQEAvatarPlaceLighting* place = GetConnectedPlayerPlace(player);
 
-        if (place == nullptr)
+        if (place == nullptr){
+            //getLogger().debug("Place was null, returning");
             return;
+        }
 
         // getLogger().debug("SetPlayerPlaceColor player %s userId %s", static_cast<std::string>(player->get_userName()).c_str(), static_cast<std::string>(player->get_userId()).c_str());
 
@@ -91,6 +95,7 @@ namespace MultiQuestensions {
         // getLogger().debug("SetPlayerPlaceColor current TargetColor %f, %f, %f, %f", place->targetColor.r, place->targetColor.g, place->targetColor.b, place->targetColor.a);
 
         if (!priority && place->targetColor != Color::get_black() && place->targetColor != Config::DefaultPlayerColor) {
+            //getLogger().debug("Default color, returning");
             // getLogger().debug("SetPlayerPlaceColor not priority and TargetColor check is priority '%s' check is black '%s', check is DefaultPlayerColor '%s' check full eval '%s'", !priority ?  "true" : "false", place->targetColor != Color::get_black() ? "true" : "false", place->targetColor != Config::DefaultPlayerColor ? "true" : "false", (!priority && place->targetColor != Color::get_black() && place->targetColor != Config::DefaultPlayerColor) ? "true" : "false");
             
             // getLogger().debug("SetPlayerPlaceColor TargetColor %f, %f, %f, %f", place->targetColor.r, place->targetColor.g, place->targetColor.b, place->targetColor.a);
@@ -102,13 +107,13 @@ namespace MultiQuestensions {
             return;
         }
 
-        getLogger().debug("SetPlayerPlaceColor setting color");
+        //getLogger().debug("SetPlayerPlaceColor setting color");
         place->SetColor(color, false);
     }
 
     void SetAllPlayerPlaceColors(Color color, bool immediate = false)
     {
-        getLogger().debug("Setting all base colors");
+        //getLogger().debug("SetAllPlayerPlaceColors");
         for (MQEAvatarPlaceLighting* place : avatarPlaces)
         {
             place->SetColor(color, immediate);
@@ -118,19 +123,19 @@ namespace MultiQuestensions {
     static void SetDefaultPlayerPlaceColors()
     {
         SetAllPlayerPlaceColors(Color::get_black(), true);
-        getLogger().debug("SetDefaultPlayerPlaceColors set local player color");
+        //getLogger().debug("SetDefaultPlayerPlaceColors, set local player color");
         SetPlayerPlaceColor(sessionManager->get_localPlayer(), config.getPlayerColor(), true);
         using System::Collections::Generic::List_1;
         for (int i = 0; i < reinterpret_cast<List_1<IConnectedPlayer*>*>(sessionManager->get_connectedPlayers())->get_Count(); i++) {
             auto player = sessionManager->get_connectedPlayers()->get_Item(i);
             std::string userId = player->get_userId();
             if (userId == static_cast<std::string>(sessionManager->get_localPlayer()->get_userId())) continue;
-            getLogger().debug("SetDefaultPlayerPlaceColors set player color for userId %s", userId.c_str());
+            //getLogger().debug("SetDefaultPlayerPlaceColors, set player color for userId %s", userId.c_str());
             if (_mpexPlayerData.contains(userId)) {
-                getLogger().debug("SetDefaultPlayerPlaceColors found MpexPlayerData setting color for player %s", userId.c_str());
+                //getLogger().debug("SetDefaultPlayerPlaceColors, found MpexPlayerData setting color for player %s", userId.c_str());
                 SetPlayerPlaceColor(player, _mpexPlayerData.at(userId)->Color, true);
             } else {
-                getLogger().debug("SetDefaultPlayerPlaceColors did not find MpexPlayerData setting default color for player %s", userId.c_str());
+                //getLogger().debug("SetDefaultPlayerPlaceColors, did not find MpexPlayerData setting default color for player %s", userId.c_str());
                 SetPlayerPlaceColor(player, Config::DefaultPlayerColor, true);
             }
         }
@@ -142,7 +147,7 @@ namespace MultiQuestensions {
 
     void HandleLobbyEnvironmentLoaded() {
         initialized = false;
-        getLogger().debug("HandleLobbyEnvironmentLoaded Started");
+        getLogger().debug("HandleLobbyEnvironmentLoaded start");
         auto nativeAvatarPlaces = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace*>();
         for (int i = 0; i < nativeAvatarPlaces.Length(); i++)
         {
@@ -167,6 +172,7 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyController_ActivateMultiplayerLobby, &MultiplayerLobbyController::ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
+        getLogger().debug("MultiplayerLobbyController::ActivateMultiplayerLobby");
         _placeManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlaceManager*>()[0];
         _menuEnvironmentManager = Resources::FindObjectsOfTypeAll<MenuEnvironmentManager*>()[0];
         _stageManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyCenterStageManager*>()[0];
@@ -178,9 +184,15 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(LightWithIdMonoBehaviour_RegisterLight, &LightWithIdMonoBehaviour::RegisterLight, void, LightWithIdMonoBehaviour* self) {
-        getLogger().debug("MQE registering light");
-        if (!(self && self->get_transform() && self->get_transform()->get_parent() && self->get_transform()->get_parent()->get_name()->Contains("LobbyAvatarPlace"))) 
+        if ((self && self->get_transform() && self->get_transform()->get_parent() && self->get_transform()->get_parent()->get_name()->Contains("LobbyAvatarPlace"))){
+            if(!self->dyn__isRegistered()){
+                //getLogger().debug("MQE registering a MQEAvatarPlaceLighting or light that has the lobby avatar place as a parent");
+                LightWithIdMonoBehaviour_RegisterLight(self);
+            }
+        }
+        else{
             LightWithIdMonoBehaviour_RegisterLight(self);
+        }
     }
 #pragma endregion
 
@@ -195,11 +207,11 @@ namespace MultiQuestensions {
 
         if (_refPlayerIdToAvatarMap != nullptr) {
             MultiplayerLobbyAvatarController* value;
-            getLogger().debug("Start GetAvatarController return MultiplayerLobbyAvatarController");
+            //getLogger().debug("Start GetAvatarController return MultiplayerLobbyAvatarController");
             return _refPlayerIdToAvatarMap->TryGetValue(userId, byref(value)) ? value : nullptr;
         }
 
-        //getLogger().debug("GetAvatarController return nullptr, this part should never be triggered");
+        getLogger().debug("GetAvatarController return nullptr, this part should never be triggered");
 
         return nullptr;
     }
@@ -217,10 +229,9 @@ namespace MultiQuestensions {
         if (objAvatarCaption == nullptr)
             return;
 
-        //getLogger().debug("Found GetAvatarCaptionObject");
         MQEAvatarNameTag* nameTag;
         if (!objAvatarCaption->TryGetComponent<MQEAvatarNameTag*>(byref(nameTag))) {
-            //getLogger().debug("Adding new LobbyAvatarNameTag Component");
+            getLogger().debug("Adding new LobbyAvatarNameTag Component");
             nameTag = objAvatarCaption->AddComponent<MQEAvatarNameTag*>();
         }
         nameTag->SetPlayerInfo(player);
@@ -231,9 +242,9 @@ namespace MultiQuestensions {
         for (int i = 0; i < MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Count(); i++) {
             auto player = MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Item(i);
             auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
-            //getLogger().debug("Finding GetAvatarCaptionObject");
+            getLogger().debug("Finding GetAvatarCaptionObject");
             if (objAvatarCaption == nullptr) {
-                //getLogger().debug("UpdateNameTagIcons: objAvatarCaption is nullptr");
+                //getLogger().debug("GetAvatarCaptionObject is nullptr, returning");
                 continue;
             }
 
@@ -251,18 +262,11 @@ namespace MultiQuestensions {
     }
 
     MAKE_HOOK_MATCH(MultiplayerLobbyAvatarManager_AddPlayer, &MultiplayerLobbyAvatarManager::AddPlayer, void, MultiplayerLobbyAvatarManager* self, IConnectedPlayer* connectedPlayer) {
-        getLogger().debug("MultiplayerLobbyAvatarManager::AddPlayer");
+        //getLogger().debug("MultiplayerLobbyAvatarManager::AddPlayer");
         MultiplayerLobbyAvatarManager_AddPlayer(self, connectedPlayer);
         _avatarManager = self;
-        HandleLobbyAvatarCreated(connectedPlayer);
+        HandleLobbyAvatarCreated(connectedPlayer);//TODO que this so that it is ran when the player returns to the lobby?
     }
-
-    // MAKE_HOOK_MATCH(AvatarPoseRestrictions_HandleAvatarPoseControllerPositionsWillBeSet, &AvatarPoseRestrictions::HandleAvatarPoseControllerPositionsWillBeSet, void, AvatarPoseRestrictions* self, Quaternion headRotation, Vector3 headPosition, Vector3 leftHandPosition, Vector3 rightHandPosition, ByRef<Vector3> newHeadPosition, ByRef<Vector3> newLeftHandPosition, ByRef<Vector3> newRightHandPosition) {
-    //     newHeadPosition.heldRef = headPosition;
-    //     newLeftHandPosition.heldRef = self->LimitHandPositionRelativeToHead(leftHandPosition, headPosition);
-    //     newRightHandPosition.heldRef = self->LimitHandPositionRelativeToHead(rightHandPosition, headPosition);
-    //     //AvatarPoseRestrictions_HandleAvatarPoseControllerPositionsWillBeSet(self, headRotation, headPosition, leftHandPosition, rightHandPosition, newHeadPosition, newLeftHandPosition, newRightHandPosition);
-    // }
 
 #pragma endregion
 
@@ -270,6 +274,5 @@ namespace MultiQuestensions {
         INSTALL_HOOK(getLogger(), MultiplayerLobbyController_ActivateMultiplayerLobby);
         INSTALL_HOOK(getLogger(), LightWithIdMonoBehaviour_RegisterLight);
         INSTALL_HOOK(getLogger(), MultiplayerLobbyAvatarManager_AddPlayer);
-        // INSTALL_HOOK_ORIG(getLogger(), AvatarPoseRestrictions_HandleAvatarPoseControllerPositionsWillBeSet);
     }
 }

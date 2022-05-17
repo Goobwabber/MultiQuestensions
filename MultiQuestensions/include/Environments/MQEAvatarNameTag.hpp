@@ -1,6 +1,5 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
-// #include "Extensions/ExtendedPlayer.hpp"
 #include "Players/MpexPlayerData.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
@@ -38,6 +37,7 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, MQEAvatarNameTag, UnityEn
 
     MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*, MultiplayerCore::Players::MpPlayerData*> _platformDataEventHandler;
     MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> _mpexPlayerDataEventHandler;
+    
 
     std::map<PlayerIconSlot, HMUI::ImageView*> _playerIcons;
 

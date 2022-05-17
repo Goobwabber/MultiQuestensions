@@ -18,6 +18,10 @@ using namespace HMUI;
 DEFINE_TYPE(MultiQuestensions::Environments, MQEAvatarNameTag);
 
 namespace MultiQuestensions::Environments {
+
+    public MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*, MultiplayerCore::Players::MpPlayerData*> _platformDataEventHandler;
+
+
     static StringW BG() {
         static ConstString bg("BG");
         return bg;
@@ -86,8 +90,8 @@ namespace MultiQuestensions::Environments {
         _enabled = true;
 
         // Subscribe to events
-        MultiplayerCore::Players::MpPlayerManager::PlayerConnected += _platformDataEventHandler;
-        MultiQuestensions::Players::MpexPlayerManager::PlayerConnected += _mpexPlayerDataEventHandler;
+        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData += _platformDataEventHandler;
+        MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData += _mpexPlayerDataEventHandler;
 
         // Set player info
         if (_playerInfo != nullptr)
@@ -100,8 +104,8 @@ namespace MultiQuestensions::Environments {
         _enabled = false;
 
         // Unsubscribe from events
-        MultiplayerCore::Players::MpPlayerManager::PlayerConnected -= _platformDataEventHandler;
-        MultiQuestensions::Players::MpexPlayerManager::PlayerConnected -= _mpexPlayerDataEventHandler;
+        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData -= _platformDataEventHandler;
+        MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData -= _mpexPlayerDataEventHandler;
     }
 
     #pragma region Set Player Info
@@ -123,10 +127,6 @@ namespace MultiQuestensions::Environments {
         MultiplayerCore::Players::MpPlayerData* data;
         if (MultiplayerCore::Players::MpPlayerManager::TryGetPlayer(userId, data))
             SetPlatformData(data);
-        // if (il2cpp_utils::AssignableFrom<MultiQuestensions::Extensions::ExtendedPlayer*>(reinterpret_cast<Il2CppObject*>(player)->klass))
-        //     SetExtendedPlayerInfo(reinterpret_cast<MultiQuestensions::Extensions::ExtendedPlayer*>(player));
-        // else
-            // SetSimplePlayerInfo(player);
     }
 
     void MQEAvatarNameTag::SetPlatformData(MultiplayerCore::Players::MpPlayerData* data) {
@@ -188,22 +188,18 @@ namespace MultiQuestensions::Environments {
             return;
         
         SetPlayerInfo(simplePlayer);
-        // _nameText->set_text(simplePlayer->get_userName());
-        // _nameText->set_color(Color::get_white());
-
-        // RemoveIcon(PlayerIconSlot::Platform);
     }
 
     using MultiplayerCore::Players::MpPlayerData;
-   void MQEAvatarNameTag::HandlePlatformData(IConnectedPlayer* player, MpPlayerData* data) {
-       //getLogger().debug("HandlePlatformData");
+    void MQEAvatarNameTag::HandlePlatformData(IConnectedPlayer* player, MpPlayerData* data) {
+        getLogger().debug("HandlePlatformData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             SetPlatformData(data);
     }
 
     using MultiQuestensions::Players::MpexPlayerData;
     void MQEAvatarNameTag::HandleMpexData(IConnectedPlayer* player, MpexPlayerData* data) {
-        //getLogger().debug("HandleMpexData");
+        getLogger().debug("HandleMpexData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             _nameText->set_color(data->Color);
     }
@@ -212,7 +208,7 @@ namespace MultiQuestensions::Environments {
     #pragma region Set Icons
     void MQEAvatarNameTag::SetIcon(PlayerIconSlot slot, Sprite* sprite)
     {
-        //getLogger().debug("SetIcon Sprite %p", sprite);
+        getLogger().debug("SetIcon Sprite %p", sprite);
 
         if (!_enabled)
             return;
@@ -220,7 +216,7 @@ namespace MultiQuestensions::Environments {
         HMUI::ImageView* imageView;
         if (!_playerIcons.contains(slot))
         {
-            //getLogger().debug("SetIcon, create new Icon");
+            getLogger().debug("SetIcon, create new Icon");
             auto iconObj = GameObject::New_ctor(string_format("MQEPlayerIcon(%d)", (int)slot).c_str());
             iconObj->get_transform()->SetParent(_bg->get_transform(), false);
             iconObj->get_transform()->SetSiblingIndex((int)slot);
@@ -248,7 +244,6 @@ namespace MultiQuestensions::Environments {
     void MQEAvatarNameTag::RemoveIcon(PlayerIconSlot slot)
     {
         //getLogger().debug("MQEAvatarNameTag::RemoveIcon");
-
         if (!_enabled)
             return;
         if (_playerIcons.contains(slot))

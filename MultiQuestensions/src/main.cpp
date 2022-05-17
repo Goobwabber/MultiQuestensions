@@ -78,13 +78,11 @@ namespace MultiQuestensions {
 
 // LobbyPlayersDataModel Activate
 MAKE_HOOK_MATCH(LobbyPlayersActivate, &LobbyPlayersDataModel::Activate, void, LobbyPlayersDataModel* self) {
-    getLogger().debug("LobbyPlayersDataModel::Activate");
     lobbyPlayersDataModel = self;
     LobbyPlayersActivate(lobbyPlayersDataModel);
 }
 
 MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    getLogger().debug("LobbySetupViewController::DidActivate");
     lobbySetupView = self;
     LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     if (firstActivation) {
@@ -93,7 +91,6 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
 }
 
 MAKE_HOOK_MATCH(LobbyGameStateController_Activate, &LobbyGameStateController::Activate, void, LobbyGameStateController* self) {
-    getLogger().debug("LobbyGameStateController::Activate");
     lobbyGameStateController = self;
     LobbyGameStateController_Activate(self);
 }
