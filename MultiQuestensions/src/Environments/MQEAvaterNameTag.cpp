@@ -17,7 +17,7 @@ using namespace HMUI;
 
 DEFINE_TYPE(MultiQuestensions::Environments, MQEAvatarNameTag);
 
-namespace MultiQuestensions::Environments {
+namespace MultiQuestensions::Environments {    
     static StringW BG() {
         static ConstString bg("BG");
         return bg;
