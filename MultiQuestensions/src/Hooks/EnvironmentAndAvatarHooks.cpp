@@ -5,6 +5,7 @@
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Environments/MQEAvatarPlaceLighting.hpp"
 #include "Environments/MQEAvatarNameTag.hpp"
+#include "Players/MpexPlayerManager.hpp"
 #include "Config.hpp"
 
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
@@ -20,15 +21,12 @@
 #include "GlobalNamespace/MultiplayerLobbyAvatarManager.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "GlobalNamespace/ConnectedPlayerManager_ConnectedPlayer.hpp"
-// #include "GlobalNamespace/AvatarPoseRestrictions.hpp"
 #include "GlobalNamespace/GameplayServerConfiguration.hpp"
 
 #include "System/Collections/Generic/List_1.hpp"
 
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Transform.hpp"
-
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
 
 using namespace GlobalNamespace;
 using namespace UnityEngine;
@@ -251,8 +249,8 @@ namespace MultiQuestensions {
             //getLogger().debug("Found GetAvatarCaptionObject");
             MQEAvatarNameTag* nameTag;
             if (objAvatarCaption->TryGetComponent<MQEAvatarNameTag*>(byref(nameTag))) {
-                MultiplayerCore::Players::MpPlayerData* mpPlayerData;
-                if (MultiplayerCore::Players::MpPlayerManager::TryGetPlayer(player->get_userId(), mpPlayerData)) {
+                MultiQuestensions::Players::MpPlayerData* mpPlayerData;
+                if (MultiQuestensions::Players::MpexPlayerManager::TryGetMpPlayerData(player->get_userId(), mpPlayerData)) {
                     nameTag->SetPlatformData(mpPlayerData);
                 } else {
                     getLogger().debug("UpdateNameTagIcons: mpPlayerData is nullptr");
@@ -265,7 +263,7 @@ namespace MultiQuestensions {
         //getLogger().debug("MultiplayerLobbyAvatarManager::AddPlayer");
         MultiplayerLobbyAvatarManager_AddPlayer(self, connectedPlayer);
         _avatarManager = self;
-        HandleLobbyAvatarCreated(connectedPlayer);//TODO que this so that it is ran when the player returns to the lobby?
+        HandleLobbyAvatarCreated(connectedPlayer);
     }
 
 #pragma endregion

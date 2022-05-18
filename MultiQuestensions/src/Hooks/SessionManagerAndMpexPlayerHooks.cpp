@@ -20,34 +20,36 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 #include "MultiplayerCore/shared/Networking/MpPacketSerializer.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
-
-#include "Environments/MQEAvatarNameTag.hpp"
+#include "MultiplayerCore/shared/CodegenExtensions/EnumUtils.hpp"
+#include "Players/MpexPlayerManager.hpp"
+#include "Players/MpPlayerData.hpp"
 
 using namespace MultiQuestensions;
 using namespace MultiplayerCore::Networking;
 using namespace GlobalNamespace;
-using namespace MultiQuestensions::Environments;
 
-// std::map<std::string, SafePtr<Extensions::ExtendedPlayer>> _extendedPlayers;
-std::map<std::string, SafePtr<Players::MpexPlayerData>> _mpexPlayerData;
-//System::Collections::Generic::Dictionary_2<Il2CppString*, Extensions::ExtendedPlayer*>* extendedPlayers;
-//SafePtr<System::Collections::Generic::Dictionary_2<std::string, Extensions::ExtendedPlayer*>*> extendedPlayersSPTR;
-//SafePtr<Extensions::ExtendedPlayer*> localExtendedPlayerSPTR;
-// SafePtr<Extensions::ExtendedPlayer> localExtendedPlayer;
 SafePtr<Players::MpexPlayerData> localMpexPlayerData;
+std::map<std::string, SafePtr<Players::MpexPlayerData>> _mpexPlayerData;
+
+SafePtr<MultiQuestensions::Players::MpPlayerData> localPlayer;
+std::map<std::string, SafePtr<MultiQuestensions::Players::MpPlayerData>> _playerData;
+
 IPlatformUserModel* platformUserModel;
 
+event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpPlayerData*> MultiQuestensions::Players::MpexPlayerManager::RecievedPlayerData;
+event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData;
 
-MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
-MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
-MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason> _DisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason>(HandleDisconnect);
+event<GlobalNamespace::DisconnectedReason> MultiQuestensions::Players::MpexPlayerManager::disconnectedEvent;
+event<GlobalNamespace::IConnectedPlayer*> MultiQuestensions::Players::MpexPlayerManager::playerConnectedEvent;
+event<GlobalNamespace::IConnectedPlayer*> MultiQuestensions::Players::MpexPlayerManager::playerDisconnectedEvent;
 
 
-MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData;
+event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiQuestensions::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
+event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiQuestensions::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
+event_handler<GlobalNamespace::DisconnectedReason> _DisconnectedHandler = MultiQuestensions::event_handler<GlobalNamespace::DisconnectedReason>(HandleDisconnect);
 
-bool MultiQuestensions::Players::MpexPlayerManager::TryGetPlayer(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
+
+bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
             if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
                 player = static_cast<MultiQuestensions::Players::MpexPlayerData*>(_mpexPlayerData.at(playerId));
                 return true;
@@ -55,15 +57,50 @@ bool MultiQuestensions::Players::MpexPlayerManager::TryGetPlayer(std::string pla
             return false;
         }
 
-MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetPlayer(std::string playerId) {
+MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetMpexPlayerData(std::string playerId) {
             if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
                 return static_cast<MultiQuestensions::Players::MpexPlayerData*>(_mpexPlayerData.at(playerId));
             }
             return nullptr;
         }
 
+
+bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpPlayerData(std::string playerId, Players::MpPlayerData*& player) {
+    if (_playerData.find(playerId) != _playerData.end()) {
+        player = static_cast<Players::MpPlayerData*>(_playerData.at(playerId));
+        return true;
+    }
+    return false;
+}
+
+Players::MpPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetMpPlayerData(std::string playerId) {
+    if (_playerData.find(playerId) != _playerData.end()) {
+        return static_cast<Players::MpPlayerData*>(_playerData.at(playerId));
+    }
+    return nullptr;
+}
+
+
+
+static void HandlePlayerData(Players::MpPlayerData* playerData, IConnectedPlayer* player) {
+    if (_playerData.contains(static_cast<std::string>(player->get_userId()))) {
+        getLogger().debug("HandlePlayerData, player already exists");
+        _playerData.at(static_cast<std::string>(player->get_userId())) = playerData;
+    }
+    else {
+        getLogger().info("Received new 'MpPlayerData' from '%s' with platformID: '%s' platform: '%d'",
+            to_utf8(csstrtostr(player->get_userId())).c_str(),
+            to_utf8(csstrtostr(playerData->platformId)).c_str(),
+            (int)playerData->platform
+        );
+        _playerData.emplace(static_cast<std::string>(player->get_userId()), playerData);
+    }
+    getLogger().debug("MpPlayerData firing event");
+    MultiQuestensions::Players::MpexPlayerManager::RecievedPlayerData(player, playerData);
+    getLogger().debug("MpPlayerData done");
+}
+
 static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* player) {
-    getLogger().debug("HandleMpexData");
     const std::string userId = to_utf8(csstrtostr(player->get_userId()));
 
     if (_mpexPlayerData.contains(userId)) {
@@ -78,22 +115,32 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
     }
 
     SetPlayerPlaceColor(player, packet->Color, true);
-    getLogger().info("Calling event 'RecievedMpExPlayerData'");
+    getLogger().info("Calling event 'PlayerConnected'");
     MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData(player, packet);
 }
 
+
 void HandlePlayerConnected(IConnectedPlayer* player) {
     try {
-        getLogger().debug("MQE HandlePlayerConnected");
+        getLogger().debug("MpEx HandlePlayerConnected");
         if (player) {
-            const std::string userId = player->get_userId();
-            getLogger().info("MQE Player '%s' joined", userId.c_str());
+            getLogger().info("Player '%s' joined", static_cast<std::string>(player->get_userId()).c_str());
+            if (localPlayer->platformId)
+            {
+                getLogger().debug("Sending MpPlayerData with platformID: '%s' platform: '%d'",
+                    static_cast<std::string>(localPlayer->platformId).c_str(),
+                    (int)localPlayer->platform
+                );
+                MultiplayerCore::mpPacketSerializer->Send(localPlayer);
+            }
+            getLogger().debug("MpPlayerData sent");
+
             getLogger().debug("Sending MpexPlayerData");
             if (localMpexPlayerData)
             {
                 MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData->ToSerializable());
+                getLogger().debug("MpexPlayerData sent");
             }
-            getLogger().debug("MpexPlayerData sent");
 
             SetPlayerPlaceColor(player, Config::DefaultPlayerColor, false);
         }
@@ -104,23 +151,66 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
 }
 
 void HandlePlayerDisconnected(IConnectedPlayer* player) {
-    if (player) {
+    try {
         const std::string userId = to_utf8(csstrtostr(player->get_userId()));
-        if (_mpexPlayerData.contains(userId)) {
-            getLogger().info("Reseting platform lights for Player '%s'", userId.c_str());
-            SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
-            _mpexPlayerData.erase(userId);
+        getLogger().info("Player '%s' left", userId.c_str());
+
+        if (player) {
+            if(_playerData.contains(userId)){
+                _playerData.at(userId).~SafePtr();
+                _playerData.erase(userId);
+            }
+            if (_mpexPlayerData.contains(userId)) {
+                getLogger().info("Reseting platform lights for Player '%s'", userId.c_str());
+                SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
+                _mpexPlayerData.at(userId).~SafePtr();
+                _mpexPlayerData.erase(userId);
+            }
         }
+    }
+        catch (const std::runtime_error& e) {
+        getLogger().error("REPORT TO ENDER: %s", e.what());
     }
 }
 
-void HandleDisconnect(DisconnectedReason reason ) {
+
+void HandleDisconnect(DisconnectedReason reason) {
+    getLogger().info("Disconnected from server reason: '%s'", MultiplayerCore::EnumUtils::GetEnumName(reason).c_str());
+    _playerData.clear();
     getLogger().info("Clearing MPEX player data");
     _mpexPlayerData.clear();
-    MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent -= _PlayerConnectedHandler;
-    MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent -= _PlayerDisconnectedHandler;
-    MultiplayerCore::Players::MpPlayerManager::disconnectedEvent -= _DisconnectedHandler;
+    getLogger().info("MQE Removing connected/disconnected/disconnect events");
+    Players::MpexPlayerManager::playerConnectedEvent -= _PlayerConnectedHandler;
+    Players::MpexPlayerManager::playerDisconnectedEvent -= _PlayerDisconnectedHandler;
+    Players::MpexPlayerManager::disconnectedEvent -= _DisconnectedHandler;
 }
+
+MAKE_HOOK_MATCH(MultiplayerSessionManager_HandlePlayerConnected, &MultiplayerSessionManager::HandlePlayerConnected, void, MultiplayerSessionManager* self, IConnectedPlayer* player) {
+    getLogger().debug("MultiplayerSessionManager_HandlePlayerConnected");
+    MultiplayerSessionManager_HandlePlayerConnected(self, player);
+    if(player){
+        getLogger().debug("MultiplayerSessionManager_HandlePlayerConnected, triggering MQE event");
+        Players::MpexPlayerManager::playerConnectedEvent(player);
+    }
+}
+
+MAKE_HOOK_MATCH(MultiplayerSessionManager_HandlePlayerDisconnected, &MultiplayerSessionManager::HandlePlayerDisconnected, void, MultiplayerSessionManager* self, IConnectedPlayer* player) {
+    getLogger().debug("MultiplayerSessionManager_HandlePlayerDisconnected");
+    MultiplayerSessionManager_HandlePlayerDisconnected(self, player);
+    if(player){
+        getLogger().debug("MultiplayerSessionManager_HandlePlayerDisconnected, triggering MQE event");
+        Players::MpexPlayerManager::playerDisconnectedEvent(player);
+    }
+}
+
+MAKE_HOOK_MATCH(MultiplayerSessionManager_HandleDisconnected, &MultiplayerSessionManager::HandleDisconnected, void, MultiplayerSessionManager* self, DisconnectedReason disconnectedReason) {
+    getLogger().debug("MultiplayerSessionManager_HandleDisconnected, triggeing event first");
+    Players::MpexPlayerManager::disconnectedEvent(disconnectedReason);
+    getLogger().debug("MultiplayerSessionManager_HandleDisconnected, triggering base game");
+    MultiplayerSessionManager_HandleDisconnected(self, disconnectedReason);
+}
+
+
 
 MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
 
@@ -128,23 +218,88 @@ MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, Mu
     SessionManagerStart(sessionManager);
 }
 
+Players::Platform getPlatform(UserInfo::Platform platform) {
+    switch (platform.value) {
+    case UserInfo::Platform::Oculus:
+        getLogger().debug("Platform: Oculus = OculusQuest");
+        return Players::Platform::OculusQuest; // If platform is Oculus, we assume the user is using Quest
+    case UserInfo::Platform::PS4:
+        getLogger().debug("Platform: PS4");
+        return Players::Platform::PS4;
+    case UserInfo::Platform::Steam:
+        getLogger().debug("Platform: Steam");
+        return Players::Platform::Steam;
+    case UserInfo::Platform::Test:
+        getLogger().debug("Platform: Test = Unknown");
+        return Players::Platform::Unknown;
+    default:
+        try {
+            getLogger().debug("Platform: %s", MultiplayerCore::EnumUtils::GetEnumName(platform).c_str());
+        }
+        catch (const std::runtime_error& e) {
+            getLogger().error("REPORT TO ENDER: %s", e.what());
+        }
+        catch (const std::exception& e) {
+            getLogger().error("REPORT TO ENDER: %s", e.what());
+        }
+        catch (...) {
+            getLogger().error("REPORT TO ENDER: Unknown exception");
+        }
+        getLogger().debug("Platform: %d", (int)platform.value);
+        return (Players::Platform)platform.value;
+    }
+}
+
+
+
+
 MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSession, void, MultiplayerSessionManager* self, MultiplayerSessionManager_SessionType sessionType, ConnectedPlayerManager* connectedPlayerManager) {
     SessionManager_StartSession(self, sessionType, connectedPlayerManager);
+
+    getLogger().debug("MultiplayerSessionManager.StartSession, creating localPlayer");
+
+
+    static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>().get(0);
+    static auto UserInfoTask = localNetworkPlayerModel->dyn__platformUserModel()->GetUserInfo();
+    static auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
+        auto userInfo = userInfoTask->get_Result();
+        if (userInfo) {
+            if (!localPlayer) localPlayer = Players::MpPlayerData::Init(userInfo->dyn_platformUserId(), getPlatform(userInfo->dyn_platform()));
+            else {
+                localPlayer->platformId = userInfo->dyn_platformUserId();
+                localPlayer->platform = getPlatform(userInfo->dyn_platform());
+            }
+        }
+        else getLogger().error("Failed to get local network player!");
+        }
+    );
+    reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+
+
+
+    getLogger().debug("MultiplayerSessionManager.StartSession, creating localMpexPlayerData");
 
     localMpexPlayerData = Players::MpexPlayerData::New_ctor();
     localMpexPlayerData->Color = config.getPlayerColor();
 
+    //mpPacketSerializer->RegisterCallback<Players::MpPlayerData*>(HandlePlayerData);
+    MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpPlayerData*>(HandlePlayerData);
+    getLogger().debug("Callback HandlePlayerData Registered");
     MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
 
+    Players::MpexPlayerManager::playerConnectedEvent += _PlayerConnectedHandler;
+    Players::MpexPlayerManager::playerDisconnectedEvent += _PlayerDisconnectedHandler;
+    Players::MpexPlayerManager::disconnectedEvent += _DisconnectedHandler;
 
-
-    MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent += _PlayerConnectedHandler;
-    MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent += _PlayerDisconnectedHandler;
-    MultiplayerCore::Players::MpPlayerManager::disconnectedEvent += _DisconnectedHandler;
 }
+
 
 
 void MultiQuestensions::Hooks::SessionManagerAndExtendedPlayerHooks() {
     INSTALL_HOOK(getLogger(), SessionManagerStart);
     INSTALL_HOOK(getLogger(), SessionManager_StartSession);
+
+    INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerConnected);
+    INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandlePlayerDisconnected);
+    INSTALL_HOOK(getLogger(), MultiplayerSessionManager_HandleDisconnected);
 }

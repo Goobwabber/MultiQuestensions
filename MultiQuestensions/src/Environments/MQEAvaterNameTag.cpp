@@ -9,7 +9,9 @@
 #include "GlobalNamespace/ConnectedPlayerName.hpp"
 #include "UnityEngine/Object.hpp"
 #include "Players/MpexPlayerManager.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
+#include "Players/MpPlayerData.hpp"
+#include "Utils/event.hpp"
+
 using namespace GlobalNamespace;
 using namespace UnityEngine::UI;
 using namespace UnityEngine;
@@ -70,12 +72,12 @@ namespace MultiQuestensions::Environments {
         _nameText->set_text(Player());
 
         // Create Event handlers
-        _platformDataEventHandler = MultiplayerCore::event_handler<IConnectedPlayer*, MultiplayerCore::Players::MpPlayerData*>(
-            [this](GlobalNamespace::IConnectedPlayer* player, MultiplayerCore::Players::MpPlayerData* data) {
+        _platformDataEventHandler = event_handler<IConnectedPlayer*, Players::MpPlayerData*>(
+            [this](GlobalNamespace::IConnectedPlayer* player, Players::MpPlayerData* data) {
                 HandlePlatformData(player, data);
         });
-        _mpexPlayerDataEventHandler = MultiplayerCore::event_handler<IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*>(
-            [this](GlobalNamespace::IConnectedPlayer* player, MultiQuestensions::Players::MpexPlayerData* data) {
+        _mpexPlayerDataEventHandler = event_handler<IConnectedPlayer*, Players::MpexPlayerData*>(
+            [this](GlobalNamespace::IConnectedPlayer* player, Players::MpexPlayerData* data) {
                 HandleMpexData(player, data);
         });
     }
@@ -86,8 +88,8 @@ namespace MultiQuestensions::Environments {
         _enabled = true;
 
         // Subscribe to events
-        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData += _platformDataEventHandler;
-        MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData += _mpexPlayerDataEventHandler;
+        Players::MpexPlayerManager::RecievedPlayerData += _platformDataEventHandler;
+        Players::MpexPlayerManager::RecievedMpExPlayerData += _mpexPlayerDataEventHandler;
 
         // Set player info
         if (_playerInfo != nullptr)
@@ -100,8 +102,8 @@ namespace MultiQuestensions::Environments {
         _enabled = false;
 
         // Unsubscribe from events
-        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData -= _platformDataEventHandler;
-        MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData -= _mpexPlayerDataEventHandler;
+        Players::MpexPlayerManager::RecievedPlayerData -= _platformDataEventHandler;
+        Players::MpexPlayerManager::RecievedMpExPlayerData -= _mpexPlayerDataEventHandler;
     }
 
     #pragma region Set Player Info
@@ -120,14 +122,14 @@ namespace MultiQuestensions::Environments {
 
         RemoveIcon(PlayerIconSlot::Platform);
         
-        MultiplayerCore::Players::MpPlayerData* data;
-        if (MultiplayerCore::Players::MpPlayerManager::TryGetPlayer(userId, data))
+        Players::MpPlayerData* data;
+        if (Players::MpexPlayerManager::TryGetMpPlayerData(userId, data))
             SetPlatformData(data);
     }
 
-    void MQEAvatarNameTag::SetPlatformData(MultiplayerCore::Players::MpPlayerData* data) {
+    void MQEAvatarNameTag::SetPlatformData(Players::MpPlayerData* data) {
         //getLogger().debug("MQEAvatarNameTag::SetPlatformData");
-        using MultiplayerCore::Players::Platform;
+        using Players::Platform;
         switch (data->platform)
         {
             case Platform::Steam:
@@ -148,33 +150,6 @@ namespace MultiQuestensions::Environments {
         }
     }
 
-    // void LobbyAvatarNameTag::SetExtendedPlayerInfo(ExtendedPlayer* extendedPlayer)
-    // {
-    //     _playerInfo = reinterpret_cast<IConnectedPlayer*>(extendedPlayer);
-
-    //     if (!_enabled)
-    //         return;
-
-    //     _nameText->set_text(extendedPlayer->get_userName());
-    //     _nameText->set_color(extendedPlayer->get_playerColor());
-
-    //     //getLogger().debug("SetExtendedPlayerInfo platform: %d", (int)extendedPlayer->get_platform());
-
-    //     switch (extendedPlayer->get_platform())
-    //     {
-    //     case Extensions::Platform::Steam:
-    //         SetIcon(PlayerIconSlot::Platform, Sprites::IconSteam64());
-    //         break;
-    //     case Extensions::Platform::OculusQuest:
-    //     case Extensions::Platform::OculusPC:
-    //         SetIcon(PlayerIconSlot::Platform, Sprites::IconOculus64());
-    //         break;
-    //     default:
-    //         RemoveIcon(PlayerIconSlot::Platform);
-    //         break;
-    //     }
-    // }
-
     void MQEAvatarNameTag::SetSimplePlayerInfo(IConnectedPlayer* simplePlayer)
     {
         //getLogger().debug("SetSimplePlayerInfo");
@@ -186,14 +161,14 @@ namespace MultiQuestensions::Environments {
         SetPlayerInfo(simplePlayer);
     }
 
-    using MultiplayerCore::Players::MpPlayerData;
+    using Players::MpPlayerData;
     void MQEAvatarNameTag::HandlePlatformData(IConnectedPlayer* player, MpPlayerData* data) {
         getLogger().debug("HandlePlatformData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
             SetPlatformData(data);
     }
 
-    using MultiQuestensions::Players::MpexPlayerData;
+    using Players::MpexPlayerData;
     void MQEAvatarNameTag::HandleMpexData(IConnectedPlayer* player, MpexPlayerData* data) {
         getLogger().debug("HandleMpexData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())
