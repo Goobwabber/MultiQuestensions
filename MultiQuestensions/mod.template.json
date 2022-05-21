@@ -1,5 +1,5 @@
 {
-  "_QPVersion": "0.1.2",
+  "_QPVersion": "0.1.1",
   "name": "${mod_name}",
   "id": "${mod_id}",
   "author": "EnderdracheLP and Goobie",
@@ -8,16 +8,6 @@
   "packageVersion": "1.21.0",
   "description": "Lightweight port of MultiplayerExtensions, the PC mod that adds features to Multiplayer.!",
   "dependencies": [
-    {
-      "version": "^1.4.0",
-      "id": "BeatTogether",
-      "downloadIfMissing": "https://github.com/pythonology/BeatTogether.Quest/releases/download/v1.4.0/BeatTogether_v1.4.0.qmod"
-    },
-    {
-      "version": "^1.0.0",
-      "id": "MultiplayerCore.Quest",
-      "downloadIfMissing": "https://github.com/EnderdracheLP/MultiplayerCore.Quest/releases/download/v1.0.0/MultiplayerCore.qmod"
-    }
   ],
   "modFiles": [],
   "libraryFiles": [],

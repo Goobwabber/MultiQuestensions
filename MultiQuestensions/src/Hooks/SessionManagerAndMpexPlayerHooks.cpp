@@ -251,14 +251,10 @@ Players::Platform getPlatform(UserInfo::Platform platform) {
 }
 
 
-
-
 MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSession, void, MultiplayerSessionManager* self, MultiplayerSessionManager_SessionType sessionType, ConnectedPlayerManager* connectedPlayerManager) {
     SessionManager_StartSession(self, sessionType, connectedPlayerManager);
-
     getLogger().debug("MultiplayerSessionManager.StartSession, creating localPlayer");
-
-
+    
     static auto localNetworkPlayerModel = UnityEngine::Resources::FindObjectsOfTypeAll<LocalNetworkPlayerModel*>().get(0);
     static auto UserInfoTask = localNetworkPlayerModel->dyn__platformUserModel()->GetUserInfo();
     static auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
@@ -268,19 +264,26 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
             else {
                 localPlayer->platformId = userInfo->dyn_platformUserId();
                 localPlayer->platform = getPlatform(userInfo->dyn_platform());
+                getLogger().error("got local network player, it will be null after this so no repeats");
             }
         }
         else getLogger().error("Failed to get local network player!");
         }
     );
-    reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+    if(action){
+        reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+        action = nullptr;
+    }
 
 
-
+    
     getLogger().debug("MultiplayerSessionManager.StartSession, creating localMpexPlayerData");
 
-    localMpexPlayerData = Players::MpexPlayerData::New_ctor();
-    localMpexPlayerData->Color = config.getPlayerColor();
+    if(!localMpexPlayerData){
+        localMpexPlayerData = Players::MpexPlayerData::New_ctor();
+        localMpexPlayerData->Color = config.getPlayerColor();
+    }
+
 
     //mpPacketSerializer->RegisterCallback<Players::MpPlayerData*>(HandlePlayerData);
     MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpPlayerData*>(HandlePlayerData);

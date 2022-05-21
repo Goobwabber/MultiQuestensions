@@ -1,5 +1,5 @@
 {
-  "_QPVersion": "0.1.2",
+  "_QPVersion": "0.1.1",
   "name": "MultiQuestensions",
   "id": "MultiQuestensions",
   "author": "EnderdracheLP and Goobie",
@@ -9,19 +9,9 @@
   "description": "Lightweight port of MultiplayerExtensions, the PC mod that adds features to Multiplayer.!",
   "dependencies": [
     {
-      "version": "^1.4.0",
-      "id": "BeatTogether",
-      "downloadIfMissing": "https://github.com/pythonology/BeatTogether.Quest/releases/download/v1.4.0/BeatTogether_v1.4.0.qmod"
-    },
-    {
-      "version": "^1.0.0",
-      "id": "MultiplayerCore.Quest",
-      "downloadIfMissing": "https://github.com/EnderdracheLP/MultiplayerCore.Quest/releases/download/v1.0.0/MultiplayerCore.qmod"
-    },
-    {
       "version": "^0.15.9",
       "id": "custom-types",
-      "downloadIfMissing": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.9/CustomTypes.qmod"
+      "downloadIfMissing": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.10/CustomTypes.qmod"
     },
     {
       "version": "^0.22.0",
@@ -38,7 +28,7 @@
     "libMultiQuestensions.so"
   ],
   "libraryFiles": [
-    "libbeatsaber-hook_3_7_4.so"
+    "libbeatsaber-hook_3_8_5.so"
   ],
   "fileCopies": [],
   "copyExtensions": []
