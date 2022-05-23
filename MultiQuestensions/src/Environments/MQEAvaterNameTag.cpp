@@ -11,7 +11,7 @@
 #include "Players/MpexPlayerManager.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
-#include "Utils/event.hpp"
+#include "MultiplayerCore/shared/Utils/event.hpp"
 
 using namespace GlobalNamespace;
 using namespace UnityEngine::UI;
