@@ -31,7 +31,7 @@ using namespace MultiplayerCore::Networking;
 using namespace GlobalNamespace;
 
 SafePtr<Players::MpexPlayerData> localMpexPlayerData;
-std::map<std::string, SafePtr<Players::MpexPlayerData>> _mpexPlayerData;
+std::unordered_map<std::string, SafePtr<Players::MpexPlayerData>> _mpexPlayerData;
 
 IPlatformUserModel* platformUserModel;
 

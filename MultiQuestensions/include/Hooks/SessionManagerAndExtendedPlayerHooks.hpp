@@ -4,7 +4,7 @@
 #include "GlobalNamespace/DisconnectedReason.hpp"
 
 extern SafePtr<MultiQuestensions::Players::MpexPlayerData> localMpexPlayerData;
-extern std::map<std::string, SafePtr<MultiQuestensions::Players::MpexPlayerData>> _mpexPlayerData;
+extern std::unordered_map<std::string, SafePtr<MultiQuestensions::Players::MpexPlayerData>> _mpexPlayerData;
 
 extern void HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player);
 extern void HandlePlayerDisconnected(GlobalNamespace::IConnectedPlayer* player);
