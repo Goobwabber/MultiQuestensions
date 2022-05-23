@@ -9,7 +9,8 @@
 #include "GlobalNamespace/ConnectedPlayerName.hpp"
 #include "UnityEngine/Object.hpp"
 #include "Players/MpexPlayerManager.hpp"
-#include "Players/MpPlayerData.hpp"
+#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
+#include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
 #include "Utils/event.hpp"
 
 using namespace GlobalNamespace;
@@ -72,11 +73,11 @@ namespace MultiQuestensions::Environments {
         _nameText->set_text(Player());
 
         // Create Event handlers
-        _platformDataEventHandler = event_handler<IConnectedPlayer*, Players::MpPlayerData*>(
-            [this](GlobalNamespace::IConnectedPlayer* player, Players::MpPlayerData* data) {
+        _platformDataEventHandler = MultiplayerCore::event_handler<IConnectedPlayer*, MultiplayerCore::Players::MpPlayerData*>(
+            [this](GlobalNamespace::IConnectedPlayer* player, MultiplayerCore::Players::MpPlayerData* data) {
                 HandlePlatformData(player, data);
         });
-        _mpexPlayerDataEventHandler = event_handler<IConnectedPlayer*, Players::MpexPlayerData*>(
+        _mpexPlayerDataEventHandler = MultiplayerCore::event_handler<IConnectedPlayer*, Players::MpexPlayerData*>(
             [this](GlobalNamespace::IConnectedPlayer* player, Players::MpexPlayerData* data) {
                 HandleMpexData(player, data);
         });
@@ -88,7 +89,7 @@ namespace MultiQuestensions::Environments {
         _enabled = true;
 
         // Subscribe to events
-        Players::MpexPlayerManager::RecievedPlayerData += _platformDataEventHandler;
+        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData += _platformDataEventHandler;
         Players::MpexPlayerManager::RecievedMpExPlayerData += _mpexPlayerDataEventHandler;
 
         // Set player info
@@ -102,7 +103,7 @@ namespace MultiQuestensions::Environments {
         _enabled = false;
 
         // Unsubscribe from events
-        Players::MpexPlayerManager::RecievedPlayerData -= _platformDataEventHandler;
+        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData -= _platformDataEventHandler;
         Players::MpexPlayerManager::RecievedMpExPlayerData -= _mpexPlayerDataEventHandler;
     }
 
@@ -122,14 +123,14 @@ namespace MultiQuestensions::Environments {
 
         RemoveIcon(PlayerIconSlot::Platform);
         
-        Players::MpPlayerData* data;
-        if (Players::MpexPlayerManager::TryGetMpPlayerData(userId, data))
+        MultiplayerCore::Players::MpPlayerData* data;
+        if (MultiplayerCore::Players::MpPlayerManager::TryGetMpPlayerData(userId, data))
             SetPlatformData(data);
     }
 
-    void MQEAvatarNameTag::SetPlatformData(Players::MpPlayerData* data) {
+    void MQEAvatarNameTag::SetPlatformData(MultiplayerCore::Players::MpPlayerData* data) {
         //getLogger().debug("MQEAvatarNameTag::SetPlatformData");
-        using Players::Platform;
+        using MultiplayerCore::Players::Platform;
         switch (data->platform)
         {
             case Platform::Steam:
@@ -161,7 +162,7 @@ namespace MultiQuestensions::Environments {
         SetPlayerInfo(simplePlayer);
     }
 
-    using Players::MpPlayerData;
+    using MultiplayerCore::Players::MpPlayerData;
     void MQEAvatarNameTag::HandlePlatformData(IConnectedPlayer* player, MpPlayerData* data) {
         getLogger().debug("HandlePlatformData");
         if (data && player && _playerInfo && player->get_userId() == _playerInfo->get_userId())

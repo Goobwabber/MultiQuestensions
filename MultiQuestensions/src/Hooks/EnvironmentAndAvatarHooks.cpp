@@ -7,6 +7,7 @@
 #include "Environments/MQEAvatarNameTag.hpp"
 #include "Players/MpexPlayerManager.hpp"
 #include "Config.hpp"
+#include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
 
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
 #include "GlobalNamespace/LightWithIdMonoBehaviour.hpp"
@@ -249,8 +250,8 @@ namespace MultiQuestensions {
             //getLogger().debug("Found GetAvatarCaptionObject");
             MQEAvatarNameTag* nameTag;
             if (objAvatarCaption->TryGetComponent<MQEAvatarNameTag*>(byref(nameTag))) {
-                MultiQuestensions::Players::MpPlayerData* mpPlayerData;
-                if (MultiQuestensions::Players::MpexPlayerManager::TryGetMpPlayerData(player->get_userId(), mpPlayerData)) {
+                MultiplayerCore::Players::MpPlayerData* mpPlayerData;
+                if (MultiplayerCore::Players::MpPlayerManager::TryGetMpPlayerData(player->get_userId(), mpPlayerData)) {
                     nameTag->SetPlatformData(mpPlayerData);
                 } else {
                     getLogger().debug("UpdateNameTagIcons: mpPlayerData is nullptr");
