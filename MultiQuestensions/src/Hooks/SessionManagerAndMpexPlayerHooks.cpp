@@ -30,12 +30,12 @@ using namespace MultiQuestensions;
 using namespace MultiplayerCore::Networking;
 using namespace GlobalNamespace;
 
-SafePtr<Players::MpexPlayerData> localMpexPlayerData;
-std::unordered_map<std::string, SafePtr<Players::MpexPlayerData>> _mpexPlayerData;
+Players::MpexPlayerData* localMpexPlayerData;
+std::unordered_map<std::string, Players::MpexPlayerData*> _mpexPlayerData;
 
 IPlatformUserModel* platformUserModel;
 
-MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData;
+MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::ReceivedMpExPlayerData;
 
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
@@ -44,7 +44,7 @@ MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason> _Disconnecte
 
 bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
     if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
-        player = static_cast<MultiQuestensions::Players::MpexPlayerData*>(_mpexPlayerData.at(playerId));
+        player = _mpexPlayerData.at(playerId);
         return true;
     }
     return false;
@@ -52,7 +52,7 @@ bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::st
 
 MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetMpexPlayerData(std::string playerId) {
     if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
-        return static_cast<MultiQuestensions::Players::MpexPlayerData*>(_mpexPlayerData.at(playerId));
+        return _mpexPlayerData.at(playerId);
     }
     return nullptr;
 }
@@ -73,8 +73,8 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
         }
 
         SetPlayerPlaceColor(player, packet->Color, true);
-        getLogger().info("Calling event 'RecievedMpExPlayerData'");
-        MultiQuestensions::Players::MpexPlayerManager::RecievedMpExPlayerData(player, packet);
+        getLogger().info("Calling event 'ReceivedMpExPlayerData'");
+        MultiQuestensions::Players::MpexPlayerManager::ReceivedMpExPlayerData(player, packet);
     }
 }
 
@@ -108,7 +108,6 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
             if (_mpexPlayerData.contains(userId)) {
                 getLogger().info("Reseting platform lights for Player '%s'", userId.c_str());
                 SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
-                _mpexPlayerData.at(userId).~SafePtr();
                 _mpexPlayerData.erase(userId);
             }
         }
@@ -147,8 +146,8 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
     }
 
 
-    getLogger().debug("Callback HandlePlayerData Registered");
-    MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
+    getLogger().debug("Callback HandlePlayerData Registered"); 
+    MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData); //TODO should be fine?
 
     MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent += _PlayerConnectedHandler;
     MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent += _PlayerDisconnectedHandler;

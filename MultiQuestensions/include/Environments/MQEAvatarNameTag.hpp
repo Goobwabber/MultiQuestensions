@@ -23,7 +23,6 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, MQEAvatarNameTag, UnityEn
     DECLARE_INSTANCE_METHOD(void, OnDisable);
 
     DECLARE_INSTANCE_METHOD(void, SetPlayerInfo, GlobalNamespace::IConnectedPlayer* player);
-    // DECLARE_INSTANCE_METHOD(void, SetExtendedPlayerInfo, MultiQuestensions::Extensions::ExtendedPlayer* extendedPlayer);
     DECLARE_INSTANCE_METHOD(void, SetPlatformData, MultiplayerCore::Players::MpPlayerData* data);
     DECLARE_INSTANCE_METHOD(void, SetSimplePlayerInfo, GlobalNamespace::IConnectedPlayer* simplePlayer);
     DECLARE_INSTANCE_METHOD(void, HandlePlatformData, GlobalNamespace::IConnectedPlayer* player, MultiplayerCore::Players::MpPlayerData* data);

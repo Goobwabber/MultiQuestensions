@@ -12,6 +12,6 @@ namespace MultiQuestensions::Players {
         static bool TryGetMpexPlayerData(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player);
         static MpexPlayerData* GetMpexPlayerData(std::string playerId);
 
-        static MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MpexPlayerData*> RecievedMpExPlayerData;
+        static MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MpexPlayerData*> ReceivedMpExPlayerData;
     };
 }

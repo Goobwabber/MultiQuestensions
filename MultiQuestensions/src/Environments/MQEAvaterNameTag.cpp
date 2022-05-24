@@ -89,8 +89,8 @@ namespace MultiQuestensions::Environments {
         _enabled = true;
 
         // Subscribe to events
-        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData += _platformDataEventHandler;
-        Players::MpexPlayerManager::RecievedMpExPlayerData += _mpexPlayerDataEventHandler;
+        MultiplayerCore::Players::MpPlayerManager::ReceivedPlayerData += _platformDataEventHandler;
+        Players::MpexPlayerManager::ReceivedMpExPlayerData += _mpexPlayerDataEventHandler;
 
         // Set player info
         if (_playerInfo != nullptr)
@@ -103,8 +103,8 @@ namespace MultiQuestensions::Environments {
         _enabled = false;
 
         // Unsubscribe from events
-        MultiplayerCore::Players::MpPlayerManager::RecievedPlayerData -= _platformDataEventHandler;
-        Players::MpexPlayerManager::RecievedMpExPlayerData -= _mpexPlayerDataEventHandler;
+        MultiplayerCore::Players::MpPlayerManager::ReceivedPlayerData -= _platformDataEventHandler;
+        Players::MpexPlayerManager::ReceivedMpExPlayerData -= _mpexPlayerDataEventHandler;
     }
 
     #pragma region Set Player Info
