@@ -83,6 +83,7 @@ namespace MultiQuestensions::UI {
 		//QuestUI::BeatSaberUI::CreateColorPickerModal(parent->get_transform(), "Player Color Selection", playerColor);
 
 		auto colorPicker = QuestUI::BeatSaberUI::CreateColorPickerModal(parent, "Player Color Selection", playerColor,
+			//Done
 			[&playerColor, sessionManager](UnityEngine::Color value) {
 				playerColor = value;
 				config.setPlayerColor(value);
@@ -97,12 +98,14 @@ namespace MultiQuestensions::UI {
 				// packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
 				MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData);
 			},
+			//Cancel
 			[sessionManager] {
 				SetPlayerPlaceColor(sessionManager->get_localPlayer(), localMpexPlayerData->Color, true);
 				//Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
 				//getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
 				//packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
 			},
+			//OnChange
 			[sessionManager](UnityEngine::Color value) {
 				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
 				// TODO: Uncomment when MpEx supports live platform color updates or maybe not because that might be too much packets sent

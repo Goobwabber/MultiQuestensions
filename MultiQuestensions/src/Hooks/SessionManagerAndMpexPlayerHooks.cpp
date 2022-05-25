@@ -20,6 +20,8 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 #include "MultiplayerCore/shared/Networking/MpPacketSerializer.hpp"
+#include "MultiplayerCore/shared/Networking/MpNetworkingEvents.hpp"
+
 #include "MultiplayerCore/shared/CodegenExtensions/EnumUtils.hpp"
 #include "Players/MpexPlayerManager.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
@@ -36,6 +38,9 @@ std::unordered_map<std::string, Players::MpexPlayerData*> _mpexPlayerData;
 IPlatformUserModel* platformUserModel;
 
 MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::ReceivedMpExPlayerData;
+
+MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*> _RegisterMpexPacketsHandler = MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*>(HandleRegisterMpexPackets);
+
 
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
@@ -78,6 +83,11 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
     }
 }
 
+void HandleRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer) {
+
+        _mpPacketSerializer->RegisterCallback<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
+        getLogger().debug("Callback HandleMpexData Registered");
+}
 
 void HandlePlayerConnected(IConnectedPlayer* player) {
     try {
@@ -145,10 +155,6 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
         localMpexPlayerData->Color = config.getPlayerColor();
     }
 
-
-    getLogger().debug("Callback HandlePlayerData Registered"); 
-    MultiplayerCore::Networking::MpPacketSerializer::RegisterCallbackStatic<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData); //TODO should be fine?
-
     MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent += _PlayerConnectedHandler;
     MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent += _PlayerDisconnectedHandler;
     MultiplayerCore::Players::MpPlayerManager::disconnectedEvent += _DisconnectedHandler;
@@ -158,6 +164,8 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
 
 
 void MultiQuestensions::Hooks::SessionManagerAndExtendedPlayerHooks() {
+    MultiplayerCore::Networking::MpNetworkingEvents::RegisterPackets += _RegisterMpexPacketsHandler;
+
     INSTALL_HOOK(getLogger(), SessionManagerStart);
     INSTALL_HOOK(getLogger(), SessionManager_StartSession);
 }
