@@ -13,17 +13,17 @@
   "dependencies": [
     {
       "id": "codegen",
-      "versionRange": "^0.22.0",
+      "versionRange": "^0.23.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.9",
+      "versionRange": "^0.15.10",
       "additionalData": {}
     },
     {
       "id": "questui",
-      "versionRange": "^0.13.1",
+      "versionRange": "^0.15.2",
       "additionalData": {}
     },
     {

@@ -44,7 +44,7 @@ MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*>
 
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
-MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason> _DisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason>(HandleDisconnect);
+MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason, GlobalNamespace::IConnectedPlayer*> _DisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason, GlobalNamespace::IConnectedPlayer*>(HandleDisconnect);
 
 
 bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
@@ -128,7 +128,7 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
 }
 
 
-void HandleDisconnect(DisconnectedReason reason) {
+void HandleDisconnect(DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* locPlayer) {
     getLogger().info("Disconnected from server reason: '%s'", MultiplayerCore::EnumUtils::GetEnumName(reason).c_str());
     getLogger().info("Clearing MPEX player data");
     _mpexPlayerData.clear();
