@@ -5,7 +5,7 @@
   "author": "EnderdracheLP and Goobie",
   "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.21.0",
+  "packageVersion": "1.22.0",
   "description": "Lightweight port of MultiplayerExtensions, the PC mod that adds features to Multiplayer.!",
   "dependencies": [
   ],
