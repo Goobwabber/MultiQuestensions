@@ -1,6 +1,7 @@
 #include "main.hpp"
 #include "Hooks/Hooks.hpp"
 #include "GlobalFields.hpp"
+#include "MultiplayerCore/shared/GlobalFields.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Environments/MQEAvatarPlaceLighting.hpp"
@@ -123,12 +124,12 @@ namespace MultiQuestensions {
     {
         SetAllPlayerPlaceColors(Color::get_black(), true);
         //getLogger().debug("SetDefaultPlayerPlaceColors, set local player color");
-        SetPlayerPlaceColor(sessionManager->get_localPlayer(), config.getPlayerColor(), true);
+        SetPlayerPlaceColor(MultiplayerCore::_multiplayerSessionManager->get_localPlayer(), config.getPlayerColor(), true);
         using System::Collections::Generic::List_1;
-        for (int i = 0; i < reinterpret_cast<List_1<IConnectedPlayer*>*>(sessionManager->get_connectedPlayers())->get_Count(); i++) {
-            auto player = sessionManager->get_connectedPlayers()->get_Item(i);
+        for (int i = 0; i < reinterpret_cast<List_1<IConnectedPlayer*>*>(MultiplayerCore::_multiplayerSessionManager->get_connectedPlayers())->get_Count(); i++) {
+            auto player = MultiplayerCore::_multiplayerSessionManager->get_connectedPlayers()->get_Item(i);
             std::string userId = player->get_userId();
-            if (userId == static_cast<std::string>(sessionManager->get_localPlayer()->get_userId())) continue;
+            if (userId == static_cast<std::string>(MultiplayerCore::_multiplayerSessionManager->get_localPlayer()->get_userId())) continue;
             //getLogger().debug("SetDefaultPlayerPlaceColors, set player color for userId %s", userId.c_str());
             if (_mpexPlayerData.contains(userId)) {
                 //getLogger().debug("SetDefaultPlayerPlaceColors, found MpexPlayerData setting color for player %s", userId.c_str());
@@ -159,8 +160,8 @@ namespace MultiQuestensions {
             avatarPlaces.push_back(avatarPlace);
         }
 
-        innerCircleRadius = _placeManager->dyn__innerCircleRadius();
-        minOuterCircleRadius = _placeManager->dyn__minOuterCircleRadius();
+        innerCircleRadius = _placeManager->innerCircleRadius;
+        minOuterCircleRadius = _placeManager->minOuterCircleRadius;
 
         angleBetweenPlayersWithEvenAdjustment = MultiplayerPlayerPlacement::GetAngleBetweenPlayersWithEvenAdjustment(_lobbyStateDataModel->get_configuration().maxPlayerCount, MultiplayerPlayerLayout::Circle);
         outerCircleRadius = fmax(MultiplayerPlayerPlacement::GetOuterCircleRadius(angleBetweenPlayersWithEvenAdjustment, innerCircleRadius), minOuterCircleRadius);
@@ -175,7 +176,7 @@ namespace MultiQuestensions {
         _placeManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlaceManager*>()[0];
         _menuEnvironmentManager = Resources::FindObjectsOfTypeAll<MenuEnvironmentManager*>()[0];
         _stageManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyCenterStageManager*>()[0];
-        _lobbyStateDataModel = _placeManager->dyn__lobbyStateDataModel();
+        _lobbyStateDataModel = _placeManager->lobbyStateDataModel;
 
         MultiplayerLobbyController_ActivateMultiplayerLobby(self);
 
@@ -184,7 +185,7 @@ namespace MultiQuestensions {
 
     MAKE_HOOK_MATCH(LightWithIdMonoBehaviour_RegisterLight, &LightWithIdMonoBehaviour::RegisterLight, void, LightWithIdMonoBehaviour* self) {
         if ((self && self->get_transform() && self->get_transform()->get_parent() && self->get_transform()->get_parent()->get_name()->Contains("LobbyAvatarPlace"))){
-            if(!self->dyn__isRegistered()){
+            if(!self->isRegistered){
                 //getLogger().debug("MQE registering a MQEAvatarPlaceLighting or light that has the lobby avatar place as a parent");
                 LightWithIdMonoBehaviour_RegisterLight(self);
             }
@@ -200,7 +201,7 @@ namespace MultiQuestensions {
     {
         //getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap");
         if (_refPlayerIdToAvatarMap == nullptr && _avatarManager)
-            _refPlayerIdToAvatarMap = _avatarManager->dyn__playerIdToAvatarMap();
+            _refPlayerIdToAvatarMap = _avatarManager->playerIdToAvatarMap;
 
         //getLogger().debug("Start GetAvatarController: _refPlayerIdToAvatarMap Done");
 
@@ -238,8 +239,8 @@ namespace MultiQuestensions {
 
     void UpdateNameTagIcons() {
         getLogger().debug("Start UpdateNameTagIcons");
-        for (int i = 0; i < MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Count(); i++) {
-            auto player = MultiplayerCore::_multiplayerSessionManager->dyn__connectedPlayers()->get_Item(i);
+        for (int i = 0; i < MultiplayerCore::_multiplayerSessionManager->connectedPlayers->get_Count(); i++) {
+            auto player = MultiplayerCore::_multiplayerSessionManager->connectedPlayers->get_Item(i);
             auto objAvatarCaption = GetAvatarCaptionObject(player->get_userId());
             getLogger().debug("Finding GetAvatarCaptionObject");
             if (objAvatarCaption == nullptr) {

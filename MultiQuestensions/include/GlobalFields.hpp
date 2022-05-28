@@ -1,6 +1,6 @@
 #pragma once
 //#include "main.hpp"
-#include "GlobalNamespace/MultiplayerSessionManager.hpp"
+//#include "GlobalNamespace/MultiplayerSessionManager.hpp"
 #include "GlobalNamespace/LobbyPlayersDataModel.hpp"
 #include "GlobalNamespace/LobbyGameStateController.hpp"
 
@@ -10,7 +10,7 @@
 //#include "System/Collections/Generic/Dictionary_2.hpp"
 namespace MultiQuestensions {
     // Plugin setup stuff
-    extern GlobalNamespace::MultiplayerSessionManager* sessionManager;
+    //extern GlobalNamespace::MultiplayerSessionManager* sessionManager;
     extern GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
     extern GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 }

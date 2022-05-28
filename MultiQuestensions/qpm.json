@@ -39,7 +39,11 @@
     {
       "id": "beatsaber-hook",
       "versionRange": "^3.8.5",
-      "additionalData": {}
+      "additionalData": {
+        "extraFiles": [
+          "src/inline-hook"
+        ]
+      }
     }
   ],
   "additionalData": {}

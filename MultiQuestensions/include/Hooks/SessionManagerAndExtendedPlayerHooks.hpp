@@ -10,6 +10,9 @@ extern std::unordered_map<std::string, MultiQuestensions::Players::MpexPlayerDat
 
 extern void HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player);
 extern void HandlePlayerDisconnected(GlobalNamespace::IConnectedPlayer* player);
-extern void HandleDisconnect(GlobalNamespace::DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* locPlayer);
+extern void HandleDisconnect(GlobalNamespace::DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* localPlayer);
+extern void HandleConnecting(GlobalNamespace::IConnectedPlayer* localPlayer);
+
 
 extern void HandleRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer);
+extern void HandleUnRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer);

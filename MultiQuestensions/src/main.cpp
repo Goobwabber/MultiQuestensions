@@ -14,6 +14,7 @@
 #include "custom-types/shared/register.hpp"
 #include "questui/shared/QuestUI.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
+#include "MultiplayerCore/shared/GlobalFields.hpp"
 
 
 //#include "GlobalNamespace/LobbySetupViewController.hpp"
@@ -60,17 +61,16 @@ Config MultiQuestensions::config;
 
 namespace MultiQuestensions {
     // Plugin setup stuff
-    GlobalNamespace::MultiplayerSessionManager* sessionManager;
+    //GlobalNamespace::MultiplayerSessionManager* sessionManager;
     GlobalNamespace::LobbyPlayersDataModel* lobbyPlayersDataModel;
-    // MultiQuestensions::PacketManager* packetManager;
     GlobalNamespace::LobbyGameStateController* lobbyGameStateController;
 
     LobbySetupViewController* lobbySetupView;
 
     bool AllPlayersModded() {
         getLogger().debug("MQE AllPlayersModded");
-        for (int i = 0; i < sessionManager->dyn__connectedPlayers()->get_Count(); i++) {
-            if (!sessionManager->dyn__connectedPlayers()->get_Item(i)->HasState("modded")) return false;
+        for (int i = 0; i < MultiplayerCore::_multiplayerSessionManager->connectedPlayers->get_Count(); i++) {
+            if (!MultiplayerCore::_multiplayerSessionManager->connectedPlayers->get_Item(i)->HasState("modded")) return false;
         }
         return true;
     }
@@ -86,7 +86,7 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
     lobbySetupView = self;
     LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     if (firstActivation) {
-        MultiQuestensions::UI::LobbySetupPanel::AddSetupPanel(self->get_rectTransform(), sessionManager, self);
+        MultiQuestensions::UI::LobbySetupPanel::AddSetupPanel(self->get_rectTransform(), MultiplayerCore::_multiplayerSessionManager, self);
     }
 }
 

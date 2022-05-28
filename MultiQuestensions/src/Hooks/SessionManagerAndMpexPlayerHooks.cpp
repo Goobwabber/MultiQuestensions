@@ -26,7 +26,7 @@
 #include "Players/MpexPlayerManager.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
 #include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
-
+#include "MultiplayerCore/shared/GlobalFields.hpp"
 
 using namespace MultiQuestensions;
 using namespace MultiplayerCore::Networking;
@@ -35,19 +35,21 @@ using namespace GlobalNamespace;
 Players::MpexPlayerData* localMpexPlayerData;
 std::unordered_map<std::string, Players::MpexPlayerData*> _mpexPlayerData;
 
-IPlatformUserModel* platformUserModel;
+IPlatformUserModel* platformUserModel; //TODO what is this used for and why is it here
 
 MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::ReceivedMpExPlayerData;
 
 MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*> _RegisterMpexPacketsHandler = MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*>(HandleRegisterMpexPackets);
+MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*> _UnRegisterMpexPacketsHandler = MultiplayerCore::event_handler<MultiplayerCore::Networking::MpPacketSerializer*>(HandleUnRegisterMpexPackets);
 
 
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerConnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerConnected);
 MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _PlayerDisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandlePlayerDisconnected);
+MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*> _ConnectingHandler = MultiplayerCore::event_handler<GlobalNamespace::IConnectedPlayer*>(HandleConnecting);
 MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason, GlobalNamespace::IConnectedPlayer*> _DisconnectedHandler = MultiplayerCore::event_handler<GlobalNamespace::DisconnectedReason, GlobalNamespace::IConnectedPlayer*>(HandleDisconnect);
 
 
-bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::string playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
+bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::string const& playerId, MultiQuestensions::Players::MpexPlayerData*& player) {
     if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
         player = _mpexPlayerData.at(playerId);
         return true;
@@ -55,7 +57,7 @@ bool MultiQuestensions::Players::MpexPlayerManager::TryGetMpexPlayerData(std::st
     return false;
 }
 
-MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetMpexPlayerData(std::string playerId) {
+MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlayerManager::GetMpexPlayerData(std::string const& playerId) {
     if (_mpexPlayerData.find(playerId) != _mpexPlayerData.end()) {
         return _mpexPlayerData.at(playerId);
     }
@@ -64,7 +66,7 @@ MultiQuestensions::Players::MpexPlayerData* MultiQuestensions::Players::MpexPlay
 
 static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* player) {
     if(player){
-        const std::string userId = to_utf8(csstrtostr(player->get_userId()));
+        std::string const& userId = player->get_userId();
         if (_mpexPlayerData.contains(userId)) {
             getLogger().info("Recieved 'MpexPlayerData', player already exists");
             _mpexPlayerData[userId] = packet;
@@ -76,7 +78,6 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
             );
             _mpexPlayerData.emplace(userId, packet);
         }
-
         SetPlayerPlaceColor(player, packet->Color, true);
         getLogger().info("Calling event 'ReceivedMpExPlayerData'");
         MultiQuestensions::Players::MpexPlayerManager::ReceivedMpExPlayerData(player, packet);
@@ -84,23 +85,25 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
 }
 
 void HandleRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer) {
-
         _mpPacketSerializer->RegisterCallback<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
         getLogger().debug("Callback HandleMpexData Registered");
+}
+void HandleUnRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer) {
+        _mpPacketSerializer->UnregisterCallback<MultiQuestensions::Players::MpexPlayerData*>();
+        getLogger().debug("Callback HandleMpexData UnRegistered");
 }
 
 void HandlePlayerConnected(IConnectedPlayer* player) {
     try {
         getLogger().debug("MpEx HandlePlayerConnected");
         if (player) {
-            getLogger().info("Player '%s' joined", static_cast<std::string>(player->get_userId()).c_str());
+            getLogger().info("MpExPlayer '%s' joined", static_cast<std::string>(player->get_userId()).c_str());
             getLogger().debug("Sending MpexPlayerData");
             if (localMpexPlayerData)
             {
                 MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData->ToSerializable());
                 getLogger().debug("MpexPlayerData sent");
             }
-
             SetPlayerPlaceColor(player, Config::DefaultPlayerColor, false);
         }
     }
@@ -113,7 +116,7 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
     try {
         getLogger().debug("MpEx HandlePlayerDisconnected");
         if (player) {
-                const std::string userId = to_utf8(csstrtostr(player->get_userId()));
+                std::string const& userId = player->get_userId();
                 getLogger().info("Player '%s' left", userId.c_str());
             if (_mpexPlayerData.contains(userId)) {
                 getLogger().info("Reseting platform lights for Player '%s'", userId.c_str());
@@ -122,13 +125,13 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
             }
         }
     }
-        catch (const std::runtime_error& e) {
+    catch (const std::runtime_error& e) {
         getLogger().error("REPORT TO ENDER: %s", e.what());
     }
 }
 
 
-void HandleDisconnect(DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* locPlayer) {
+void HandleDisconnect(DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* localPlayer) {
     getLogger().info("Disconnected from server reason: '%s'", MultiplayerCore::EnumUtils::GetEnumName(reason).c_str());
     getLogger().info("Clearing MPEX player data");
     _mpexPlayerData.clear();
@@ -136,24 +139,20 @@ void HandleDisconnect(DisconnectedReason reason, GlobalNamespace::IConnectedPlay
     MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent -= _PlayerConnectedHandler;
     MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent -= _PlayerDisconnectedHandler;
     MultiplayerCore::Players::MpPlayerManager::disconnectedEvent -= _DisconnectedHandler;
+
+    MultiplayerCore::Networking::MpNetworkingEvents::RegisterPackets -= _RegisterMpexPacketsHandler;
+    MultiplayerCore::Networking::MpNetworkingEvents::UnRegisterPackets -= _UnRegisterMpexPacketsHandler;
 }
 
-
-MAKE_HOOK_MATCH(SessionManagerStart, &MultiplayerSessionManager::Start, void, MultiplayerSessionManager* self) {
-
-    sessionManager = self;
-    SessionManagerStart(sessionManager);
-}
-
-MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSession, void, MultiplayerSessionManager* self, MultiplayerSessionManager_SessionType sessionType, ConnectedPlayerManager* connectedPlayerManager) {
-    SessionManager_StartSession(self, sessionType, connectedPlayerManager);
-
-    getLogger().debug("MultiplayerSessionManager.StartSession, creating localMpexPlayerData");
+void HandleConnecting(GlobalNamespace::IConnectedPlayer* localPlayer){
+    getLogger().debug("HandleConnecting, creating localMpexPlayerData and registering events");
 
     if(!localMpexPlayerData){
         localMpexPlayerData = Players::MpexPlayerData::New_ctor();
         localMpexPlayerData->Color = config.getPlayerColor();
     }
+    MultiplayerCore::Networking::MpNetworkingEvents::RegisterPackets += _RegisterMpexPacketsHandler;
+    MultiplayerCore::Networking::MpNetworkingEvents::UnRegisterPackets += _UnRegisterMpexPacketsHandler;
 
     MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent += _PlayerConnectedHandler;
     MultiplayerCore::Players::MpPlayerManager::playerDisconnectedEvent += _PlayerDisconnectedHandler;
@@ -161,11 +160,7 @@ MAKE_HOOK_MATCH(SessionManager_StartSession, &MultiplayerSessionManager::StartSe
 
 }
 
-
-
 void MultiQuestensions::Hooks::SessionManagerAndExtendedPlayerHooks() {
-    MultiplayerCore::Networking::MpNetworkingEvents::RegisterPackets += _RegisterMpexPacketsHandler;
 
-    INSTALL_HOOK(getLogger(), SessionManagerStart);
-    INSTALL_HOOK(getLogger(), SessionManager_StartSession);
+    MultiplayerCore::Players::MpPlayerManager::connectingEvent += _ConnectingHandler;
 }

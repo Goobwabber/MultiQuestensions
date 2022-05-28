@@ -35,9 +35,9 @@ namespace MultiQuestensions::Environments {
     //     //     return;
     //     // }
 
-    //     // for (int i = 0; i < _sessionManager->dyn__connectedPlayers()->get_Count(); i++) {
-    //     //     if (_sessionManager->dyn__connectedPlayers()->get_Item(i)->get_sortIndex() == SortIndex) {
-    //     //         auto player = _sessionManager->dyn__connectedPlayers()->get_Item(i);
+    //     // for (int i = 0; i < _sessionManager->connectedPlayers->get_Count(); i++) {
+    //     //     if (_sessionManager->connectedPlayers->get_Item(i)->get_sortIndex() == SortIndex) {
+    //     //         auto player = _sessionManager->connectedPlayers->get_Item(i);
     //     //         auto mpexPlayerData = MpexPlayerManager::GetPlayer(player->get_playerId());
     //     //         this->SetColor(mpexPlayerData ? mpexPlayerData->get_color() : Config::DefaultPlayerColor, true);
     //     //         return;
