@@ -6,7 +6,6 @@
 #include "Players/MpexPlayerManager.hpp"
 #include "Config.hpp"
 
-#include "GlobalNamespace/IPlatformUserModel.hpp"
 #include "GlobalNamespace/LocalNetworkPlayerModel.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "GlobalNamespace/UserInfo.hpp"
@@ -33,9 +32,8 @@ using namespace MultiplayerCore::Networking;
 using namespace GlobalNamespace;
 
 Players::MpexPlayerData* localMpexPlayerData;
+// TODO: Check the Players::MpexPlayerData* instances don't get GC'd before getting placed in their CT
 std::unordered_map<std::string, Players::MpexPlayerData*> _mpexPlayerData;
-
-IPlatformUserModel* platformUserModel; //TODO what is this used for and why is it here
 
 MultiplayerCore::event<GlobalNamespace::IConnectedPlayer*, MultiQuestensions::Players::MpexPlayerData*> MultiQuestensions::Players::MpexPlayerManager::ReceivedMpExPlayerData;
 
@@ -68,7 +66,7 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
     if(player){
         std::string const& userId = player->get_userId();
         if (_mpexPlayerData.contains(userId)) {
-            getLogger().info("Recieved 'MpexPlayerData', player already exists");
+            getLogger().info("Received 'MpexPlayerData', player already exists");
             _mpexPlayerData[userId] = packet;
         }
         else {
@@ -142,13 +140,19 @@ void HandleDisconnect(DisconnectedReason reason, GlobalNamespace::IConnectedPlay
 
     MultiplayerCore::Networking::MpNetworkingEvents::RegisterPackets -= _RegisterMpexPacketsHandler;
     MultiplayerCore::Networking::MpNetworkingEvents::UnRegisterPackets -= _UnRegisterMpexPacketsHandler;
+
+    // Clear our manually created localMpexPlayerData instance
+    if(localMpexPlayerData){
+        gc_free_specific(localMpexPlayerData);
+        localMpexPlayerData = nullptr;
+    }
 }
 
 void HandleConnecting(GlobalNamespace::IConnectedPlayer* localPlayer){
     getLogger().debug("HandleConnecting, creating localMpexPlayerData and registering events");
 
     if(!localMpexPlayerData){
-        localMpexPlayerData = Players::MpexPlayerData::New_ctor();
+        localMpexPlayerData = Players::MpexPlayerData::New_ctor<::il2cpp_utils::CreationType::Manual>();
         localMpexPlayerData->Color = config.getPlayerColor();
     }
     MultiplayerCore::Networking::MpNetworkingEvents::RegisterPackets += _RegisterMpexPacketsHandler;
