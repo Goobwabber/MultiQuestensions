@@ -99,7 +99,7 @@ void HandlePlayerConnected(IConnectedPlayer* player) {
             getLogger().debug("Sending MpexPlayerData");
             if (localMpexPlayerData)
             {
-                MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData->ToSerializable());
+                MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData);
                 getLogger().debug("MpexPlayerData sent");
             }
             SetPlayerPlaceColor(player, Config::DefaultPlayerColor, false);
