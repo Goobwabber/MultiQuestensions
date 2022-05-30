@@ -67,6 +67,8 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
         std::string const& userId = player->get_userId();
         if (_mpexPlayerData.contains(userId)) {
             getLogger().info("Received 'MpexPlayerData', player already exists");
+            // Explicitly free previous MpexPlayerData
+            gc_free_specific( _mpexPlayerData[userId]);
             _mpexPlayerData[userId] = packet;
         }
         else {
@@ -83,7 +85,9 @@ static void HandleMpexData(Players::MpexPlayerData* packet, IConnectedPlayer* pl
 }
 
 void HandleRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer) {
-        _mpPacketSerializer->RegisterCallback<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
+        // Explicitly allocate instance when packet is received, we will manually clear it
+        _mpPacketSerializer->RegisterCallback<MultiQuestensions::Players::MpexPlayerData*, ::il2cpp_utils::CreationType::Manual>(HandleMpexData);
+        // _mpPacketSerializer->RegisterCallback<MultiQuestensions::Players::MpexPlayerData*>(HandleMpexData);
         getLogger().debug("Callback HandleMpexData Registered");
 }
 void HandleUnRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer) {
@@ -119,6 +123,8 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
             if (_mpexPlayerData.contains(userId)) {
                 getLogger().info("Reseting platform lights for Player '%s'", userId.c_str());
                 SetPlayerPlaceColor(player, UnityEngine::Color::get_black(), true);
+                // Explicitly free previous MpexPlayerData
+                gc_free_specific( _mpexPlayerData[userId]);
                 _mpexPlayerData.erase(userId);
             }
         }
@@ -132,6 +138,10 @@ void HandlePlayerDisconnected(IConnectedPlayer* player) {
 void HandleDisconnect(DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* localPlayer) {
     getLogger().info("Disconnected from server reason: '%s'", MultiplayerCore::EnumUtils::GetEnumName(reason).c_str());
     getLogger().info("Clearing MPEX player data");
+    // TODO: Clear each instance manually
+    for (const auto & [ key, value ] : _mpexPlayerData) {
+       gc_free_specific(value);
+    }
     _mpexPlayerData.clear();
     getLogger().info("MQE Removing connected/disconnected/disconnect events");
     MultiplayerCore::Players::MpPlayerManager::playerConnectedEvent -= _PlayerConnectedHandler;

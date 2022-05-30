@@ -38,11 +38,6 @@ using namespace System::Collections::Generic;
 namespace MultiQuestensions {
 
 #pragma region Fields
-    ILobbyStateDataModel* _lobbyStateDataModel;
-    MenuEnvironmentManager* _menuEnvironmentManager;
-    MultiplayerLobbyAvatarPlaceManager* _placeManager;
-    MultiplayerLobbyCenterStageManager* _stageManager;
-
     std::vector<MQEAvatarPlaceLighting*> avatarPlaces;
 
     float innerCircleRadius;
@@ -61,7 +56,7 @@ namespace MultiQuestensions {
     MQEAvatarPlaceLighting* GetConnectedPlayerPlace(IConnectedPlayer* player)
     {
         //getLogger().debug("GetConnectedPlayerPlace, lighting");
-        int sortIndex = _lobbyStateDataModel->get_localPlayer()->get_sortIndex();
+        int sortIndex = MultiplayerCore::_multiplayerSessionManager->get_localPlayer()->get_sortIndex();
         //getLogger().debug("GetConnectedPlayerPlace sortIndex %d, angleBetweenPlayersWithEvenAdjustment %f", sortIndex, angleBetweenPlayersWithEvenAdjustment);
         //static auto* sortIndexMethod = THROW_UNLESS(il2cpp_utils::FindMethodUnsafe(classof(IConnectedPlayer*), "get_sortIndex", 0));
         //int playerSortIndex = il2cpp_utils::RunMethodThrow<int>(player, sortIndexMethod);
@@ -129,23 +124,17 @@ namespace MultiQuestensions {
         for (int i = 0; i < reinterpret_cast<List_1<IConnectedPlayer*>*>(MultiplayerCore::_multiplayerSessionManager->get_connectedPlayers())->get_Count(); i++) {
             auto player = MultiplayerCore::_multiplayerSessionManager->get_connectedPlayers()->get_Item(i);
             std::string userId = player->get_userId();
+            // If user is us, we skip
             if (userId == static_cast<std::string>(MultiplayerCore::_multiplayerSessionManager->get_localPlayer()->get_userId())) continue;
-            //getLogger().debug("SetDefaultPlayerPlaceColors, set player color for userId %s", userId.c_str());
             if (_mpexPlayerData.contains(userId)) {
-                //getLogger().debug("SetDefaultPlayerPlaceColors, found MpexPlayerData setting color for player %s", userId.c_str());
                 SetPlayerPlaceColor(player, _mpexPlayerData.at(userId)->Color, true);
             } else {
-                //getLogger().debug("SetDefaultPlayerPlaceColors, did not find MpexPlayerData setting default color for player %s", userId.c_str());
                 SetPlayerPlaceColor(player, Config::DefaultPlayerColor, true);
             }
         }
-
-        // for (auto& [key, extendedPlayer] : _mpexPlayerData) {
-        //     SetPlayerPlaceColor(reinterpret_cast<IConnectedPlayer*>(extendedPlayer->get_self()), extendedPlayer->get_playerColor(), true);
-        // }
     }
 
-    void HandleLobbyEnvironmentLoaded() {
+    void HandleLobbyEnvironmentLoaded(ILobbyStateDataModel* _lobbyStateDataModel, MenuEnvironmentManager* _menuEnvironmentManager, MultiplayerLobbyAvatarPlaceManager* _placeManager, MultiplayerLobbyCenterStageManager* _stageManager) {
         initialized = false;
         getLogger().debug("HandleLobbyEnvironmentLoaded start");
         auto nativeAvatarPlaces = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace*>();
@@ -173,14 +162,14 @@ namespace MultiQuestensions {
 
     MAKE_HOOK_MATCH(MultiplayerLobbyController_ActivateMultiplayerLobby, &MultiplayerLobbyController::ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
         getLogger().debug("MultiplayerLobbyController::ActivateMultiplayerLobby");
-        _placeManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlaceManager*>()[0];
-        _menuEnvironmentManager = Resources::FindObjectsOfTypeAll<MenuEnvironmentManager*>()[0];
-        _stageManager = Resources::FindObjectsOfTypeAll<MultiplayerLobbyCenterStageManager*>()[0];
-        _lobbyStateDataModel = _placeManager->lobbyStateDataModel;
+        MultiplayerLobbyAvatarPlaceManager* _placeManager = self->multiplayerLobbyAvatarPlaceManager;
+        MenuEnvironmentManager* _menuEnvironmentManager = self->menuEnvironmentManager;
+        MultiplayerLobbyCenterStageManager* _stageManager = self->multiplayerLobbyCenterStageManager;
+        ILobbyStateDataModel* _lobbyStateDataModel = _placeManager->lobbyStateDataModel;
 
         MultiplayerLobbyController_ActivateMultiplayerLobby(self);
 
-        HandleLobbyEnvironmentLoaded();
+        HandleLobbyEnvironmentLoaded(_lobbyStateDataModel, _menuEnvironmentManager, _placeManager, _stageManager);
     }
 
     MAKE_HOOK_MATCH(LightWithIdMonoBehaviour_RegisterLight, &LightWithIdMonoBehaviour::RegisterLight, void, LightWithIdMonoBehaviour* self) {
