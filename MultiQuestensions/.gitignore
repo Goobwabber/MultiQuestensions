@@ -50,7 +50,6 @@ out/
 [Oo]bjs/
 [Bb]uild/
 *.zip
-*.txt
 extern/
 Android.mk.backup
 qpm.shared.json

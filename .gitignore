@@ -349,3 +349,5 @@ ndkbuild.props
 *.qmod
 *.cmake
 /build/
+MultiQuestensions/logcat.log_unstripped.txt
+MultiQuestensions/ndkpath.txt
