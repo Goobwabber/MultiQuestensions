@@ -2,44 +2,12 @@ name: NDK Build
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'MultiQuestensions/**'
-      - '.github/workflows/ndk-build.yml'
-      - '!**.yml'
-      - '.github/workflows/ndk-build.yml'
-      - '!**.json'
-      - 'qpm.json'
-      - 'bmbfmod.json'
-      - 'mod.json'
-      - '!**.ps1'
-      - 'build.ps1'
-      - 'buildQMOD.ps1'
-      - 'buildBMBF.ps1'
-      - '!**.hint'
-      - '!**.md'
-      - '!.gitignore'
   pull_request:
-    paths:
-      - 'MultiQuestensions/**'
-      - '!**.yml'
-      - '.github/workflows/ndk-build.yml'
-      - '!**.json'
-      - 'qpm.json'
-      - 'bmbfmod.json'
-      - 'mod.json'
-      - '!**.ps1'
-      - 'build.ps1'
-      - 'buildQMOD.ps1'
-      - 'buildBMBF.ps1'
-      - '!**.hint'
-      - '!**.md'
-      - '!.gitignore'
       
 env:
      module_id: MultiQuestensions
-     version: 0.2.0-Dev-${{ github.run_number }}
-     BS_Version: 1.21.0
+     version_num: 0.2.0
+     BS_Version: 1.22.0
      #ndkname: android-ndk-r24
 
 jobs:
@@ -80,6 +48,27 @@ jobs:
     #  run: |
     #    cd ndk
     #    pwd > ${GITHUB_WORKSPACE}/MultiQuestensions/ndkpath.txt
+
+    # extract branch name
+    - name: Extract branch name
+      if: github.event_name != 'pull_request'
+      shell: bash
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+      id: extract_branch
+
+    # extract branch name on pull request
+    - name: Print branch name
+      if: github.event_name == 'pull_request'
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
+
+    - name: Set version
+      run: echo "version=$(echo $version_num-$BRANCH_NAME.${{ github.run_number }})" >> $GITHUB_ENV
+
+    # print branch name and version
+    - name: Get branch name
+      run: |
+        echo 'The branch name is' $BRANCH_NAME
+        echo 'The version is' $version
 
     - name: Create ndkpath.txt
       run: |

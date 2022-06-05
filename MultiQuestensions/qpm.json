@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "id": "codegen",
-      "versionRange": "^0.23.0",
+      "versionRange": "^0.22.0",
       "additionalData": {}
     },
     {
@@ -23,7 +23,7 @@
     },
     {
       "id": "questui",
-      "versionRange": "^0.15.2",
+      "versionRange": "^0.13.5",
       "additionalData": {}
     },
     {
@@ -44,6 +44,11 @@
           "src/inline-hook"
         ]
       }
+    },
+    {
+      "id": "MultiplayerCore",
+      "versionRange": "^1.0.0",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

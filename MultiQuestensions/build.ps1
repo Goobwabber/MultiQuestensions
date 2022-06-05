@@ -1,21 +1,25 @@
 Param (
 [Parameter(Mandatory=$false)][Switch]$clean,
 [Parameter(HelpMessage="The version the mod should be compiled with")][string]$Version,
+[Parameter(Mandatory=$false, HelpMessage="To create a release build")][Alias("publish")][Switch]$release,
+[Parameter(Mandatory=$false, HelpMessage="To create a github actions build, assumes specific Environment variables are set")][Alias("github-build")][Switch]$actions,
 [Parameter(HelpMessage="The MpEx protocol version the mod should be compiled with")][Alias("MpEx-Protocol")][string]$MpEx_Protocol
 )
-Write-Host $Version
-if ($env:VERSION) {
-$Version = $env:VERSION
+$QPMpackage = "./qpm.json"
+$qpmjson = Get-Content $QPMpackage -Raw | ConvertFrom-Json
+if (-not $Version) {
+    $VERSION = $qpmjson.info.version
+} else {
+    $VERSION = $Version
 }
-if (!($Version)) {
-$Version = "1.0.0"
+if ($release -ne $true -and -not $VERSION.Contains('-')) {
+    $VERSION += "-Dev"
 }
-if ($env:MPEX_PROTOCOL) {
-$MpEx_Protocol = $env:MPEX_PROTOCOL
+
+if ($env:version -eq "") {
+    & qpm-rust package edit --version $VERSION
 }
-if (!($MpEx_Protocol)) {
-$MpEx_Protocol = "1.0.0"
-}
+
 if ((Test-Path "./extern/includes/beatsaber-hook/src/inline-hook/And64InlineHook.cpp", "./extern/includes/beatsaber-hook/src/inline-hook/inlineHook.c", "./extern/includes/beatsaber-hook/src/inline-hook/relocate.c") -contains $false) {
     Write-Host "Critical: Missing inline-hook"
     if (!(Test-Path "./extern/includes/beatsaber-hook/src/inline-hook/And64InlineHook.cpp")) {
@@ -45,8 +49,6 @@ if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
 {
     (new-item -Path build -ItemType Directory) | Out-Null
 }
-
-& qpm-rust package edit --version $Version
 
 Set-Location build
 & cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DMPEX_PROTOCOL="$MpEx_Protocol" ../
