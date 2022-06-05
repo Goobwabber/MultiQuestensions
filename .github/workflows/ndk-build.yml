@@ -99,7 +99,8 @@ jobs:
     - name: QPM Collapse
       run: |
         chmod +x ./QPM/qpm-rust
-        ./QPM/qpm-rust collapse
+        cd ./MultiQuestensions
+        ../QPM/qpm-rust collapse
         
     - name: QPM Dependencies Cache
       id: cache-qpm-deps
@@ -116,7 +117,6 @@ jobs:
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
-        cd ./MultiQuestensions
         ../QPM/qpm-rust restore
 
     - name: Check dependency Folders
