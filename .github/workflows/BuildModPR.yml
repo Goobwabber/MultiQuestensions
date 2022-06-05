@@ -105,6 +105,7 @@ jobs:
       
     - name: QPM Restore
       run: |
+        cd ./MultiQuestensions
         ../QPM/qpm-rust restore
 
     - name: Check dependency Folders
