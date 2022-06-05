@@ -116,7 +116,6 @@ jobs:
       
     - name: QPM Restore
       run: |
-        chmod +x ./QPM/QPM
         ../QPM/qpm-rust restore
 
     - name: Check dependency Folders
