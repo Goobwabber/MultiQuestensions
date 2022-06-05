@@ -122,10 +122,10 @@ jobs:
     - name: Check dependency Folders
       run: |
         echo "Checking extern includes"
-        ls -lh ${GITHUB_WORKSPACE}/extern/includes
+        ls -lh ${GITHUB_WORKSPACE}/MultiQuestensions/extern/includes
         echo ""
         echo "Checking libs"
-        ls -lh ${GITHUB_WORKSPACE}/extern/libs
+        ls -lh ${GITHUB_WORKSPACE}/MultiQuestensions/extern/libs
         echo ""
         echo "Checking QPM-Rust/cache Folder"
         ls -lh $HOME/.local/share/QPM-Rust/cache
