@@ -38,7 +38,7 @@ on:
       
 env:
      module_id: MultiQuestensions
-     version: 0.2.0-Dev-${{ github.run_number }}
+     version: 0.2.0-Dev.${{ github.run_number }}
      BS_Version: 1.21.0
      #ndkname: android-ndk-r24
 
@@ -136,12 +136,13 @@ jobs:
         cd ${GITHUB_WORKSPACE}/MultiQuestensions
         ../QPM/qpm-rust package edit --version ${{ env.version }}
         ../QPM/qpm-rust qmod build
-        pwsh -Command ./build.ps1 --actions
+        ls
+        pwsh -Command ./build.ps1
 
     - name: Get Library Name
       id: libname
       run: |
-        cd ./build/
+        cd ${GITHUB_WORKSPACE}/MultiQuestensions/build/
         pattern="lib${module_id}*.so"
         files=( $pattern )
         echo ::set-output name=NAME::"${files[0]}"

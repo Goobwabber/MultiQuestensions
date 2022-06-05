@@ -50,10 +50,7 @@ if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
     (new-item -Path build -ItemType Directory) | Out-Null
 }
 
-Get-ChildItem
-
 Set-Location build
-Get-ChildItem
 & cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DMPEX_PROTOCOL="$MpEx_Protocol" ../
 & cmake --build . -j 6
 $ExitCode = $LastExitCode

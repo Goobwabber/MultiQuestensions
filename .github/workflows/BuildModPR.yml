@@ -130,7 +130,7 @@ jobs:
     - name: Get Library Name
       id: libname
       run: |
-        cd ./build/
+        cd ${GITHUB_WORKSPACE}/MultiQuestensions/build/
         pattern="lib${module_id}*.so"
         files=( $pattern )
         echo ::set-output name=NAME::"${files[0]}"
