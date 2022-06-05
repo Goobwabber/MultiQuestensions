@@ -137,7 +137,7 @@ jobs:
 
     - name: Package QMOD
       run: |
-        cd ${GITHUB_WORKSPACE}
+        cd ${GITHUB_WORKSPACE}/MultiQuestensions
         pwsh -Command ./buildQMOD.ps1 -package
         
     - name: Upload non-debug artifact

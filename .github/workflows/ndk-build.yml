@@ -136,7 +136,6 @@ jobs:
         cd ${GITHUB_WORKSPACE}/MultiQuestensions
         ../QPM/qpm-rust package edit --version ${{ env.version }}
         ../QPM/qpm-rust qmod build
-        ls
         pwsh -Command ./build.ps1
 
     - name: Get Library Name
@@ -149,7 +148,7 @@ jobs:
 
     - name: Package QMOD
       run: |
-        cd ${GITHUB_WORKSPACE}
+        cd ${GITHUB_WORKSPACE}/MultiQuestensions
         pwsh -Command ./buildQMOD.ps1 -package
         
     - name: Upload non-debug artifact
