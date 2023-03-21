@@ -1,14 +1,15 @@
 #include "main.hpp"
 #include "Hooks/Hooks.hpp"
 #include "GlobalFields.hpp"
-#include "MultiplayerCore/shared/GlobalFields.hpp"
+#include "multiplayer-core/shared/GlobalFields.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Environments/MQEAvatarPlaceLighting.hpp"
 #include "Environments/MQEAvatarNameTag.hpp"
 #include "Players/MpexPlayerManager.hpp"
 #include "Config.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerManager.hpp"
+#include "multiplayer-core/shared/Utils/EnumUtils.hpp"
 
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
 #include "GlobalNamespace/LightWithIdMonoBehaviour.hpp"
@@ -24,6 +25,15 @@
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "GlobalNamespace/ConnectedPlayerManager_ConnectedPlayer.hpp"
 #include "GlobalNamespace/GameplayServerConfiguration.hpp"
+#include "GlobalNamespace/MultiplayerGameplayAnimator.hpp"
+#include "GlobalNamespace/MultiplayerController.hpp"
+#include "GlobalNamespace/SimpleColorSO.hpp"
+#include "GlobalNamespace/ConnectedPlayerHelpers.hpp"
+#include "GlobalNamespace/LightsAnimator.hpp"
+#include "GlobalNamespace/EaseType.hpp"
+
+#include "Tweening/Tween_1.hpp"
+#include "Tweening/ColorTween.hpp"
 
 #include "System/Collections/Generic/List_1.hpp"
 
@@ -257,11 +267,89 @@ namespace MultiQuestensions {
         HandleLobbyAvatarCreated(connectedPlayer);
     }
 
+#pragma region Lighting hooks
+
+    // Utilities for working with colors
+    ColorSO* getColorSO(UnityEngine::Color color) {
+        SimpleColorSO* colorSO = UnityEngine::ScriptableObject::CreateInstance<SimpleColorSO*>();
+        colorSO->SetColor(color);
+        return colorSO;
+    }
+
+    MAKE_HOOK_MATCH(MultiplayerGameplayAnimator_HandleStateChanged, &MultiplayerGameplayAnimator::HandleStateChanged, void, MultiplayerGameplayAnimator* self, MultiplayerController::State state) {
+        getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: Checking State %s", MultiplayerCore::EnumUtils::GetEnumName(state).c_str());
+        getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: Checking Player IsFailed %s", ConnectedPlayerHelpers::IsFailed(self->connectedPlayer) ? "true" : "false");
+
+        static bool skippedFirst = false;
+
+        if (!ConnectedPlayerHelpers::IsFailed(self->connectedPlayer)) {
+            getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: Player is not Failed");
+            if (self && self->connectedPlayer && self->connectedPlayer->get_isMe()) {
+                if (state == MultiplayerController::State::Gameplay)
+                {
+                    getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: State is Gameplay and Player is not Failed (Me)");
+                    self->activeLightsColor = getColorSO(config.getPlayerColor());
+                    self->leadingLightsColor = getColorSO(config.getPlayerColor());
+                    // self->failedLightsColor = getColorSO(config.getPlayerColor());
+                    skippedFirst = false;
+                }
+                else if (state == MultiplayerController::State::Intro)
+                {   
+                    getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: State is Intro and Player is not Failed (Me)");
+                    // if (skippedFirst)
+                    // {
+                        // TODO: Figure out how to animate the lights to the new color without the old value mixing itself in
+                        for(LightsAnimator* lightsAnimator : self->allLightsAnimators)
+                        {
+                            // lightsAnimator->tween->set_delay(1.0f);
+                            // lightsAnimator->tween->fromValue = {0, 0, 0, 0};
+                            // lightsAnimator->tween->toValue = config.getPlayerColor();
+                            lightsAnimator->AnimateToColor(config.getPlayerColor() * 1.1, 3, EaseType::Linear);
+                        }
+                    // }
+                    // else skippedFirst = true;
+
+                }
+            }
+            else if (self && self->connectedPlayer) {
+                StringW userId = self->connectedPlayer->get_userId();
+                if (userId && _mpexPlayerData.contains(userId)) {
+                    if (state == MultiplayerController::State::Gameplay)
+                    {
+                        getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: State is Gameplay and Player is not Failed (Other Player)");
+                        self->activeLightsColor = getColorSO(_mpexPlayerData.at(userId)->Color);
+                        self->leadingLightsColor = getColorSO(_mpexPlayerData.at(userId)->Color);
+                        // self->failedLightsColor = getColorSO(_mpexPlayerData.at(userId)->Color);
+                        skippedFirst = false;
+                    }
+                    else if (state == MultiplayerController::State::Intro)
+                    {
+                        getLogger().debug("MultiplayerGameplayAnimator::HandleStateChanged: State is Intro and Player is not Failed (Other Player)");
+                        // if (skippedFirst)
+                        // {
+                            // TODO: Figure out how to animate the lights to the new color without the old value mixing itself in
+                            for(LightsAnimator* lightsAnimator : self->allLightsAnimators)
+                            {
+                                // lightsAnimator->tween->set_delay(1.0f);
+                                // lightsAnimator->tween->fromValue = {0, 0, 0, 0};
+                                // lightsAnimator->tween->toValue = _mpexPlayerData.at(userId)->Color;
+                                lightsAnimator->AnimateToColor(_mpexPlayerData.at(userId)->Color * 1.1, 3, EaseType::Linear);
+                            }
+                        // }
+                        // else skippedFirst = true;
+                    }
+                }
+            }
+        }
+        MultiplayerGameplayAnimator_HandleStateChanged(self, state);
+    }
+
 #pragma endregion
 
     void Hooks::EnvironmentHooks() {
         INSTALL_HOOK(getLogger(), MultiplayerLobbyController_ActivateMultiplayerLobby);
         INSTALL_HOOK(getLogger(), LightWithIdMonoBehaviour_RegisterLight);
         INSTALL_HOOK(getLogger(), MultiplayerLobbyAvatarManager_AddPlayer);
+        INSTALL_HOOK(getLogger(), MultiplayerGameplayAnimator_HandleStateChanged);
     }
 }
