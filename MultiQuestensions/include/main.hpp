@@ -36,24 +36,6 @@
 #include <string>
 
 // Define these functions here so that we can easily read configuration and log information from other files
-Configuration& getConfig();
 Logger& getLogger();
 
-// Utilities
-Il2CppString* LevelIdToHash(Il2CppString*);
-
-extern std::string GetHash(const std::string& levelId);
-
 extern ModInfo modInfo;
-
-extern std::vector<std::string> DownloadedSongIds;
-
-extern bool gotSongPackOverrides;
-
-extern std::string missingLevelText;
-
-namespace MultiQuestensions {
-    extern bool AllPlayersHaveNE();
-    extern bool AllPlayersHaveME();
-    extern bool AllPlayersHaveChroma();
-}

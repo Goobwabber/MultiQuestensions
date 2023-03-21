@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "UI/LobbySetupPanel.hpp"
+#include "Config.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "UnityEngine/UI/ContentSizeFitter.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
@@ -9,22 +10,22 @@
 #include "GlobalFields.hpp"
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
-#include "songloader/shared/API.hpp"
-#include "UI/DownloadedSongsGSM.hpp"
-#include "Utils/SemVerChecker.hpp"
+
+#include "multiplayer-core/shared/Networking/MpPacketSerializer.hpp"
 using namespace UnityEngine::UI;
+using namespace MultiQuestensions;
 
 namespace MultiQuestensions::UI {
 
 	UnityEngine::UI::Toggle* LobbySetupPanel::lagReducerToggle;
 	bool LobbySetupPanel::needRefresh;
 
-	void SetLagReducer(bool value) {
-		getConfig().config["LagReducer"].SetBool(value);
-		getConfig().Write();
+	void SetNoMetaZone(bool value) {
+		config.setNoMetaZone(value);
+		UpdateNameTagIcons();
 	}
 
-	void LobbySetupPanel::AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager) {
+	void LobbySetupPanel::AddSetupPanel(UnityEngine::RectTransform* parent, GlobalNamespace::MultiplayerSessionManager* sessionManager, GlobalNamespace::LobbySetupViewController* lobbySetupViewController) {
 		auto vertical = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(parent);
 
 		auto horizontal = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
@@ -47,51 +48,64 @@ namespace MultiQuestensions::UI {
 		vertical4->get_gameObject()->AddComponent<LayoutElement*>()
 			->set_minWidth(45);
 
-		using namespace MultiQuestensions::Utils;
-		if (IsInstalled(ChromaID) && !MatchesVersion(ChromaID, ChromaVersionRange)) {
-			//HMUI::ModalView* modal = QuestUI::BeatSaberUI::CreateModal(parent, { 55, 25 }, std::nullptr_t());
-			//auto wrapper = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(modal->get_transform());
-			//auto container = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(wrapper->get_transform());
-			//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
-			//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
-			//modal->Show(true, true, nullptr);
-			QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(),
-				"Chroma outdated!\r\nPlease update to the latest version of Chroma.",
-				{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
-			getLogger().warning("Chroma outdated");
-		}
-		else getLogger().debug("Chroma not installed or version compatible");
+		// using namespace MultiQuestensions::Utils;
+		// if (IsInstalled(ChromaID) && !MatchesVersion(ChromaID, ChromaVersionRange)) {
+		// 	//HMUI::ModalView* modal = QuestUI::BeatSaberUI::CreateModal(parent, { 55, 25 }, std::nullptr_t());
+		// 	//auto wrapper = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(modal->get_transform());
+		// 	//auto container = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(wrapper->get_transform());
+		// 	//container->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
+		// 	//QuestUI::BeatSaberUI::CreateText(modal->get_transform(), "Chroma detected!\r\nChroma may cause issues such as crashes,\r\nif you're experiencing issues like these,\r\nthen it may be best to try disabling Chroma")->set_alignment(TMPro::TextAlignmentOptions::Center);
+		// 	//modal->Show(true, true, nullptr);
+		// 	QuestUI::BeatSaberUI::CreateText(vertical2->get_transform(),
+		// 		"Chroma outdated!\r\nPlease update to the latest version of Chroma.",
+		// 		{ -40, 0 })->set_alignment(TMPro::TextAlignmentOptions::Left);
+		// 	getLogger().warning("Chroma outdated");
+		// }
+		// else getLogger().debug("Chroma not installed or version incompatible");
 
 
 		// <toggle-setting id="LagReducerToggle" value='LagReducer' on-change='SetLagReducer' text='Lag Reducer' hover-hint='Makes multiplayer easier for computers to handle.'></toggle-setting>
 
 		//QuestUI::BeatSaberUI::CreateText(vertical4->get_transform(), "THESE TOGGLES ARE JUST\r\nPLACEHOLDERS!");
 
-		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", getConfig().config["LagReducer"].GetBool(), SetLagReducer);
-		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes multiplayer easier for the quest to handle.");
+		lagReducerToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Lag Reducer", config.getLagReducer(), [](bool value) { config.setLagReducer(value); });
+		QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Makes Multiplayer easier for the Quest to handle.");
+		// lagReducerToggle->set_interactable(false);
+		// QuestUI::BeatSaberUI::AddHoverHint(lagReducerToggle->get_gameObject(), "Currently Broken.");
 
-		UnityEngine::Color playerColor;
-		UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
+		auto noMetaToggle = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "No Meta Icons", config.getNoMetaZone(), SetNoMetaZone);
+		QuestUI::BeatSaberUI::AddHoverHint(noMetaToggle->get_gameObject(), "Shows the Oculus Icon for Quest Players instead.");
+
+
+		UnityEngine::Color playerColor = config.getPlayerColor();
+		// UnityEngine::ColorUtility::TryParseHtmlString(getConfig().config["color"].GetString(), playerColor);
 
 		//QuestUI::BeatSaberUI::CreateColorPickerModal(parent->get_transform(), "Player Color Selection", playerColor);
 
 		auto colorPicker = QuestUI::BeatSaberUI::CreateColorPickerModal(parent, "Player Color Selection", playerColor,
+			//Done
 			[&playerColor, sessionManager](UnityEngine::Color value) {
 				playerColor = value;
-				getConfig().config["color"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
-				getConfig().Write();
-				localExtendedPlayer->playerColor = value;
+				config.setPlayerColor(value);
+				// config.PlayerColor = value;
+				// getConfig().config["PlayerColor"].SetString(UnityEngine::ColorUtility::ToHtmlStringRGB_CPP(value), getConfig().config.GetAllocator());
+				// getConfig().Write();
+				// localExtendedPlayer->playerColor = value;
+				localMpexPlayerData->Color = value;
 				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
-				Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
-				getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
-				packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				// Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
+				getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localMpexPlayerData->Color.r, localMpexPlayerData->Color.g, localMpexPlayerData->Color.b);
+				// packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
+				MultiplayerCore::mpPacketSerializer->Send(localMpexPlayerData);
 			},
+			//Cancel
 			[sessionManager] {
-				SetPlayerPlaceColor(sessionManager->get_localPlayer(), localExtendedPlayer->get_playerColor(), true);
+				SetPlayerPlaceColor(sessionManager->get_localPlayer(), localMpexPlayerData->Color, true);
 				//Extensions::ExtendedPlayerPacket* localPlayerPacket = Extensions::ExtendedPlayerPacket::Init(localExtendedPlayer->get_platformID(), localExtendedPlayer->get_platform(), localExtendedPlayer->get_playerColor());
 				//getLogger().debug("LocalPlayer Color is, R: %f G: %f B: %f", localPlayerPacket->playerColor.r, localPlayerPacket->playerColor.g, localPlayerPacket->playerColor.b);
 				//packetManager->Send(reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(localPlayerPacket));
 			},
+			//OnChange
 			[sessionManager](UnityEngine::Color value) {
 				SetPlayerPlaceColor(sessionManager->get_localPlayer(), value, true);
 				// TODO: Uncomment when MpEx supports live platform color updates or maybe not because that might be too much packets sent
@@ -107,11 +121,11 @@ namespace MultiQuestensions::UI {
 			}
 		);
 
-		auto autoDelete = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Auto-Delete Songs", getConfig().config["autoDelete"].GetBool(), [](bool value) {
-			getConfig().config["autoDelete"].SetBool(value);
-			getConfig().Write();
-			});
-		QuestUI::BeatSaberUI::AddHoverHint(autoDelete->get_gameObject(), "Automatically deletes downloaded songs after playing them.");
+		// auto autoDelete = QuestUI::BeatSaberUI::CreateToggle(vertical4->get_transform(), "Auto-Delete Songs", getConfig().config["autoDelete"].GetBool(), [](bool value) {
+		// 	getConfig().config["autoDelete"].SetBool(value);
+		// 	getConfig().Write();
+		// 	});
+		// QuestUI::BeatSaberUI::AddHoverHint(autoDelete->get_gameObject(), "Automatically deletes downloaded songs after playing them.");
 
 		//auto deleteDownloadedSongs = QuestUI::BeatSaberUI::CreateUIButton(vertical2->get_transform(), "Delete Downloaded", [] {
 		//	using namespace RuntimeSongLoader::API;
@@ -142,6 +156,8 @@ namespace MultiQuestensions::UI {
 		);
 		QuestUI::BeatSaberUI::AddHoverHint(colorPickerButton->get_gameObject(), "Lets you pick your own personal platform and Name Tag color for everyone to see.");
 
+		lobbySetupViewController->spectatorWarningTextWrapper->get_transform()->SetParent(parent->get_transform());
+		lobbySetupViewController->spectatorWarningTextWrapper->get_transform()->set_localPosition({ 0, -20, 0 });
 		//customSongsToggle = QuestUI::BeatSaberUI::CreateToggle(vertical2->get_transform(), "Custom Songs", getConfig().config["customsongs"].GetBool(), SetCustomSongs);
 		//QuestUI::BeatSaberUI::AddHoverHint(customSongsToggle->get_gameObject(), "Toggles custom songs for all players");
 	}

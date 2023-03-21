@@ -3,44 +3,27 @@
   "dependenciesDir": "extern",
   "info": {
     "name": "MultiQuestensions",
-    "id": "multiquestensions",
-    "version": "0.1.0",
+    "id": "MultiQuestensions",
+    "version": "1.0.0",
     "url": "",
-    "additionalData": {}
+    "additionalData": {
+      "overrideSoName": "libMultiQuestensions.so"
+    }
   },
   "dependencies": [
     {
-      "id": "beatsaber-hook",
-      "versionRange": "^2.3.2",
-      "additionalData": {
-        "extraFiles": [
-          "src/inline-hook"
-        ]
-      }
-    },
-    {
       "id": "codegen",
-      "versionRange": "^0.14.0",
+      "versionRange": "^0.23.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "=0.12.7",
-      "additionalData": {}
-    },
-    {
-      "id": "songloader",
-      "versionRange": "^0.7.1",
+      "versionRange": "^0.15.10",
       "additionalData": {}
     },
     {
       "id": "questui",
-      "versionRange": "^0.11.1",
-      "additionalData": {}
-    },
-    {
-      "id": "songdownloader",
-      "versionRange": "^0.3.2",
+      "versionRange": "^0.15.2",
       "additionalData": {}
     },
     {
@@ -49,9 +32,18 @@
       "additionalData": {}
     },
     {
-      "id": "cpp-semver",
+      "id": "modloader",
       "versionRange": "*",
       "additionalData": {}
+    },
+    {
+      "id": "beatsaber-hook",
+      "versionRange": "^3.8.5",
+      "additionalData": {
+        "extraFiles": [
+          "src/inline-hook"
+        ]
+      }
     }
   ],
   "additionalData": {}

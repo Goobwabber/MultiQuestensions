@@ -39,10 +39,9 @@ on:
       - '!.gitignore'
       
 env:
-     module_id: multiquestensions
-     version: 0.1.1-Dev-${{ github.run_number }}
-     bs_hook: 2_3_2
-     BS_Version: 1.17.1
+     module_id: MultiQuestensions
+     version: 0.2.0-Dev-${{ github.run_number }}
+     BS_Version: 1.21.0
      #ndkname: android-ndk-r23
 
 jobs:

@@ -4,7 +4,10 @@
 #include "GlobalNamespace/TubeBloomPrePassLight.hpp"
 #include "UnityEngine/Color.hpp"
 
-DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, LobbyAvatarPlaceLighting, UnityEngine::MonoBehaviour, 
+#include "Players/MpexPlayerManager.hpp"
+#include "multiplayer-core/shared/Utils/event.hpp"
+
+DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, MQEAvatarPlaceLighting, UnityEngine::MonoBehaviour, 
     std::vector<GlobalNamespace::TubeBloomPrePassLight*> lights;
     DECLARE_INSTANCE_FIELD(float, smoothTime);
     DECLARE_INSTANCE_FIELD_DEFAULT(UnityEngine::Color, targetColor, UnityEngine::Color::get_black());
@@ -12,9 +15,10 @@ DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, LobbyAvatarPlaceLighting,
 
     DECLARE_CTOR(New);
 
+    // DECLARE_INSTANCE_METHOD(void, Awake);
     DECLARE_INSTANCE_METHOD(void, OnEnable);
     DECLARE_INSTANCE_METHOD(void, OnDisable);
-    DECLARE_INSTANCE_METHOD(void, Update);
+    DECLARE_INSTANCE_METHOD(void, FixedUpdate);
     DECLARE_INSTANCE_METHOD(UnityEngine::Color, GetColor);
     DECLARE_INSTANCE_METHOD(bool, IsColorVeryCloseToColor, UnityEngine::Color color0, UnityEngine::Color color1);
 

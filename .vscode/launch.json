@@ -4,12 +4,76 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "type": "pwa-chrome",
+            "name": "Launch Beat Saber",
+            "type": "fb-lldb",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "android": {
+                "application": {
+                    "package": "com.beatgames.beatsaber",
+                    "activity": "com.unity3d.player.UnityPlayerActivity"
+                },
+                "lldbConfig": {
+                    "sourceMaps": [
+                        "\\home\\runner\\work\\MultiplayerCore.Quest\\MultiplayerCore.Quest\\ ${workspaceFolder}/../",
+                        "/home/runner/work/MultiplayerCore.Quest/MultiplayerCore.Quest/ ${workspaceFolder}/../",
+                        "\\home\\runner\\work\\MultiQuestensions\\MultiQuestensions\\ ${workspaceFolder}/MultiQuestensions/",
+                        "/home/runner/work/MultiQuestensions/ ${workspaceFolder}/MultiQuestensions/",
+                        "/home/runner/work/SongDownloader/ ${workspaceFolder}/../",
+                        "/home/runner/work/SongDownloader/SongDownloader/shared ${workspaceFolder}/extern/includes/SongDownloader/shared",
+                        "/home/runner/work/SongLoader/ ${workspaceFolder}/../",
+                        "/home/runner/work/SongLoader/SongLoader/shared ${workspaceFolder}/extern/includes/SongLoader/shared",
+                        "/home/runner/work/questui/ ${workspaceFolder}/../",
+                        "/home/runner/work/questui/questui/shared ${workspaceFolder}/extern/includes/questui/shared",
+                        "/home/runner/work/beatsaber-hook/ ${workspaceFolder}/../",
+                        "/home/runner/work/beatsaber-hook/beatsaber-hook/ ${workspaceFolder}/extern/includes/beatsaber-hook/",
+                        "/home/runner/work/custom-types/ ${workspaceFolder}/../",
+                        "/home/runner/work/Il2CppQuestTypePatching/Il2CppQuestTypePatching/shared ${workspaceFolder}/extern/includes/custom-types/shared"
+                    ],
+                    "librarySearchPaths": [
+                        "${workspaceFolder}/build/debug/",
+                        "${workspaceFolder}/extern/libs/",
+                        "${workspaceFolder}/../Symbols/",
+                        "${workspaceFolder}/../MultiplayerCore.Quest/build/debug/",
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Attach to running Beat Saber Instance",
+            "type": "fb-lldb",
+            "request": "attach",
+            "android": {
+                "application": {
+                    "package": "com.beatgames.beatsaber",
+                    "activity": "com.unity3d.player.UnityPlayerActivity"
+                },
+                "lldbConfig": {
+                    "sourceMaps": [
+                        "\\home\\runner\\work\\MultiplayerCore.Quest\\MultiplayerCore.Quest\\ ${workspaceFolder}/../",
+                        "/home/runner/work/MultiplayerCore.Quest/MultiplayerCore.Quest/ ${workspaceFolder}/../",
+                        "\\home\\runner\\work\\MultiQuestensions\\MultiQuestensions\\ ${workspaceFolder}/MultiQuestensions/",
+                        "/home/runner/work/MultiQuestensions/ ${workspaceFolder}/MultiQuestensions/",
+                        "/home/runner/work/SongDownloader/ ${workspaceFolder}/../",
+                        "/home/runner/work/SongDownloader/SongDownloader/shared ${workspaceFolder}/extern/includes/SongDownloader/shared",
+                        "/home/runner/work/SongLoader/ ${workspaceFolder}/../",
+                        "/home/runner/work/SongLoader/SongLoader/shared ${workspaceFolder}/extern/includes/SongLoader/shared",
+                        "/home/runner/work/questui/ ${workspaceFolder}/../",
+                        "/home/runner/work/questui/questui/shared ${workspaceFolder}/extern/includes/questui/shared",
+                        "/home/runner/work/beatsaber-hook/ ${workspaceFolder}/../",
+                        "/home/runner/work/beatsaber-hook/beatsaber-hook/ ${workspaceFolder}/extern/includes/beatsaber-hook/",
+                        "/home/runner/work/custom-types/ ${workspaceFolder}/../",
+                        "/home/runner/work/Il2CppQuestTypePatching/Il2CppQuestTypePatching/shared ${workspaceFolder}/extern/includes/custom-types/shared"
+                    ],
+                    "librarySearchPaths": [
+                        "${workspaceFolder}/build/debug/",
+                        "${workspaceFolder}/extern/libs/",
+                        "${workspaceFolder}/../Symbols/",
+                        "${workspaceFolder}/../MultiplayerCore.Quest/build/debug/",
+                    ]
+                }
+            }
         }
     ]
 }

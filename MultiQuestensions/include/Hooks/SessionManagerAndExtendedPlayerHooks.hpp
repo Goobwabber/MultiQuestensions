@@ -1,7 +1,18 @@
 #pragma once
-#include "Extensions/ExtendedPlayer.hpp"
+#include "Players/MpexPlayerData.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
+#include "GlobalNamespace/DisconnectedReason.hpp"
+#include "multiplayer-core/shared/Networking/MpPacketSerializer.hpp"
+#include "multiplayer-core/shared/Networking/MpNetworkingEvents.hpp"
 
-extern SafePtr<MultiQuestensions::Extensions::ExtendedPlayer> localExtendedPlayer;
-extern std::map<std::string, SafePtr<MultiQuestensions::Extensions::ExtendedPlayer>> _extendedPlayers;
+extern MultiQuestensions::Players::MpexPlayerData* localMpexPlayerData;
+extern std::unordered_map<std::string, MultiQuestensions::Players::MpexPlayerData*> _mpexPlayerData;
 
-static void HandlePreviewBeatmapPacket(MultiQuestensions::Beatmaps::PreviewBeatmapPacket* packet, GlobalNamespace::IConnectedPlayer* player);
+extern void HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player);
+extern void HandlePlayerDisconnected(GlobalNamespace::IConnectedPlayer* player);
+extern void HandleDisconnect(GlobalNamespace::DisconnectedReason reason, GlobalNamespace::IConnectedPlayer* localPlayer);
+extern void HandleConnecting(GlobalNamespace::IConnectedPlayer* localPlayer);
+
+
+extern void HandleRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer);
+extern void HandleUnRegisterMpexPackets(MultiplayerCore::Networking::MpPacketSerializer* _mpPacketSerializer);

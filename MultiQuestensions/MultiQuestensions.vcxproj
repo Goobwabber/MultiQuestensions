@@ -81,6 +81,7 @@
     <ClInclude Include="include\UI\CenterScreenLoading.hpp" />
     <ClInclude Include="include\UI\LobbySetupPanel.hpp" />
     <ClInclude Include="shared\CodegenExtensions\ColorUtility.hpp" />
+    <ClInclude Include="shared\CodegenExtensions\TempBloomFilterUtil.hpp" />
     <ClInclude Include="shared\Utils\CustomData.hpp" />
     <ClInclude Include="shared\Utils\SemVerChecker.hpp" />
     <ClInclude Include="src\Hooks\NetworkPlayerEntitlementCheckerHooks.cpp" />
@@ -114,12 +115,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>src;include;extern\includes;extern\includes\libil2cpp\il2cpp\libil2cpp;extern\includes\codegen\include;extern\includes\custom-types\shared</NMakeIncludeSearchPath>
     <NMakePreprocessorDefinitions>ID='"Mod ID"';VERSION='"Mod Version"';MPEX_PROTOCOL='"0.6.1"'</NMakePreprocessorDefinitions>
     <NMakeBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" NDK_PROJECT_PATH=$(ProjectDir) APP_BUILD_SCRIPT=$(ProjectDir)Android.mk NDK_APPLICATION_MK=$(ProjectDir)Application.mk</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(NdkPath)\build\ndk-build.cmd" -B</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(NdkPath)\build\ndk-build.cmd" clean</NMakeCleanCommandLine>
-    <NMakeForcedIncludes>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared;..\android-ndk-r23\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\**;..\android-ndk-r23\sources\cxx-stl\system\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++abi\include</NMakeForcedIncludes>
+    <NMakeForcedIncludes>src;include;extern\includes;extern\includes\libil2cpp\il2cpp\libil2cpp;extern\includes\codegen\include;extern\includes\custom-types\shared;..\android-ndk-r23\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\**;..\android-ndk-r23\sources\cxx-stl\system\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++\include;..\android-ndk-r23\sources\cxx-stl\llvm-libc++abi\include</NMakeForcedIncludes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <NMakeIncludeSearchPath>src;include;extern;extern\libil2cpp\il2cpp\libil2cpp;extern\codegen\include;extern\custom-types\shared</NMakeIncludeSearchPath>

@@ -1,66 +1,104 @@
-# Builds a .qmod file for loading with QP
-if ($args.Count -eq 0) {
-$ModID = "multiquestensions"
-$BSHook = "2_3_2"
-$VERSION = "0.1.0"
-$BS_Version = "1.17.1"
-$new_VERSION = Read-Host -Prompt "Input desired mod version (leave empty for default: '$VERSION')"
-$bs_hook_version = $BSHook.Replace("_", ".")
-$new_BSHook = Read-Host -Prompt "Input current bs-hook version (leave empty for default: '$bs_hook_version')"
-if ($new_VERSION -ne "") {
-    $VERSION = $new_VERSION
-}
-if ($new_BSHook -ne "") {
-    $BSHook = $new_BSHook.Replace(".", "_")
-}
-Write-Host "Compiling Mod"
-& $PSScriptRoot/build.ps1 -Version $VERSION
-& Copy-Item "./obj/local/arm64-v8a/lib$ModID.so" -Destination "./debug-builds/libmultiquestensions_$VERSION.so"
+Param(
+    [Parameter(Mandatory=$false, HelpMessage="The name the output qmod file should have")][String] $qmodname="MultiQuestensions",
+
+    [Parameter(Mandatory=$false, HelpMessage="The version of the mod")][String] $version,
+
+    [Parameter(Mandatory=$false, HelpMessage="Switch to create a clean compilation")]
+    [Alias("rebuild")]
+    [Switch] $clean,
+
+    [Parameter(Mandatory=$false, HelpMessage="Prints the help instructions")]
+    [Switch] $help,
+
+    [Parameter(Mandatory=$false, HelpMessage="Tells the script to not compile and only package the existing files")]
+    [Alias("actions", "pack")]
+    [Switch] $package
+)
+
+# Builds a .qmod file for loading with QP or BMBF
+
+
+if ($help -eq $true) {
+    Write-Output "`"BuildQmod <qmodName>`" - Copiles your mod into a `".so`" or a `".a`" library"
+    Write-Output "`n-- Parameters --`n"
+    Write-Output "qmodName `t The file name of your qmod"
+
+    Write-Output "`n-- Arguments --`n"
+
+    Write-Output "-clean `t`t Performs a clean build on both your library and the qmod"
+    Write-Output "-help `t`t Prints this"
+    Write-Output "-package `t Only packages existing files, without recompiling`n"
+
+    exit
 }
 
-# TODO: Get the below working with Github Actions variables.
-if ($args[0] -eq "--package") {
-    $ModID = $env:module_id
-    $BSHook = $env:bs_hook
-    $VERSION = $env:version
-    $BS_Version = $env:BSVersion
-    Write-Host "Github Actions Package started"
+if ($qmodName -eq "")
+{
+    Write-Output "Give a proper qmod name and try again"
+    exit
 }
-# Checks if the build was successful
-if ($?) {
-    # Checks if any needed files are missing
-    if ((Test-Path "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so", "./libs/arm64-v8a/lib$ModID.so", "./mod.json") -contains $false) {
-        Write-Host "The following files are missing"
-        if (!(Test-Path "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so")) {
-            Write-Host "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so"
-        }
-        if (!(Test-Path "./libs/arm64-v8a/lib$ModID.so")) {
-            Write-Host "./libs/arm64-v8a/lib$ModID.so"
-        }
-            if (!(Test-Path ".\mod.json")) {
-            Write-Host ".\mod.json"
-        }
-        Write-Host "Task Failed"
-        exit 1;
-    }
-    else {
-    # If we have all files needed, go ahead and packe into qmod
-        if ($args.Count -eq 0 -or $args[0] -eq "--package") {
-            Write-Host "Upating mod.json"
-            $json = Get-Content $PSScriptRoot/mod.json -raw | ConvertFrom-Json
-            $json.packageVersion = "$BS_Version" 
-            $json.version="$VERSION"
-            $json.libraryFiles=@("libbeatsaber-hook_$BSHook.so")
-            $json | ConvertTo-Json -depth 32| Set-Content $PSScriptRoot/mod.json
 
-            Write-Host "Packaging QMod with ModID: $ModID Version: $VERSION and BS-Hook version: $BSHook"
-            $packagename = $ModID + "_v" + $VERSION
-            Compress-Archive -Path "./libs/arm64-v8a/lib$ModID.so", "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so", ".\mod.json" -DestinationPath "./Temp$packagename.zip" -Update
-            Move-Item "./Temp$packagename.zip" "./$packagename.qmod" -Force
-        }
-        Write-Host "Task Completed"
+if ($package -eq $true) {
+    $qmodName = "$($env:module_id)_$($env:version)"
+    Write-Output "Actions: Packaging QMod $qmodName"
+}
+if (($args.Count -eq 0) -And $package -eq $false) {
+    Write-Output "Creating QMod $qmodName"
+    & $PSScriptRoot/build.ps1 -clean:$clean -version:$version
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Output "Failed to build, exiting..."
+        exit $LASTEXITCODE
     }
+
+    qpm-rust qmod build
 }
-else {
-    Write-Host "Build failed, see output"
+
+Write-Output "Creating qmod from mod.json"
+
+$mod = "./mod.json"
+$modJson = Get-Content $mod -Raw | ConvertFrom-Json
+
+$filelist = @($mod)
+
+$cover = "./" + $modJson.coverImage
+if ((-not ($cover -eq "./")) -and (Test-Path $cover))
+{ 
+    $filelist += ,$cover
+} else {
+    Write-Output "No cover Image found"
 }
+
+foreach ($mod in $modJson.modFiles)
+{
+    $path = "./build/" + $mod
+    if (-not (Test-Path $path))
+    {
+        $path = "./extern/libs/" + $mod
+    }
+    $filelist += $path
+}
+
+foreach ($lib in $modJson.libraryFiles)
+{
+    $path = "./extern/libs/" + $lib
+    if (-not (Test-Path $path))
+    {
+        $path = "./build/" + $lib
+    }
+    $filelist += $path
+}
+
+$zip = $qmodName + ".zip"
+$qmod = $qmodName + ".qmod"
+
+if ((-not ($clean.IsPresent)) -and (Test-Path $qmod))
+{
+    Write-Output "Making Clean Qmod"
+    Move-Item $qmod $zip -Force
+}
+
+Compress-Archive -Path $filelist -DestinationPath $zip -Update
+Move-Item $zip $qmod -Force
+
+Write-Output "Task Completed"
