@@ -11,7 +11,7 @@
 #include "Hooks/SessionManagerAndExtendedPlayerHooks.hpp"
 #include "Hooks/EnvironmentAndAvatarHooks.hpp"
 
-#include "MultiplayerCore/shared/Networking/MpPacketSerializer.hpp"
+#include "multiplayer-core/shared/Networking/MpPacketSerializer.hpp"
 using namespace UnityEngine::UI;
 using namespace MultiQuestensions;
 

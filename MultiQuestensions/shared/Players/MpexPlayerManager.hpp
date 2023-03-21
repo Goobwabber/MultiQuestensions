@@ -1,7 +1,7 @@
 #pragma once
 #include "MpexPlayerData.hpp"
-#include "MultiplayerCore/shared/Utils/event.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
+#include "multiplayer-core/shared/Utils/event.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerData.hpp"
 
 
 namespace MultiQuestensions::Players {

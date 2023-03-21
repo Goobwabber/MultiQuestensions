@@ -1,7 +1,7 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
-#include "MultiplayerCore/shared/Networking/Abstractions/MpPacket.hpp"
+#include "multiplayer-core/shared/Networking/Abstractions/MpPacket.hpp"
 #include "UnityEngine/Color.hpp"
 
 DECLARE_CLASS_CUSTOM_DLL(MultiQuestensions::Players, MpexPlayerData, MultiplayerCore::Networking::Abstractions::MpPacket, "MultiplayerExtensions.Players",

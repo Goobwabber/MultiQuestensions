@@ -5,7 +5,7 @@
 #include "UnityEngine/Color.hpp"
 
 #include "Players/MpexPlayerManager.hpp"
-#include "MultiplayerCore/shared/Utils/event.hpp"
+#include "multiplayer-core/shared/Utils/event.hpp"
 
 DECLARE_CLASS_CODEGEN(MultiQuestensions::Environments, MQEAvatarPlaceLighting, UnityEngine::MonoBehaviour, 
     std::vector<GlobalNamespace::TubeBloomPrePassLight*> lights;

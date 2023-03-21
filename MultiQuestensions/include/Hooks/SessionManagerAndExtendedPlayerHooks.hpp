@@ -2,8 +2,8 @@
 #include "Players/MpexPlayerData.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "GlobalNamespace/DisconnectedReason.hpp"
-#include "MultiplayerCore/shared/Networking/MpPacketSerializer.hpp"
-#include "MultiplayerCore/shared/Networking/MpNetworkingEvents.hpp"
+#include "multiplayer-core/shared/Networking/MpPacketSerializer.hpp"
+#include "multiplayer-core/shared/Networking/MpNetworkingEvents.hpp"
 
 extern MultiQuestensions::Players::MpexPlayerData* localMpexPlayerData;
 extern std::unordered_map<std::string, MultiQuestensions::Players::MpexPlayerData*> _mpexPlayerData;

@@ -1,7 +1,7 @@
 #pragma once
 #include "custom-types/shared/macros.hpp"
 #include "Players/MpexPlayerData.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerData.hpp"
 #include "Players/MpexPlayerManager.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "HMUI/ImageView.hpp"

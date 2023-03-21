@@ -18,14 +18,14 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
-#include "MultiplayerCore/shared/Networking/MpPacketSerializer.hpp"
-#include "MultiplayerCore/shared/Networking/MpNetworkingEvents.hpp"
+#include "multiplayer-core/shared/Networking/MpPacketSerializer.hpp"
+#include "multiplayer-core/shared/Networking/MpNetworkingEvents.hpp"
 
-#include "MultiplayerCore/shared/CodegenExtensions/EnumUtils.hpp"
+#include "multiplayer-core/shared/Utils/EnumUtils.hpp"
 #include "Players/MpexPlayerManager.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
-#include "MultiplayerCore/shared/GlobalFields.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerData.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerManager.hpp"
+#include "multiplayer-core/shared/GlobalFields.hpp"
 
 using namespace MultiQuestensions;
 using namespace MultiplayerCore::Networking;

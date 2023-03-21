@@ -14,7 +14,7 @@
 #include "custom-types/shared/register.hpp"
 #include "questui/shared/QuestUI.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
-#include "MultiplayerCore/shared/GlobalFields.hpp"
+#include "multiplayer-core/shared/GlobalFields.hpp"
 
 
 //#include "GlobalNamespace/LobbySetupViewController.hpp"

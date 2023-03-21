@@ -9,9 +9,9 @@
 #include "GlobalNamespace/ConnectedPlayerName.hpp"
 #include "UnityEngine/Object.hpp"
 #include "Players/MpexPlayerManager.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerData.hpp"
-#include "MultiplayerCore/shared/Players/MpPlayerManager.hpp"
-#include "MultiplayerCore/shared/Utils/event.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerData.hpp"
+#include "multiplayer-core/shared/Players/MpPlayerManager.hpp"
+#include "multiplayer-core/shared/Utils/event.hpp"
 
 using namespace GlobalNamespace;
 using namespace UnityEngine::UI;
